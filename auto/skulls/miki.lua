@@ -13,7 +13,8 @@ local identity = Skull.registerIdentity{
 		---@param skull SkullInstanceBlock
 		---@param model ModelPart
 		ON_READY = function (skull, model)
-			model:play("models.miki.test")
+			model:play("models.miki.idle")
+			model:setSpeed(0.1)
 			model:setPos(0,(-24-3)*invRatio,0)
 			model:scale(invRatio,invRatio,invRatio)
 		end,
