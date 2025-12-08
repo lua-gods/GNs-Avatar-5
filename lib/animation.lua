@@ -105,6 +105,7 @@ end
 ---@param entry AvatarNBT.Model
 ---@param model ModelPart
 local function parseNBTModelData(entry,model)
+	assert(model,"Model is nil")
 	makeDefaults(model)
 	if entry.anim then
 		---@param index integer
@@ -284,8 +285,7 @@ end
 ---@param animationName string
 function ModelPart:play(animationName)
 	local id=animationIdentityLookup[animationName]
-	if not id then return end
-	
+	assert(id,"Unable to find animation "..animationName)
 	applyNested(self,function (self, id)
 		local sourceModel=modelOriginals[self] or self
 		local timeline=animiationTimelines[id][sourceModel]

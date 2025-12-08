@@ -150,7 +150,10 @@ local modelUtils = require("lib.modelUtils")
 
 local function modelPreprocess(model)
 	if type(model) == "table" then
-		model = model[1]
+		if model[1] then
+			model[1]:setParentType("SKULL")
+			return model[1]
+		end
 	end
 	if model then
 		model:setVisible(false)
@@ -480,10 +483,10 @@ function SkullAPI.registerIdentity(cfg)
 	identity.modelHud             = modelPreprocess(cfg.modelHud)
 	identity.modelEntity          = modelPreprocess(cfg.modelEntity)
 
-	identity.noModelBlockDeepCopy = cfg.modelBlock
-	identity.noModelHatDeepCopy   = cfg.modelHat
-	identity.noModelHudDeepCopy   = cfg.modelHud
-	identity.noModelItemDeepCopy  = cfg.modelEntity
+	identity.noModelBlockDeepCopy = cfg.noModelBlockDeepCopy
+	identity.noModelHatDeepCopy   = cfg.noModelHatDeepCopy
+	identity.noModelHudDeepCopy   = cfg.noModelHudDeepCopy
+	identity.noModelItemDeepCopy  = cfg.noModelItemDeepCopy
 
 	identity.processBlock         = applyPlaceholders(cfg.processBlock)
 	identity.processHat           = applyPlaceholders(cfg.processHat)
@@ -515,26 +518,36 @@ end
 
 local function prepareInstance(identity, modelType)
 	local model
+	local noDeepCopy = true
 	local baseModel = models:newPart("skull" .. getNextInt())
 	if modelType == 1 then
 		model = identity.modelEntity
+		noDeepCopy = identity.noModelItemDeepCopy
 	elseif modelType == 2 then
 		model = identity.modelBlock
+		noDeepCopy = identity.noModelBlockDeepCopy
 	elseif modelType == 3 then
 		model = identity.modelHat
+		noDeepCopy = identity.noModelHatDeepCopy
 	elseif modelType == 4 then
 		model = identity.modelHud
+		noDeepCopy = identity.noModelHudDeepCopy
 	end
 
 	if not model then
 		model = model or models:newPart("emptyPlcaeholder" .. getNextInt())
 	end
-
+	
+	if not noDeepCopy then
+		model = modelUtils.deepCopy(model)
+	end
+	model:moveTo(baseModel):setParentType("NONE")
+	
 	local instance = {
 		lastSeen = tick,
 		identity = identity,
-		model = modelUtils.deepCopy(model):setVisible(true):moveTo(baseModel):setParentType("NONE"),
-		baseModel = baseModel:setParentType("SKULL"):setVisible(false),
+		model = model:setVisible(true),
+		baseModel = model:setParentType("SKULL"),
 	}
 	return instance
 end
@@ -628,6 +641,8 @@ end
 local BetterError = require("lib.betterError")
 local ERROR_SCALE = 1 / 4
 
+local FALLBACK_MODE = true
+
 ---@param skull SkullInstance
 ---@param fun fun()
 ---@param ... any
@@ -639,7 +654,7 @@ local function skullPcall(skull, fun, ...)
 		skull.model:setVisible(false)
 		if not skull.hasErrored then
 			skull.hasErrored = true
-			local error = toJson(BetterError.parseError(result))
+			local error = FALLBACK_MODE and result or toJson(BetterError.parseError(result))
 			local lineCount = 0
 			error:gsub("\\n", function() lineCount = lineCount + 1 end)
 			local width = client.getTextWidth(error)
