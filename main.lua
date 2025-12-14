@@ -1,7 +1,9 @@
 
 --[ [ <- separate to enable
 
-for _, path in ipairs(listFiles("core")) do
+local core = listFiles("core")
+table.sort(core)
+for _, path in ipairs(core) do
 	require(path)
 end
 

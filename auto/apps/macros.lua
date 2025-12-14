@@ -125,7 +125,6 @@ end
 
 --[────────────────────────-< More UI >-────────────────────────]--
 
-local GNUI = require("lib.GNUI.main")
 
 local Box = require("lib.GNUI.widget.box")
 local Button = require("lib.GNUI.widget.button")

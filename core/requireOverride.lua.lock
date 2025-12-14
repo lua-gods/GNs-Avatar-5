@@ -1,0 +1,41 @@
+local ogRequire = require
+local TRACEBACK_OBTAINER = function(depth) error('', depth) end
+
+---makes path relative when need to  
+---snippet by Auria
+---@param path string
+---@param depth number
+---@return string
+local function resolvePath(path, depth)
+	
+   if path:match('%./') then -- relative paths
+      if path:match('^%.%.?/') then
+         local _, from = pcall(TRACEBACK_OBTAINER, depth)
+         from = (from or ""):match('^[^\n:]*')
+         if from then
+            path = from:gsub('%.', '/'):gsub('/[^/]*$', '')..'/'..path
+         end
+      end
+		
+      path = path:gsub('/%./', '/')
+		
+		local active = true
+		for i = 1, 10, 1 do
+			path = path:gsub('[^/]*[^.]/(%.%./)', function ()
+				active = true
+				return ''
+			end,1)
+			if not active then break end
+		end
+		
+   end
+	path = (path:gsub('^/', ''))
+	return path
+end
+
+function require(path)
+	return ogRequire(resolvePath(path,5))
+end
+
+
+

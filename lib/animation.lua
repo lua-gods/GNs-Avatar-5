@@ -67,7 +67,6 @@ local animationIdentityLookup={} ---@type table<string,integer>
 local animiationTimelines={} ---@type table<ModelPart,AvatarNBT.AnimationData>
 
 local modelOriginals={} ---@type table<ModelPart,ModelPart>
-
 local animationStates={} ---@type table<ModelPart,ModelPart> # I promise this makes sense
 
 

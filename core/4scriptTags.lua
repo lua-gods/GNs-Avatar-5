@@ -1,9 +1,17 @@
 if not host:isHost() then return end
 
+
+do
+	local ok, result = pcall(addScript,"test","return 5",5)
+	if ok then
+		error("Incompatible addScript method detected!")
+	end
+end
+
+
 local IGNORE_HOST_SCRIPTS = false
 
 local fileIdentifier = avatar:getName()..".lcl"
-
 
 local hostScripts = {}
 
@@ -54,7 +62,6 @@ if host:isAvatarUploaded() then
 		end
 	end
 else
-	config:save("hash",finalHash)
 	config:save("scripts",hostScripts)
 end
 

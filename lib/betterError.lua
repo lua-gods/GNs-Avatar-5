@@ -115,6 +115,10 @@ end
 
 local annotation = {
 	{
+		color = "#ffbb28",
+		match = {"%\"[^\"]*\""},
+	},
+	{
 		color = "red",
 		match = {"%s?if%s","%s?then%s","%s?else%s","%s?elseif%s","%s?end%s","%s?until%s","%s?repeat%s","%s?for%s","%s?while%s","%s?function%s","%s?local%s","%s?do%s","%s?return%s","%s?break%s","%s?continue%s","%s?goto%s","%s?in%s"},
 	},
@@ -127,42 +131,43 @@ local annotation = {
 		match = {"%a+%("}
 	},
 	{
-		color = "#ffbb28",
-		match = {"%\"[^\"]*\""},
+		color = "#5d95ff",
+		match = {"%(","%)",","},
 	},
-	--{
-	--	color = "#5d95ff",
-	--	match = {"%(","%)",","},
-	--},
+	{
+		color = "aqua",
+		match = {"%d"},
+	},
 }
 
 ---@param path string
 ---@param line integer
 local function previewLine(path, line, preview_size)
 	local output = {}
-	if pcall(require,path) then
+	if getScripts(path) then
 		preview_size = 2
 		local lines = str.separateLines(getScript(path))
 		output[#output+1] = {text="",color="white"}
-		output[#output+1] = stylePath(path)
-		output[#output+1] = {text=" "..("-"):rep(math.max(1,(150-client.getTextWidth((path or "")..(line or "")..":"))/5)+1).."\n"}
+		output[#output+1] = stylePath((path))
+		output[#output+1] = {text=" "..("-"):rep(math.max(1,(150-client.getTextWidth(((path) or "")..((line) or "")..":"))/5)+1).."\n"}
 		
 		line = math.clamp(line, preview_size, #lines - preview_size)
 		for i = math.max(line - preview_size, 1), math.min(line + preview_size, #lines), 1 do
 			local json = {text=lines[i].." "}
 			for _, data in pairs(annotation) do
-				json = jsonSplit(json,data.match,
-				function(component)
-					component.color = data.color
-				end)
+				for index, match in ipairs(data.match) do
+					json = jsonSplit(json,match,function(component) component.color = data.color end)
+				end
 			end
 			
 			output[#output+1] = {text=">",color=line == i and "red" or "black"}
 			output[#output+1] = {text="",extra={{text=i.." ",color=line == i and "aqua" or "gray"},json}}
 			output[#output+1] = {text="\n"}
 		end
-	end
 		return output
+	else
+		return {text="???"}
+	end
 end
 
 
@@ -174,9 +179,7 @@ function betterErrorAPI.parseError(err)
 	---@type Minecraft.RawJSONText.Component[]
 	local final = {}
 
-	local mPath, mLine, mMsg = lines[1]:match("^([^:]+):(%d+) (.+)")
-
-	
+	local mPath, mLine, mMsg = lines[1]:match("^([^:]+):(%d+) ?(.*)")
 	
 	final[1] = {
 		text = "",
@@ -196,9 +199,9 @@ function betterErrorAPI.parseError(err)
 		local line = lines[i]:sub(2, -1)
 		local splits = str.split(line, ":")
 
-		local path = splits[1] or "???"
-		local line = splits[2] or 0
-		local msg = splits[3] or "???"
+		local path = (splits[1]) or "???"
+		local line = (splits[2]) or 0
+		local msg = (splits[3]) or "???"
 
 		local pathLength = client.getTextWidth(path..line.."↓:")
 		local method

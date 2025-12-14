@@ -470,7 +470,7 @@ function Nbs.parseBuffer(buffer)
 	return new
 end
 
---[[ <- playground, separate [[ to run
+--[[ <- separate braces to activate
 
 local track=Nbs.loadTrack("cool")
 local player=Nbs.newMusicPlayer(track)
