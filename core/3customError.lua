@@ -14,7 +14,6 @@ local ogError = error
 function error(error,level)
 	local ok, result = pcall(function() ogError(error, 4) end)
 	if not ok then
-		print(result)
 		local json = BetterErrorAPI.parseError(result)
 		printJson(toJson(json))
 		host:setClipboard(toJson(json))
