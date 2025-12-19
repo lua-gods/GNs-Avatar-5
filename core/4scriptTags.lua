@@ -1,12 +1,16 @@
 if not host:isHost() then return end
 
+local IGNORE_PROBLEMS = false
 
+if IGNORE_PROBLEMS then return end
 do
 	local ok, result = pcall(addScript,"test","return 5",5)
 	if ok then
-		error("Incompatible addScript method detected!")
+		error("Incompatible addScript method detected")
 	end
 end
+assert(addScript,"Missing addScript method")
+assert(getScripts,"Missing getScripts method")
 
 
 local IGNORE_HOST_SCRIPTS = false
