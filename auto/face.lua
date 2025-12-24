@@ -1,10 +1,11 @@
 
-local BLINK_RANGE = vec(1,10) * 20
+local BLINK_RANGE = vec(0.5,5) * 20
 local ANIM_X = animations.player.eyeHorizontal
 local ANIM_Y = animations.player.eyeVertical
 local ANIM_BLINK = animations.player.eyeBlink
+ANIM_BLINK:setBlendDuration(0)
 
-local MODEL_HEAD = models.player.Base.Torso.Head
+local MODEL_HEAD = models.player.Base.Torso.Waist.Chest.Head
 MODEL_HEAD:setParentType("None")
 
 ANIM_X:speed(0):play()
@@ -30,12 +31,8 @@ events.RENDER:register(function (delta, ctx)
 	rot.y = ((rot.y + 180) % 360 - 180) / -50
 	rot.x = rot.x / -90
 	---@cast rot Vector2
-	
-	MODEL_HEAD:setRot(rot.x*45,rot.y*22.5,rot.y*15*-rot.x)
 	ANIM_X:setTime(rot.y*0.5+0.5)
 	ANIM_Y:setTime(rot.x*0.5+0.5)
 end)
 
 
-
-animations.player.breathing:play():speed(0.3)

@@ -13,6 +13,8 @@ models.player.VFX:setVisible(true)
 models.player.Roll.Sword.glow:setPrimaryRenderType("EMISSIVE_SOLID")
 models.player.VFX.Smear1.Smear1Spin:setPrimaryRenderType("EYES"):setColor(0.8,0.8,0.8)
 
+models.player.Roll:setVisible(false)
+
 local current
 local function setAnimation(anim)
 	if current ~= anim then
@@ -31,4 +33,5 @@ events.TICK:register(function ()
 		alternate = not alternate
 		sounds["sounds.jolly swing"]:pitch(math.lerp(1-RANDOM_PITCH,1+RANDOM_PITCH,math.random()) * SWORD_PITCH):pos(player:getPos()):play()
 	end
+	models.player.Roll:setPos(0,0,player:isCrouching() and 5 or 0)
 end)

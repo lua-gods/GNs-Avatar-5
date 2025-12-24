@@ -2,6 +2,8 @@
 
 local ogIndex = figuraMetatables.Animation.__index
 
+local ENABLED = false
+
 local DEFAULT_DURATION = 0.2
 local DEFAULT_BLEND_CALLBACK = function (t)
 	return  math.cos(t* math.pi) * -0.5 + 0.5
@@ -22,6 +24,10 @@ end
 
 
 function Animation:play()
+	if durationTime[self] == 0 then
+		ogIndex(self,"play")(self)
+		return self
+	end
 	trueBlend[self] = trueBlend[self] or (ogIndex(self,"getBlend")(self) or 1)
 	activeTime[self] = activeTime[self] or 0
 	active[self] = true
@@ -31,6 +37,10 @@ end
 
 
 function Animation:stop()
+	if durationTime[self] == 0 then
+		ogIndex(self,"stop")(self)
+		return self
+	end
 	activeTime[self] = activeTime[self] or 1
 	active[self] = false
 	return self
@@ -41,7 +51,7 @@ end
 ---@param duration number
 ---@return Animation
 function Animation:setBlendDuration(duration)
-	durationTime[self] = duration and (1/duration)
+	durationTime[self] = duration == 0 and 0 or duration and (1/duration)
 	return self
 end
 
@@ -55,11 +65,16 @@ function Animation:blend(blend)
 	return self
 end
 
+local allowProcess = true
+events.WORLD_RENDER:register(function (delta)
+	allowProcess = true
+end)
 
 local lastTime = client:getSystemTime()
 events.RENDER:register(function (delta, ctx, matrix)
 	
-	if ctx == "RENDER" then
+	if allowProcess and ctx ~= "OTHER" then
+		allowProcess = false
 		local time = client:getSystemTime()
 		local deltaFrame = (time - lastTime) / 1000
 		lastTime = time

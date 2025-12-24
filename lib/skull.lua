@@ -209,23 +209,24 @@ local function parseTexture(identities, nbt, hash)
 	else
 		if texStr and #texStr > 0 then
 			local buffer = data:createBuffer(#texStr)
-
-			buffer:writeBase64(texStr)
-			buffer:setPosition(0)
-			local str = buffer:readByteArray(buffer:available())
-			if COMPRESS then
-				str = zlib.Deflate.Decompress(str)
-			end
-			local ok, result = pcall(parseJson, str) --parseJson(str)
-			if not ok then
-				return
+			local ok, result = pcall(buffer.writeBase64,buffer,texStr)
+			if ok then
+				buffer:setPosition(0)
+				local str = buffer:readByteArray(buffer:available())
+				if COMPRESS then
+					str = zlib.Deflate.Decompress(str)
+				end
+				local ok, result = pcall(parseJson, str) --parseJson(str)
+				if not ok then
+					return
+				else
+					texData = result
+				end
+				texDataCache[str] = texData
 			else
-				texData = result
+				texData = {}
 			end
-			texDataCache[str] = texData
-		else
-			texData = {}
-		end
+			end
 	end
 	if type(texData) == "table" then
 		local added = {}

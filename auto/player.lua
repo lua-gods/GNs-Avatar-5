@@ -5,9 +5,9 @@ vanilla_model.ARMOR:setVisible(false)
 vanilla_model.HELMET_ITEM:setVisible(true)
 local player = models.player
 
-player.Base.Torso.Body.Cape:setPrimaryTexture("CAPE")
-player.Base.Torso.Body.RightElytra:setPrimaryTexture("CAPE"):scale(1.1,1.1,2.4)
-player.Base.Torso.Body.LeftElytra:setPrimaryTexture("CAPE"):scale(1.1,1.1,2.4)
+player.Base.Torso.Waist.Chest.Cape:setPrimaryTexture("CAPE")
+player.Base.Torso.Waist.Chest.RightElytra:setPrimaryTexture("CAPE"):scale(1.1,1.1,2.4)
+player.Base.Torso.Waist.Chest.LeftElytra:setPrimaryTexture("CAPE"):scale(1.1,1.1,2.4)
 player:setPrimaryRenderType("CUTOUT_CULL")
 
 --models.player:setPrimaryTexture("SKIN")

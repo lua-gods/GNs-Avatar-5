@@ -104,7 +104,7 @@ end
 ---@param entry AvatarNBT.Model
 ---@param model ModelPart
 local function parseNBTModelData(entry,model)
-	assert(model,"Model is nil")
+	if not model then return end
 	makeDefaults(model)
 	if entry.anim then
 		---@param index integer
