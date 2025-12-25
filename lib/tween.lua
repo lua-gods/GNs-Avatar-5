@@ -1,7 +1,7 @@
 ---@diagnostic disable: assign-type-mismatch
 --[[______  __ 
   / ____/ | / /  by: GNanimates | Discord: @GN68s | Youtube: @GNamimates
- / / __/  |/ / name: Tween Library v2
+ / / __/  |/ / name: Tween Library v2.0.1
 / /_/ / /|  /  desc: a library that makes it easier to create tweens
 \____/_/ |_/ Source: https://github.com/lua-gods/GNs-Avatar-3/blob/main/libraries/tween.lua
 
@@ -378,6 +378,9 @@ local setActive ---@type function
 
 local function process()
 	sysTime = client:getSystemTime() / 1000
+	
+	local toRemove = {}
+	
 	for id, tween in pairs(queries) do
 		local duration = (sysTime - tween.start) / tween.duration
 		if duration < 1 then
@@ -385,10 +388,14 @@ local function process()
 			tween.tick(math.lerp(tween.from,tween.to, w), duration)
 		else
 			tween.tick(tween.to, 1)
-			queries[id] = nil
+			toRemove[id] = true
 			tween.onFinish()
 			setActive(next(queries) and true or false)
 		end
+	end
+	
+	for id in pairs(toRemove) do
+		queries[id] = nil
 	end
 end
 
