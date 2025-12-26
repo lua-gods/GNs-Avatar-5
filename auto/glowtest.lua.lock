@@ -1,0 +1,89 @@
+local ModelUtils = require("lib.modelUtils")
+local Tween = require("lib.tween")
+
+
+---@param modelPart ModelPart
+local function appear(modelPart)
+	Tween.new{
+		from = 0,
+		to = 1,
+		duration = 0.5,
+		easing="outQuad",
+		tick = function (v, t)
+			if modelPart:getType() ~= "GROUP" then
+				modelPart:scale(v)
+			end
+		end,
+		onFinish = function ()
+			for index, child in ipairs(modelPart:getChildren()) do
+				appear(child)
+			end
+		end
+	}
+end
+
+---@param modelPart ModelPart
+local function appear(modelPart)
+	Tween.new{
+		from = 0,
+		to = 1,
+		duration = 0.5,
+		easing="outQuad",
+		tick = function (v, t)
+			if modelPart:getType() ~= "GROUP" then
+				modelPart:scale(v)
+			end
+		end,
+		onFinish = function ()
+			for index, child in ipairs(modelPart:getChildren()) do
+				appear(child)
+			end
+		end
+	}
+end
+
+
+
+local function disappear(modelPart)
+	Tween.new{
+		from = 1,
+		to = 0,
+		duration = 0.5,
+		easing="inQuad",
+		tick = function (v, t)
+			if modelPart:getType() ~= "GROUP" then
+				modelPart:scale(v)
+			end
+		end,
+		onFinish = function ()
+			for index, child in ipairs(modelPart:getChildren()) do
+				disappear(child)
+			end
+		end
+	}
+end
+
+
+
+---@param modelPart ModelPart
+function show(modelPart)
+	appear(modelPart)
+end
+
+function hide(modelPart)
+	disappear(modelPart)
+end
+
+local wasSneaking = false
+events.TICK:register(function ()
+	local isSneaking = player:isSneaking()
+	if wasSneaking ~= isSneaking then
+		wasSneaking = isSneaking
+		
+		if isSneaking then
+			hide(models.player.Base.Torso.Waist.Chest.Wings)
+		else
+			show(models.player.Base.Torso.Waist.Chest.Wings)
+		end
+	end
+end)

@@ -1,3 +1,8 @@
+if true then
+	models.player.Base.Torso.Waist.Chest.Wings:setVisible(false)
+	return
+end
+
 local WINGX = animations.player.wingsX
 local WINGZ = animations.player.wingsZ
 
