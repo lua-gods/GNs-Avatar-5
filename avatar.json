@@ -3,5 +3,5 @@
 	"name": "GN's Avatar v4",
 	"color":"#5ac54f",
 	"autoScripts": ["main"],
-	"resources": ["*.nbs"]
+	"resources": []
 }
