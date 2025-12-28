@@ -37,6 +37,8 @@ flyMacro = macro.new(function (events, ...)
 		
 		if player:isOnGround() then
 			flyMacro:setActive(false)
+			animations.player.flyForward:stop()
+			animations.player.flySideways:stop()
 		end
 	end)
 	

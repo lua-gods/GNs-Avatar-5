@@ -6,8 +6,8 @@ return {
 		{
 			text = "Scale",
 			type = "NUMBER",
-			min = 0.1,
-			max = 16,
+			min = 0.01,
+			max = 512,
 			step = 0.25,
 			default_value = 1
 		},

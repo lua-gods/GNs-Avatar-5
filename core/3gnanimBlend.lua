@@ -24,7 +24,7 @@ end
 
 
 function Animation:play()
-	if durationTime[self] == 0 then
+	if durationTime[self] == 0 or not player:isLoaded() then
 		ogIndex(self,"play")(self)
 		return self
 	end
@@ -37,7 +37,7 @@ end
 
 
 function Animation:stop()
-	if durationTime[self] == 0 then
+	if durationTime[self] == 0 or not player:isLoaded() then
 		ogIndex(self,"stop")(self)
 		return self
 	end

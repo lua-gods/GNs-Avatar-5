@@ -9,7 +9,7 @@ return {
 			text = "Scale",
 			type = "NUMBER",
 			min = 0.1,
-			max = 10,
+			max = 100,
 			step = 0.1,
 			default_value = 1
 		},
@@ -18,8 +18,8 @@ return {
 		
 		local function apply()
 			local speed = 1 / props[1].value
-			models.player.Roll:scale(props[1].value)
-			models.player.VFX:scale(props[1].value)
+			models.player.Roll:scale(props[1].value^1.2)
+			models.player.VFX:scale(props[1].value^1.2)
 			animations.player.swordAttack1:setSpeed(speed)
 			animations.player.swordAttack2:setSpeed(speed)
 			animations.player.sword:setSpeed(speed)
