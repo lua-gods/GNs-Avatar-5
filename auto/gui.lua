@@ -1,5 +1,7 @@
 local GNUI = require("lib.GNUI.main")
 
+local screen,renderer = GNUI.getScreen()
+
 local box = GNUI.parse{
 	size = vec(100,100),
 	pos = vec(100,100),
@@ -11,4 +13,6 @@ local box = GNUI.parse{
 	}
 }
 
---printTable(box,2)
+screen:addChild(box)
+
+renderer:updateAll()
