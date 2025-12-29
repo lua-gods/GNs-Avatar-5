@@ -38,10 +38,13 @@ end
 
 ---@param box GNUI.Box
 function Render:updateElement(box)
+	local size = box.bakedSize
+	local pos = box.bakedPos
 	--────────────────────────-< FIGURA SPECIFIC CODE >-────────────────────────--
 	local task = self.modelPart:newBlock(box.id)
 	task:block("minecraft:dirt")
-	:scale(box.size.x/16,box.size.y/16,1)
+	:scale(size.x/16,size.y/16,1)
+	:pos(pos.x,pos.y,0)
 	--────────────────────────-< END OF FIGURA SPECIFIC CODE >-────────────────────────--
 end
 

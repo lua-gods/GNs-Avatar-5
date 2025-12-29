@@ -17,7 +17,10 @@ local BoxAPI = {}
 ---@field sizeFit {x:FitMode,y:FitMode}
 ---@field minSize Vector2
 ---@field maxSize Vector2
----@field finalDim Vector4
+---
+---@field bakedPos Vector2
+---@field bakedSize Vector2
+---@field bakedDim Vector4
 ---
 ---@field parent GNUI.Box?
 ---@field childIndex integer

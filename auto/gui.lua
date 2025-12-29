@@ -16,3 +16,4 @@ local box = GNUI.parse{
 screen:addChild(box)
 
 renderer:updateAll()
+
