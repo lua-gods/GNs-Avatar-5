@@ -1,5 +1,6 @@
-local Core = require("../core/core") ---@type GNUI.CoreAPI
+local config = require("../config")
 
+local Core = require("../"..config.CORE) ---@type GNUI.CoreAPI
 
 ---@class GNUI.LayoutAPI
 local LayoutAPI = {}
@@ -7,16 +8,18 @@ local LayoutAPI = {}
 
 
 ---@class GNUI.Layout
----@field size Vector2
----@field pos Vector2
+---@field size Vector2?
+---@field pos Vector2?
+---@field layout GNUI.Box.LayoutMode?
 ---@field [1] table<integer,GNUI.Layout>?
 
 
 ---@param layout GNUI.Layout
 local function parseLayout(layout)
 	local box = Core.newBox()
-	box:setSize(layout.size.x,layout.size.y)
-	box:setPos(layout.pos.x,layout.pos.y)
+	if layout.size then box:setSize(layout.size.x,layout.size.y) end
+	if layout.pos then box:setPos(layout.pos.x,layout.pos.y) end
+	if layout.layout then box:setLayout(layout.layout) end
 	if layout[1] then
 		for index, childLayout in ipairs(layout[1]) do
 			box:addChild(parseLayout(childLayout))

@@ -9,6 +9,11 @@ local BoxAPI = {}
 ---| "FILL"
 
 
+---@alias GNUI.Box.LayoutMode string?
+---| "VERTICAL"
+---| "HORIZONTAL"
+---| nil
+
 
 ---@class GNUI.Box
 ---
@@ -17,6 +22,8 @@ local BoxAPI = {}
 ---@field sizeFit {x:FitMode,y:FitMode}
 ---@field minSize Vector2
 ---@field maxSize Vector2
+---
+---@field layout GNUI.Box.LayoutMode?
 ---
 ---@field bakedPos Vector2
 ---@field bakedSize Vector2
@@ -29,6 +36,8 @@ local BoxAPI = {}
 ---
 ---@field visible boolean
 ---@field id integer
+---
+---@field sprite GNUI.Sprite?
 local Box = {}
 Box.__index = Box
 
@@ -37,6 +46,10 @@ function BoxAPI.getIndex()
 	return Box.__index
 end
 
+
+local queueUpdate = {}
+
+
 local nextFree = 1
 
 ---Creates a new box, the fundemental primitive element of GNUI.
@@ -44,9 +57,11 @@ local nextFree = 1
 function BoxAPI.new()
 	local self = {
 		pos = vec(0,0),
-		size = vec(0,0),
+		size = vec(-1,-1),
 		minSize = vec(0,0),
 		maxSize = vec(0,0),
+		
+		layout = "HORIZONTAL",
 		
 		bakedPos = vec(0,0),
 		bakedSize = vec(0,0),
@@ -88,7 +103,8 @@ function Box:getPos()
 end
 
 
----Sets the size of the box
+---Sets the size of the box  
+---NOTE: setting an axis to -1 will make it automatically fit that given axis.
 ---@overload fun(self: GNUI.Box ,size : Vector2): GNUI.Box
 ---@param x number
 ---@param y number
@@ -98,6 +114,7 @@ end
 function Box:setSize(x,y)
 	---@cast self GNUI.Box
 	self.size = util.vec2(x,y)
+	self:update()
 	return self
 end
 
@@ -105,6 +122,18 @@ end
 ---@return Vector2
 function Box:getSize()
 	return self.size
+end
+
+
+---@generic self
+---@param self self
+---@return self
+---@param layout GNUI.Box.LayoutMode
+function Box:setLayout(layout)
+	---@cast self GNUI.Box
+	self.layout = layout
+	self:update()
+	return self
 end
 
 
@@ -118,6 +147,7 @@ local function updateChildrenIndexes(box)
 end
 
 
+---@param box GNUI.Box
 ---@generic self
 ---@param self self
 ---@return self
@@ -128,6 +158,7 @@ function Box:addChild(box)
 	self.children[nextFree] = box
 	box.childIndex = nextFree
 	
+	self:update()
 	return box
 end
 
@@ -146,6 +177,7 @@ function Box:removeChild(box)
 		updateChildrenIndexes()
 		box.parent = nil
 	end
+	self:update()
 	return self
 end
 
@@ -169,6 +201,62 @@ end
 function Box:setParent(parent)
 	self:removeParent()
 	parent:addChild(self)
+	return self
+end
+
+
+--────────────────────────-< UPDATERS >-────────────────────────--
+function BoxAPI.flushUpdates()
+	for index, box in pairs(queueUpdate) do
+		box:forceUpdate()
+	end
+	queueUpdate = {}
+end
+
+
+function Box:update()
+	queueUpdate[self.id] = self
+end
+
+
+---Forces this element to update
+---@generic self
+---@param self self
+---@return self
+function Box:forceUpdate()
+	---@cast self GNUI.Box
+	self:calculateSize(false)
+	self:calculateSize(true)
+	return self
+end
+
+
+---@param other boolean? # tell if its in the X(false) or Y(true) axis
+---@generic self
+---@param self self
+---@return self
+function Box:calculateSize(other)
+	local a = (other and "y" or "x")
+	---@cast self GNUI.Box
+	if self.size[a] == -1 and self.layout then
+		if (self.layout == (other and "VERTICAL" or "HORIZONTAL")) then
+			local totalSize = 0
+			for _, child in ipairs(self.children) do
+				child:calculateSize(other)
+				totalSize = totalSize + child.bakedSize[a]
+			end
+			self.bakedSize[a] = totalSize
+		else
+			local max = -math.huge
+			for _, child in ipairs(self.children) do
+				child:calculateSize(other)
+				max = math.max(max, child.bakedSize[a])
+			end
+			self.bakedSize[a] = max
+		end
+	else
+		self.bakedSize[a] = self.size[a]
+	end
 	return self
 end
 

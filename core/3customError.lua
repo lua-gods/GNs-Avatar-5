@@ -10,9 +10,9 @@ if events.ERROR then
 	end)
 end
 
-local ogError = error
+local stopAvatar = error
 function error(error,level)
-	local ok, result = pcall(function() ogError(error, 4) end)
+	local ok, result = pcall(function() stopAvatar(error, 4) end)
 	if not ok then
 		local json = BetterErrorAPI.parseError(result)
 		printJson(toJson(json))
@@ -21,7 +21,7 @@ function error(error,level)
 			goofy:stopAvatar()
 		else
 			printJson('{"text":"\n"}')
-			ogError("Install Goofy Plugin to stop this annoying part of the error message",99)
+			stopAvatar("...",99)
 		end
 	end
 end

@@ -37,24 +37,24 @@ end
 
 
 ---@param box GNUI.Box
-function Render:updateElement(box)
+function Render:updateElement(box,i)
 	local size = box.bakedSize
 	local pos = box.bakedPos
 	--────────────────────────-< FIGURA SPECIFIC CODE >-────────────────────────--
 	local task = self.modelPart:newBlock(box.id)
-	task:block("minecraft:dirt")
-	:scale(size.x/16,size.y/16,1)
-	:pos(pos.x,pos.y,0)
+	task:block("minecraft:smooth_stone")
+	:scale(size.x/16,size.y/16,1/16)
+	:pos(pos.x,pos.y,-i)
 	--────────────────────────-< END OF FIGURA SPECIFIC CODE >-────────────────────────--
 end
 
-
 ---@param box GNUI.Box
-function Render:updateRecursive(box)
-	self:updateElement(box)
-	for index, child in ipairs(box.children) do
-		self:updateRecursive(child)
+function Render:updateRecursive(box,i)
+	i = i or 0
+	for _, child in ipairs(box.children) do
+		self:updateRecursive(child,i+1)
 	end
+	self:updateElement(box,i)
 end
 
 

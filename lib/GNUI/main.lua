@@ -4,10 +4,13 @@
 / /_/ / /|  /  desc: 
 \____/_/ |_/ source: link ]]
 
-local Core = require("./core/core") ---@type GNUI.CoreAPI
-local Layout = require("./layout/layout") ---@type GNUI.LayoutAPI
-local Render = require("./render/render") ---@type GNUI.RenderAPI
+local config = require("./config") ---@type GNUI.config
+local utils = require("./utils") ---@type GNUI.utils
 
+local Core = require("./"..config.CORE) ---@type GNUI.CoreAPI
+local Layout = require("./"..config.LAYOUT) ---@type GNUI.LayoutAPI
+local Render = require("./"..config.RENDER) ---@type GNUI.RenderAPI
+local Style = require("./"..config.STYLE) ---@type GNUI.StyleAPI
 ---@class GNUIAPI
 local GNUIAPI = {}
 
@@ -18,11 +21,22 @@ function GNUIAPI.parse(data)
 	return Layout.parse(data)
 end
 
-local screen = Core.newCanvas()
-local renderer = Render.new({canvas = screen})
+local screen
+local renderer
 
 function GNUIAPI.getScreen()
-	return screen,renderer
+	if screen then
+		return screen,renderer
+	else
+		screen = Core.newCanvas()
+		renderer = Render.new({canvas = screen})
+		screen:setSize(utils.getScreenSize())
+		return screen,renderer
+	end
+end
+
+function GNUIAPI.flushUpdates()
+	Core.flushUpdates()
 end
 
 

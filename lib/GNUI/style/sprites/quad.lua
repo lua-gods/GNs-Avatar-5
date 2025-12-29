@@ -1,22 +1,38 @@
 local Sprite = require("./sprite")
-local gnutil = require("../../gnutil") ---@type GNUtil
+local gnutil = require("../../../gnutil") ---@type GNUtil
+local Style = require("../styles/quad") ---@type GNUI.Sprite.Quad.StyleAPI
 
----@class GNUI.Render.Sprite.Quad : GNUI.Render.Sprite
----@field texture string # Path to the texture
+
+---@class GNUI.Sprite.QuadAPI
+local QuadAPI = {}
+
+
+
+
+---@class GNUI.Sprite.Quad : GNUI.Sprite
+---@field style GNUI.Sprite.Quad.Style
 local Quad = {}
 Quad.__index = gnutil.makeIndex{Quad,Sprite}
 
 
+function QuadAPI.getIndex() return Quad.__index end
+
+
 ---A representation of a quad that will get drawn
----@return GNUI.Render.Sprite.Quad
-function Quad.new()
+---@return GNUI.Sprite.Quad
+function QuadAPI.new()
 	local self = {
 		pos = vec(0,0),
 		size = vec(0,0),
-		texture = nil
 	}
 	setmetatable(self, Quad)
 	return self
+end
+
+
+---@return GNUI.Sprite.Quad.Style
+function QuadAPI.newStyle()
+	return Style.new()
 end
 
 
@@ -27,7 +43,7 @@ end
 ---@param self self
 ---@return self
 function Quad:setPos(x,y)
-	---@cast self GNUI.Render.Sprite.Quad
+	---@cast self GNUI.Sprite.Quad
 	self.pos = vec(x,y)
 	return self
 end
@@ -45,11 +61,11 @@ end
 
 
 ---Sets the size of the sprite
----@overload fun(self:GNUI.Render.Sprite.Quad,xy:Vector2):GNUI.Render.Sprite.Quad
+---@overload fun(self:GNUI.Sprite.Quad,xy:Vector2):GNUI.Sprite.Quad
 ---@param x number
 ---@param y number
 ---@generic self
----@param self GNUI.Render.Sprite.Quad
+---@param self GNUI.Sprite.Quad
 ---@return self
 function Quad:setSize(x,y)
 	self.size = vec(x,y)
@@ -63,4 +79,4 @@ function Quad:getSize()
 end
 
 
-return Quad
+return QuadAPI
