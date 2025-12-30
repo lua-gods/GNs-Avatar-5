@@ -37,8 +37,7 @@ function QuadAPI.new(box)
 	assert(box,"no GNUI.Box given")
 	local self = Sprite.new(box)
 	---@cast self GNUI.Sprite.Quad
-	print(box)
-	--box.canvas.render:newVisualQuad(box.id)
+	box.canvas.render:newVisualQuad(box.id)
 	setmetatable(self, Quad)
 	return self
 end
