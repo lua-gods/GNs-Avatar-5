@@ -49,10 +49,4 @@ function StyleAPI.getStyle(class,variant,key)
 end
 
 
----@return GNUI.Sprite.Quad
-function StyleAPI.newQuad()
-	return Quad.new()
-end
-
-
 return StyleAPI
