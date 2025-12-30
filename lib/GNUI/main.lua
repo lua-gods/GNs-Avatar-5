@@ -15,23 +15,22 @@ local Style = require("./"..config.STYLE) ---@type GNUI.StyleAPI
 local GNUIAPI = {}
 
 
+---@param canvas GNUI.Canvas
 ---@param data GNUI.Layout
 ---@return GNUI.Box
-function GNUIAPI.parse(data)
-	return Layout.parse(data)
+function GNUIAPI.parse(canvas,data)
+	return Layout.parse(canvas,data)
 end
 
 local screen
-local renderer
 
 function GNUIAPI.getScreen()
 	if screen then
-		return screen,renderer
+		return screen
 	else
 		screen = Core.newCanvas()
-		renderer = Render.new({canvas = screen})
 		screen:setSize(utils.getScreenSize())
-		return screen,renderer
+		return screen
 	end
 end
 

@@ -38,6 +38,7 @@ local BoxAPI = {}
 ---@field id integer
 ---
 ---@field sprite GNUI.Sprite?
+---@field canvas GNUI.Canvas
 local Box = {}
 Box.__index = Box
 Box.__style = "box"
@@ -53,8 +54,9 @@ local queueUpdate = {}
 local nextFree = 1
 
 ---Creates a new box, the fundemental primitive element of GNUI.
+---@param canvas GNUI.Canvas
 ---@return GNUI.Box
-function BoxAPI.new()
+function BoxAPI.new(canvas)
 	local self = {
 		pos = vec(0,0),
 		size = vec(-1,-1),
@@ -73,7 +75,9 @@ function BoxAPI.new()
 		childAlign = vec(0,0),
 		
 		id = nextFree,
-		visible = true
+		visible = true,
+		
+		canvas = canvas,
 	}
 	nextFree = nextFree + 1
 	

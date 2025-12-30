@@ -21,9 +21,10 @@ function SpriteSTyleAPI.setInstancer(new)
 end
 
 
+---@param box GNUI.Box
 ---@return GNUI.Sprite
-function SpriteStyle:newInstance()
-	return newInstance():setStyle(self)
+function SpriteStyle:newInstance(box)
+	return newInstance(box):setStyle(self)
 end
 
 

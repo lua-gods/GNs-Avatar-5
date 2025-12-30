@@ -1,8 +1,6 @@
 local SpriteStyle = require("../styles/sprite") ---@type GNUI.Sprite.StyleAPI
 local gnutil = require("../../../gnutil") ---@type GNUtil
 local util = require("../../utils") ---@type GNUI.utils
-local config = require("../../config") ---@type GNUI.config
-local Render = require("../../"..config.RENDER) ---@type GNUI.RenderAPI
 
 
 ---@class GNUI.Sprite.Quad.StyleAPI
@@ -70,9 +68,10 @@ function StyleAPI.setInstancer(new)
 end
 
 
+---@param box GNUI.Box
 ---@return GNUI.Sprite
-function QuadStyle:newInstance()
-	local instance = newInstance():setStyle(self)
+function QuadStyle:newInstance(box)
+	local instance = newInstance(box):setStyle(self)
 	return instance
 end
 

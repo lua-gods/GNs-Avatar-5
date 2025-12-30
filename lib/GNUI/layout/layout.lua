@@ -17,32 +17,36 @@ local LayoutAPI = {}
 ---@field [1] table<integer,GNUI.Layout>?
 
 
+---@param canvas GNUI.Canvas
 ---@param layout GNUI.Layout
-local function parseLayout(layout)
-	local box = Core.newBox()
+local function parseLayout(canvas,layout)
+	assert(layout,"No layout given")
+	assert(canvas,"No canvas given")
+	local box = Core.newBox(canvas)
 	if layout.size then box:setSize(layout.size.x,layout.size.y) end
 	if layout.pos then box:setPos(layout.pos.x,layout.pos.y) end
 	if layout.layout then box:setLayout(layout.layout) end
 	if layout.variant then -- Quad Sprite
 		local style = Style.getStyle(box,layout.variant,"normal")
 		if style then
-			box:setSprite(style:newInstance())
+			box:setSprite(style:newInstance(box))
 		end
 	end
 	
 	if layout[1] then
 		for index, childLayout in ipairs(layout[1]) do
-			box:addChild(parseLayout(childLayout))
+			box:addChild(parseLayout(canvas,childLayout))
 		end
 	end
 	return box
 end
 
 
----@param data GNUI.Layout
+---@param canvas GNUI.Canvas
+---@param layout GNUI.Layout
 ---@return GNUI.Box
-function LayoutAPI.parse(data)
-	return parseLayout(data)
+function LayoutAPI.parse(canvas,layout)
+	return parseLayout(canvas,layout)
 end
 
 

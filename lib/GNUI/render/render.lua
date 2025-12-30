@@ -6,9 +6,6 @@ local RenderAPI = {}
 ---@class GNUI.RenderInstance
 ---@field canvas GNUI.Canvas
 ---@field visuals table<integer,table>
-
----A Figura GNUI renderer
----@class GNUI.RenderInstance.Figura : GNUI.RenderInstance
 ---@field model ModelPart
 local Render = {}
 Render.__index = Render
@@ -18,12 +15,12 @@ Render.__index = Render
 local renders = {}
 
 ---Creates a new render instance
----@param data table|GNUI.RenderInstance
----@return GNUI.RenderInstance.Figura
-function RenderAPI.new(data)
+---@param canvas GNUI.Canvas
+---@return GNUI.RenderInstance
+function RenderAPI.new(canvas)
 	local model = models:newPart("GNUIRenderer","SKULL")
 	local self = {
-		canvas = data.canvas,
+		canvas = canvas,
 		visuals = {},
 		model = model
 	}
@@ -41,12 +38,12 @@ function Render:update(box,i)
 	local pos = box.bakedPos
 	local sprite = box.sprite
 	--────────────────────────-< FIGURA SPECIFIC CODE >-────────────────────────--
-	--if sprite then
-	--	local task = self.modelPart:newBlock(box.id)
-	--	task:block("minecraft:smooth_stone")
-	--	:scale(size.x/16,size.y/16,1/16)
-	--	:pos(pos.x,pos.y,-i)
-	--end
+	if sprite then
+		local task = self.model:newBlock(box.id)
+		task:block("minecraft:smooth_stone")
+		:scale(size.x/16,size.y/16,1/16)
+		:pos(pos.x,pos.y,-i)
+	end
 	--────────────────────────-< END OF FIGURA SPECIFIC CODE >-────────────────────────--
 end
 
@@ -98,7 +95,7 @@ VisualQuad.__index = VisualQuad
 ---comment
 ---@param id integer
 ---@return GNUI.Render.Visual
-function Render:newQuad(id)
+function Render:newVisualQuad(id)
 	local new = {
 		type = "quad",
 		render = self,

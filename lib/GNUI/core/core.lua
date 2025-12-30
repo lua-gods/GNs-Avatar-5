@@ -10,7 +10,9 @@ local CoreAPI = {}
 function CoreAPI.flushUpdates()
 	box.flushUpdates()
 end
-function CoreAPI.newBox() return box.new() end
+---@param canvas GNUI.Canvas
+---@return GNUI.Box
+function CoreAPI.newBox(canvas) return box.new(canvas) end
 function CoreAPI.newCanvas() return canvas.new() end
 
 return CoreAPI

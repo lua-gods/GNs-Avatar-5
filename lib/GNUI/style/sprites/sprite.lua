@@ -11,17 +11,6 @@ local util = require("../../../gnutil") ---@type GNUtil
 local SpriteAPI = {}
 
 
----@return GNUI.Sprite.Style
-function SpriteAPI.newStyle()
-	local self = {
-		padding = vec(0,0,0,0),
-		margin = vec(0,0,0,0)
-	}
-	setmetatable(self,Style)
-	return self
-end
-
-
 ---A base class for all sprites for boxes
 ---@class GNUI.Sprite
 ---@field color Vector3
@@ -35,13 +24,17 @@ function SpriteAPI.index(i)
 end
 
 
+---@param box GNUI.Box
 ---@return GNUI.Sprite
-function SpriteAPI.new()
+function SpriteAPI.new(box)
+	assert(box,"no GNUI.Box given")
 	local self = {
 		size = vec(0,0),
 		padding = vec(0,0,0,0),
 		margin = vec(0,0,0,0)
 	}
+	setmetatable(self, Sprite)
+	box:setSprite(self)
 	return self
 end
 
@@ -56,9 +49,10 @@ end
 
 
 ---Creates a new instance of the sprite with the style
+---@param box GNUI.Box
 ---@return GNUI.Sprite
-function Sprite:newInstance()
-	return SpriteAPI.new():setStyle(self)
+function Sprite:newInstance(box)
+	return SpriteAPI.new(box):setStyle(self)
 end
 
 
