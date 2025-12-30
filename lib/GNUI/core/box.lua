@@ -40,10 +40,10 @@ local BoxAPI = {}
 ---@field sprite GNUI.Sprite?
 local Box = {}
 Box.__index = Box
+Box.__style = "box"
 
-
-function BoxAPI.getIndex()
-	return Box.__index
+function BoxAPI.index(i)
+	return Box[i]
 end
 
 
@@ -133,6 +133,17 @@ function Box:setLayout(layout)
 	---@cast self GNUI.Box
 	self.layout = layout
 	self:update()
+	return self
+end
+
+
+---@generic self
+---@param self self
+---@return self
+---@param sprite GNUI.Sprite
+function Box:setSprite(sprite)
+	---@cast self GNUI.Box
+	self.sprite = sprite
 	return self
 end
 

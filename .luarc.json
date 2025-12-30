@@ -67,7 +67,7 @@
 
 		// Figura does not use non-standard features.
 		"nonstandardSymbol": [],
-		"plugin": "",
+		"plugin": "./.vscode/plugin/loader.lua",
 		"pluginArgs": [],
 		"special": {},
 		"unicodeName": false

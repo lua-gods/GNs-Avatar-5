@@ -24,13 +24,29 @@ for index, path in ipairs(util.listFiles("./theme")) do
 				Theme[keyClass][keyVariant] = {}
 			end
 			
-			for keyType, type in pairs(variant) do
-				Theme[keyClass][keyVariant][keyType] = type
+			for keyKey, key in pairs(variant) do
+				Theme[keyClass][keyVariant][keyKey] = key
 			end
 		end
 	end
 end
 
+
+---Get a style
+---@param class string|GNUI.Box
+---@param variant string
+---@param key any
+---@return GNUI.Sprite.Style?
+function StyleAPI.getStyle(class,variant,key)
+	if type(class) == "table" then
+		class = class.__style
+		assert(class,"No class found")
+	end
+	
+	if Theme[class] and Theme[class][variant] and Theme[class][variant][key] then
+		return Theme[class][variant][key]
+	end
+end
 
 
 ---@return GNUI.Sprite.Quad

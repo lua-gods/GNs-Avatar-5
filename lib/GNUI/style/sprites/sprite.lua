@@ -1,4 +1,9 @@
-local Style = require("../styles/quad") ---@type GNUI.Sprite.StyleAPI
+--[[______   __
+  / ____/ | / /  by: GNanimates / https://gnon.top / Discord: @gn68s
+ / / __/  |/ / name: GNUI Sprite Module
+/ /_/ / /|  /  desc: base class for all sprites
+\____/_/ |_/ source: link ]]
+local Style = require("../styles/sprite") ---@type GNUI.Sprite.StyleAPI
 local util = require("../../../gnutil") ---@type GNUtil
 
 
@@ -19,22 +24,20 @@ end
 
 ---A base class for all sprites for boxes
 ---@class GNUI.Sprite
----@field pos Vector2
----@field size Vector2
+---@field color Vector3
 ---@field style GNUI.Sprite.Style
 local Sprite = {}
 Sprite.__index = Sprite
 
 
-function SpriteAPI.getIndex()
-	return Sprite.__index
+function SpriteAPI.index(i)
+	return Sprite[i]
 end
 
 
 ---@return GNUI.Sprite
 function SpriteAPI.new()
 	local self = {
-		pos = vec(0,0),
 		size = vec(0,0),
 		padding = vec(0,0,0,0),
 		margin = vec(0,0,0,0)
@@ -43,9 +46,19 @@ function SpriteAPI.new()
 end
 
 
+Style.setInstancer(SpriteAPI.new)
+
+
 ---@return GNUI.Sprite.Style
 function SpriteAPI.newStyle()
 	return Style.new()
+end
+
+
+---Creates a new instance of the sprite with the style
+---@return GNUI.Sprite
+function Sprite:newInstance()
+	return SpriteAPI.new():setStyle(self)
 end
 
 
@@ -74,4 +87,15 @@ function Sprite:setSize(x,y)
 	return self
 end
 
-return Sprite
+
+---@generic self
+---@param self self
+---@return self
+function Sprite:setStyle(style)
+	---@cast self GNUI.Sprite
+	self.style = style
+	return self
+end
+
+
+return SpriteAPI

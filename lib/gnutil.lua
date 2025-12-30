@@ -57,22 +57,4 @@ function util.vec4(x,y,z,w)
 end
 
 
----Creates a metamethod for __index that fallback to each class given.
----@param classes table[]
-function util.makeIndex(classes)
-	local indexes = {}
-	for i,class in pairs(classes) do
-		indexes[i] = class.getIndex and class.getIndex() or class
-	end
-	return function (t,i)
-		local rawData = rawget(t,i)
-		if rawData then return rawData end
-		for _,class in pairs(indexes) do
-			local value = class[i]
-			if value then return value end
-		end
-	end
-end
-
-
 return util

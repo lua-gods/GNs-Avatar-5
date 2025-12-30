@@ -4,6 +4,7 @@ local util = require("../../utils") ---@type GNUI.utils
 local config = require("../../config") ---@type GNUI.config
 local Render = require("../../"..config.RENDER) ---@type GNUI.RenderAPI
 
+
 ---@class GNUI.Sprite.Quad.StyleAPI
 local StyleAPI = {}
 
@@ -11,13 +12,17 @@ local StyleAPI = {}
 ---@class GNUI.Sprite.Quad.Style : GNUI.Sprite.Style
 ---@field texture string
 ---@field uv Vector4
-local Style = {}
-Style.__index = gnutil.makeIndex{Style,SpriteStyle}
+local QuadStyle = {}
+QuadStyle.__index = function (t,i)
+	return rawget(t,i) or QuadStyle[i] or SpriteStyle.index(i)
+end
 
 
 function StyleAPI.getIndex()
-	return Style.__index
+	return QuadStyle.__index
 end
+
+
 
 
 ---@return GNUI.Sprite.Quad.Style
@@ -26,7 +31,7 @@ function StyleAPI.new()
 	---@cast self GNUI.Sprite.Quad.Style
 	self.texture = ""
 	self.uv = gnutil.vec4(0,0,0,0)
-	setmetatable(self,Style)
+	setmetatable(self,QuadStyle)
 	return self
 end
 
@@ -34,7 +39,7 @@ end
 ---@generic self
 ---@param self self
 ---@return self
-function Style:setTexture(path)
+function QuadStyle:setTexture(path)
 	---@cast self GNUI.Sprite.Quad.Style
 	self.texture = path
 	local size = util.getTextureSize(path)
@@ -51,10 +56,24 @@ end
 ---@generic self
 ---@param self self
 ---@return self
-function Style:setUV(x1,y1,x2,y2)
+function QuadStyle:setUV(x1,y1,x2,y2)
 	---@cast self GNUI.Sprite.Quad.Style
 	self.uv = gnutil.vec4(x1,y1,x2,y2)
 	return self
+end
+
+
+local newInstance
+
+function StyleAPI.setInstancer(new)
+	newInstance = new
+end
+
+
+---@return GNUI.Sprite
+function QuadStyle:newInstance()
+	local instance = newInstance():setStyle(self)
+	return instance
 end
 
 

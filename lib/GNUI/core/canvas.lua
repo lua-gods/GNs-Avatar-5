@@ -8,7 +8,9 @@ local CanvasAPI = {}
 ---A root node for boxes
 ---@class GNUI.Canvas : GNUI.Box
 local Canvas = {}
-Canvas.__index = util.makeIndex{Canvas,box}
+Canvas.__index = function (t,i)
+	return rawget(t,i) or Canvas[i] or box.index(i)
+end
 
 
 ---Creates a new canvas for boxes to attach to, this box is special, 

@@ -1,27 +1,39 @@
 local util = require("../../../gnutil") ---@type GNUtil
 
 ---@class GNUI.Sprite.StyleAPI
-local StyleAPI = {}
+local SpriteSTyleAPI = {}
 
 ---@class GNUI.Sprite.Style
 ---@field padding Vector4
 ---@field margin Vector4
-local Style = {}
-Style.__index = Style
+local SpriteStyle = {}
+SpriteStyle.__index = SpriteStyle
+
+local newInstance
+
+function SpriteSTyleAPI.index(i)
+	return SpriteStyle[i]
+end
 
 
-function StyleAPI.getIndex()
-	return Style.__index
+function SpriteSTyleAPI.setInstancer(new)
+	newInstance = new
+end
+
+
+---@return GNUI.Sprite
+function SpriteStyle:newInstance()
+	return newInstance():setStyle(self)
 end
 
 
 ---@return GNUI.Sprite.Style
-function StyleAPI.new()
+function SpriteSTyleAPI.new()
 	local self = {
 		padding = util.vec4(0,0,0,0),
 		margin = util.vec4(0,0,0,0)
 	}
-	setmetatable(self,Style)
+	setmetatable(self,SpriteStyle)
 	return self
 end
 
@@ -35,7 +47,7 @@ end
 ---@generic self
 ---@param self self
 ---@return self
-function Style:setPadding(x,y,z,w)
+function SpriteStyle:setPadding(x,y,z,w)
 	---@cast self GNUI.Sprite
 	self.padding = util.vec4(x,y,z,w)
 	return self
@@ -51,11 +63,11 @@ end
 ---@generic self
 ---@param self self
 ---@return self
-function Style:setMargin(x,y,z,w)
+function SpriteStyle:setMargin(x,y,z,w)
 	---@cast self GNUI.Sprite
 	self.margin = util.vec4(x,y,z,w)
 	return self
 end
 
 
-return StyleAPI
+return SpriteSTyleAPI

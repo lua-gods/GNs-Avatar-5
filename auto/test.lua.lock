@@ -1,0 +1,17 @@
+local model = models:newPart("test","SKULL")
+
+for i = 0, 20, 1 do
+	local tex = textures.avatar
+	model:newSprite("face"..i)
+	:setTexture(tex,tex:getDimensions():unpack())
+	:setPos(0,i * 20,0)
+	:setRegion(i,20)
+end
+
+for i = 0, 10, 1 do
+	local tex = textures.avatar
+	model:newSprite("face2"..i)
+	:setTexture(tex,tex:getDimensions():unpack())
+	:setPos(-40,i * 20,0)
+	:setUV(i/20,20)
+end

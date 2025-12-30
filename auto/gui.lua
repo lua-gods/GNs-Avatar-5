@@ -1,3 +1,4 @@
+
 local GNUI = require("lib.GNUI.main")
 
 local screen,renderer = GNUI.getScreen()
@@ -5,9 +6,16 @@ local screen,renderer = GNUI.getScreen()
 local box = GNUI.parse{
 	layout = "HORIZONTAL",
 	pos = vec(100,100),
+	variant="default",
 	{
-		{size = vec(50,50),},
-		{size = vec(50,50),},
+		{
+			variant="default",
+			size = vec(50,50),
+		},
+		{
+			variant="default",
+			size = vec(50,50),
+		},
 	}
 }
 
