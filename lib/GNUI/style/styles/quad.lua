@@ -1,14 +1,14 @@
 local SpriteStyle = require("../styles/sprite") ---@type GNUI.Sprite.StyleAPI
-local gnutil = require("../../../gnutil") ---@type GNUtil
+local gncommon = require("lib.gncommon") ---@type GNCommon
 local util = require("../../utils") ---@type GNUI.utils
 
 
 ---@class GNUI.Sprite.Quad.StyleAPI
-local StyleAPI = {}
+local QuadStyleAPI = {}
 
 
 ---@class GNUI.Sprite.Quad.Style : GNUI.Sprite.Style
----@field texture string
+---@field texture_path string
 ---@field uv Vector4
 local QuadStyle = {}
 QuadStyle.__index = function (t,i)
@@ -16,22 +16,38 @@ QuadStyle.__index = function (t,i)
 end
 
 
-function StyleAPI.getIndex()
+function QuadStyleAPI.getIndex()
 	return QuadStyle.__index
 end
 
 
-
-
 ---@return GNUI.Sprite.Quad.Style
-function StyleAPI.new()
+function QuadStyleAPI.new()
 	local self = SpriteStyle.new()
 	---@cast self GNUI.Sprite.Quad.Style
-	self.texture = ""
-	self.uv = gnutil.vec4(0,0,0,0)
+	self.texture_path = ""
+	self.uv = gncommon.vec4(0,0,0,0)
 	setmetatable(self,QuadStyle)
 	return self
 end
+
+
+local newInstance
+
+function QuadStyleAPI.setInstancer(new)
+	newInstance = new
+end
+
+
+---@param box GNUI.Box
+---@return GNUI.Sprite
+function QuadStyle:newInstance(box)
+	local instance = newInstance(box):setStyle(self)
+	return instance
+end
+
+
+--────────────────────────-< API >-────────────────────────--
 
 
 ---@generic self
@@ -39,9 +55,8 @@ end
 ---@return self
 function QuadStyle:setTexture(path)
 	---@cast self GNUI.Sprite.Quad.Style
-	self.texture = path
-	local size = util.getTextureSize(path)
-	self.uv = vec(0,0,size.x,size.y)
+	self.texture_path = path
+	self.uv = vec(0,0,1,1)
 	return self
 end
 
@@ -56,24 +71,12 @@ end
 ---@return self
 function QuadStyle:setUV(x1,y1,x2,y2)
 	---@cast self GNUI.Sprite.Quad.Style
-	self.uv = gnutil.vec4(x1,y1,x2,y2)
+	self.uv = gncommon.vec4(x1,y1,x2,y2)
 	return self
 end
 
 
-local newInstance
-
-function StyleAPI.setInstancer(new)
-	newInstance = new
-end
 
 
----@param box GNUI.Box
----@return GNUI.Sprite
-function QuadStyle:newInstance(box)
-	local instance = newInstance(box):setStyle(self)
-	return instance
-end
 
-
-return StyleAPI
+return QuadStyleAPI

@@ -21,9 +21,6 @@ local box = GNUI.parse(screen,{
 
 screen:addChild(box)
 
-
 events.WORLD_RENDER:register(function (delta)
 	GNUI.flushUpdates()
-	screen.render:updateAll()
-	events.WORLD_RENDER:remove("firstFrame")
-end,"firstFrame")
+end)

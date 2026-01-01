@@ -1,4 +1,4 @@
-local util = require("../../gnutil") ---@type GNUtil
+local gncommon = require("lib.gncommon") ---@type GNCommon
 
 ---@class GNUI.BoxAPI
 local BoxAPI = {}
@@ -96,7 +96,7 @@ end
 ---@return self
 function Box:setPos(x,y)
 	---@cast self GNUI.Box
-	self.pos = util.vec2(x,y)
+	self.pos = gncommon.vec2(x,y)
 	return self
 end
 
@@ -117,7 +117,7 @@ end
 ---@return self
 function Box:setSize(x,y)
 	---@cast self GNUI.Box
-	self.size = util.vec2(x,y)
+	self.size = gncommon.vec2(x,y)
 	self:update()
 	return self
 end
@@ -147,6 +147,9 @@ end
 ---@param sprite GNUI.Sprite
 function Box:setSprite(sprite)
 	---@cast self GNUI.Box
+	if self.sprite then
+		self.sprite:setBox(self)
+	end
 	self.sprite = sprite
 	return self
 end
@@ -242,6 +245,12 @@ function Box:forceUpdate()
 	---@cast self GNUI.Box
 	self:calculateSize(false)
 	self:calculateSize(true)
+	
+	if self.sprite then
+		local sprite = self.sprite
+		sprite:setPos(self.bakedPos)
+		sprite:setSize(self.bakedSize)
+	end
 	return self
 end
 

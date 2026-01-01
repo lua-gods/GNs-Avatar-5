@@ -29,3 +29,73 @@ function flip()
 	))
 end
 
+
+function mapArea()
+	
+	local SKIP = 40
+	local INTERVAL = 20 * 4
+	local STEP_SIZE = 16 * 12 * 2
+	
+	local x = 0
+	local z = 0
+	
+	local origin = player:getPos()
+	
+	local rangex = vec(-1,1)
+	local rangez = vec(-1,1)
+	
+	local axis = false
+	local flipx = false
+	local flipz = false
+	
+	local g = keybinds:newKeybind("skip","key.keyboard.g",true)
+	local timer = 0
+	
+	events.WORLD_TICK:register(function ()
+		if timer < 0 or g:isPressed() then
+			timer = INTERVAL
+			if axis then
+				if flipz then
+					z = z - 1
+					if rangez.x > z then
+						rangez.x = rangez.x - 1
+						flipz = false
+						axis = not axis
+					end
+				else
+					z = z + 1
+					if rangez.y < z then
+						rangez.y = rangez.y + 1
+						flipz = true
+						axis = not axis
+					end
+				end
+			else
+				if flipx then
+					x = x - 1
+					if rangex.x > x then
+						rangex.x = rangex.x - 1
+						flipx = false
+						axis = not axis
+					end
+				else
+					x = x + 1
+					if rangex.y < x then
+						rangex.y = rangex.y + 1
+						flipx = true
+						axis = not axis
+					end
+				end
+			end
+			host:sendChatCommand(("/tp %s %s %s"):format(origin.x + x * STEP_SIZE, origin.y, origin.z + z * STEP_SIZE))
+		else
+			timer = timer - 1
+		end
+		step = 1
+	end,"mapArea")
+	function back()
+		host:sendChatCommand(("/tp %s %s %s"):format(origin.x, origin.y, origin.z))
+		back = nil
+		events.WORLD_TICK:remove("mapArea")
+	end
+end

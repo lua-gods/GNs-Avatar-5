@@ -1,4 +1,4 @@
----@class GNUtil
+---@class GNCommon
 local util = {}
 
 

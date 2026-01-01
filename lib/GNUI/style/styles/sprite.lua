@@ -1,4 +1,4 @@
-local util = require("../../../gnutil") ---@type GNUtil
+local util = require("lib.gncommon") ---@type GNCommon
 
 ---@class GNUI.Sprite.StyleAPI
 local SpriteSTyleAPI = {}
@@ -39,34 +39,34 @@ function SpriteSTyleAPI.new()
 end
 
 
----@overload fun(self: GNUI.Sprite, xyzw: Vector4): self
----@overload fun(self: GNUI.Sprite, xy: Vector2, zw: Vector2): self
----@param x number
----@param y number
----@param z number
----@param w number
+---@overload fun(self: GNUI.Sprite, ltrb: Vector4): self
+---@overload fun(self: GNUI.Sprite, lt: Vector2, rb: Vector2): self
+---@param left number
+---@param top number
+---@param right number
+---@param bottom number
 ---@generic self
 ---@param self self
 ---@return self
-function SpriteStyle:setPadding(x,y,z,w)
+function SpriteStyle:setPadding(left,top,right,bottom)
 	---@cast self GNUI.Sprite
-	self.padding = util.vec4(x,y,z,w)
+	self.padding = util.vec4(left,top,right,bottom)
 	return self
 end
 
 
----@overload fun(self: GNUI.Sprite, xyzw: Vector4): self
----@overload fun(self: GNUI.Sprite, xy: Vector2, zw: Vector2): self
----@param x number
----@param y number
----@param z number
----@param w number
+---@overload fun(self: GNUI.Sprite, ltrb: Vector4): self
+---@overload fun(self: GNUI.Sprite, lt: Vector2, rn: Vector2): self
+---@param left number
+---@param top number
+---@param right number
+---@param bottom number
 ---@generic self
 ---@param self self
 ---@return self
-function SpriteStyle:setMargin(x,y,z,w)
+function SpriteStyle:setMargin(left,top,right,bottom)
 	---@cast self GNUI.Sprite
-	self.margin = util.vec4(x,y,z,w)
+	self.margin = util.vec4(left,top,right,bottom)
 	return self
 end
 

@@ -1,5 +1,5 @@
 ---@diagnostic disable: return-type-mismatch
-local util = require("../../gnutil") ---@type GNUtil
+local util = require("lib.gncommon") ---@type GNCommon
 local Box = require("./box") ---@type GNUI.BoxAPI
 local config = require("../config") ---@type GNUI.config
 local Render = require("../"..config.RENDER) ---@type GNUI.RenderAPI

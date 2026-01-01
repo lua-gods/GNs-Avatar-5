@@ -7,16 +7,6 @@
 ---@class GNUI.utils
 local util = {}
 
----@param path string
----@return Vector2
-function util.getTextureSize(path)
-	if textures[path] then
-		return textures[path]:getDimensions()
-	else
-		return vec(0,0)
-	end
-end
-
 
 ---@return Vector2
 function util.getScreenSize()
