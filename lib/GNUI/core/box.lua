@@ -68,7 +68,7 @@ function BoxAPI.new(canvas)
 		sizing = {x="FIT",y="FIT"},
 		size = vec(-1,-1),
 		minSize = vec(0,0),
-		maxSize = vec(0,0),
+		maxSize = vec(math.huge,math.huge),
 		
 		
 		layout = "HORIZONTAL",
@@ -144,6 +144,34 @@ function Box:setSize(x,y)
 end
 
 
+---@overload fun(self: GNUI.Box ,size : Vector2): GNUI.Box
+---@param x number?
+---@param y number?
+---@generic self
+---@param self self
+---@return self
+function Box:setMinimumSize(x,y)
+	---@cast self GNUI.Box
+	self.minSize = gncommon.vec2(x,y,self.minSize)
+	self:update()
+	return self
+end
+
+
+---@overload fun(self: GNUI.Box ,size : Vector2): GNUI.Box
+---@param x number?
+---@param y number?
+---@generic self
+---@param self self
+---@return self
+function Box:setMaximumSize(x,y)
+	---@cast self GNUI.Box
+	self.maxSize = gncommon.vec2(x,y,self.maxSize)
+	self:update()
+	return self
+end
+
+
 ---@generic self
 ---@param self self
 ---@return self
@@ -158,7 +186,10 @@ end
 
 ---@return Vector2
 function Box:getSize()
-	return self.size
+	return vec(
+		math.clamp(self.size.x,self.minSize.x,self.maxSize.x),
+		math.clamp(self.size.y,self.minSize.y,self.maxSize.y)
+	)
 end
 
 
@@ -321,7 +352,7 @@ end
 function Box:updateItself()
 	if not self.flaggedUpdate then
 		self.flaggedUpdate = true
-		queueUpdate[#queueUpdate+1] = self
+		queueUpdate[self.id] = self
 	end
 end
 
@@ -333,10 +364,15 @@ end
 function Box:forceUpdate()
 	---@cast self GNUI.Box
 	
-	self:calculateLayout(false)
-	self:calculateSize(false)
-	self:calculateSize(true)
-	self:calculateLayout(true)
+	self
+	
+	:solveForFitSizing(false)
+	:sovleForFillSizing(false)
+	:sovleForLayout(false)
+	
+	:solveForFitSizing(true)
+	:sovleForFillSizing(true)
+	:sovleForLayout(true)
 	
 	if self.sprite then
 		local sprite = self.sprite
@@ -351,33 +387,107 @@ end
 ---@generic self
 ---@param self self
 ---@return self
-function Box:calculateSize(other)
+function Box:solveForFitSizing(other)
 	local x = (other and "y" or "x")
 	---@cast self GNUI.Box
-	if self.sizing[x] == "FIT" and self.layout then
-		if (self.layout == (other and "VERTICAL" or "HORIZONTAL")) then
+	
+	for _, child in ipairs(self.children) do
+		child:solveForFitSizing(other)
+	end
+	
+	if self.sizing[x] == "FIXED" then
+		self.bakedSize[x] = self.size[x]
+	end
+	
+	if self.parent then
+		if (self.parent.layout == (other and "VERTICAL" or "HORIZONTAL")) then
 			local totalSize = 0
-			for _, child in ipairs(self.children) do
-				child:calculateSize(other)
-				totalSize = totalSize + child.bakedSize[x]
-			end
+			totalSize = totalSize + self.bakedSize[x]
 			self.bakedSize[x] = totalSize
 		else
 			local max = -math.huge
-			for _, child in ipairs(self.children) do
-				child:calculateSize(other)
-				max = math.max(max, child.bakedSize[x])
-			end
+			max = math.max(max, self.bakedSize[x])
 			self.bakedSize[x] = max
 		end
+	end
+	
+	return self
+end
+
+---@param other boolean? # tell if its in the X(false) or Y(true) axis
+---@generic self
+---@param self self
+---@return self
+function Box:sovleForFillSizing(other)
+	---@cast self GNUI.Box
+	local x = (other and "y" or "x")
+	local remainingSpace = self.bakedSize[x]
+	
+	local parallel = self.layout == (other and "VERTICAL" or "HORIZONTAL")
+	local fillers = {} ---@type GNUI.Box[]
+	
+	if parallel then
+		for _, child in ipairs(self.children) do
+			if child.sizing[x] ~= "FILL" then
+				remainingSpace = remainingSpace - child.bakedSize[x]
+			else
+				remainingSpace = remainingSpace - child.minSize[x]
+				child.bakedSize[x] = 0
+				fillers[#fillers+1] = child
+			end
+		end
+		
+		if #fillers > 0 then
+			for i = 1, 10, 1 do
+				if remainingSpace <= 0 then break end
+				local smallest = fillers[1]
+				local smallestSpace = 0
+				local secondSmallest = math.huge
+				local spaceToAdd = remainingSpace
+				
+				for _, child in pairs(fillers) do
+					if child.bakedSize[x] < smallest.bakedSize[x] then
+						secondSmallest = smallest.bakedSize[x]
+						smallest = child
+					end
+					if child.bakedSize[x] > smallest.bakedSize[x] then
+						secondSmallest = math.min(secondSmallest, child.bakedSize[x])
+						spaceToAdd = secondSmallest - smallestSpace
+					end
+				end
+				
+				spaceToAdd = math.min(spaceToAdd, remainingSpace / #fillers)
+				
+				for _, child in pairs(fillers) do
+					if child.bakedSize[x] == smallest.bakedSize[x] then
+						child.bakedSize[x] = child.bakedSize[x] + spaceToAdd
+						remainingSpace = remainingSpace - spaceToAdd
+					end
+				end
+			end
+		end
 	else
-		self.bakedSize[x] = self.size[x]
+		for _, child in pairs(self.children) do
+			if child.sizing[x] == "FILL" then
+				child.bakedSize[x] = remainingSpace
+			end
+		end
+	end
+	
+	
+	for _, child in ipairs(self.children) do
+		child:sovleForFillSizing(other)
 	end
 	return self
 end
 
 
-function Box:calculateLayout(other)
+---@param other boolean? # tell if its in the X(false) or Y(true) axis
+---@generic self
+---@param self self
+---@return self
+function Box:sovleForLayout(other)
+	---@cast self GNUI.Box
 	local x = (other and "y" or "x")
 	local y = (other and "x" or "y")
 	if self.layout then
@@ -391,6 +501,7 @@ function Box:calculateLayout(other)
 			end
 		end
 	end
+	return self
 end
 
 
