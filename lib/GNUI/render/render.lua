@@ -69,9 +69,17 @@ end
 
 ---@class GNUI.Render.Visual
 ---@field render GNUI.RenderInstance
+---@field type string
 ---@field id integer
+---
+---@field index integer
+---@field childCount integer
+---@field children GNUI.Render.Visual[]
+---
+---@field pos Vector2
+---@field size Vector2
 ---@field free fun()
-
+---@field model ModelPart
 
 function Render:free(id)
 	self.visuals[id]:free()
@@ -82,22 +90,27 @@ end
 --────────────────────────-< Quad >-────────────────────────--
 
 ---@class GNUI.Render.Visual.Quad : GNUI.Render.Visual
----@field children GNUI.Render.Visual[]
 ---@field texture_path string
 ---@field texture_size Vector2
 ---@field uv Vector4
 ---@field task SpriteTask
 
 
+
 ---@return integer
 function Render:newQuadVisual()
 	local id = #self.visuals+1
+	local model = self.model:newPart("quad" .. id)
 	local new = {
 		type = "quad",
 		render = self,
 		id = id,
+		index = 1,
+		childCount = 0,
+		pos = vec(0,0),
 		children = {},
-		task = self.model:newSprite("a"..id)
+		task = model:newSprite("sprite"),
+		model = model
 	}
 	
 	self.visuals[id] = new
@@ -114,14 +127,16 @@ function Render:free(id)
 end
 
 
----Sets the position of the visual
+---Sets the position of the visual, relative to its parent
 ---
 ---Works for all visual types
 ---@param id integer
 ---@param x number
 ---@param y number
 function Render:setPos(id,x,y)
-	self.visuals[id].task:pos(x,y)
+	local visual = self.visuals[id]
+	visual.model:pos(-x,-y,-visual.index)
+	visual.pos = vec(x,y)
 end
 
 
@@ -132,7 +147,17 @@ end
 ---@param x number
 ---@param y number
 function Render:setSize(id,x,y)
-	self.visuals[id].task:scale(x/20,y/20)
+	local visual = self.visuals[id]
+	visual.size = vec(x,y)
+	visual.task:scale(x/20,y/20,1)
+end
+
+
+function Render:setIndex(id,index)
+	local visual = self.visuals[id]
+	local pos = visual.pos
+	visual.index = index
+	visual.model:pos(pos.x,pos.y,index)
 end
 
 
@@ -149,8 +174,10 @@ function Render:setTexture(id,path)
 	visual.texture_path = path
 	visual.texture_size = textureSize
 	visual.uv = uv
-	visual.task:texture(textures[path],textureSize.x,textureSize.y)
-	visual.task:setUV(uv.xy / visual.texture_size):setRegion(uv.zw * visual.texture_size)
+	visual.task
+	:texture(textures[path],textureSize.x,textureSize.y)
+	:setUV(uv.xy / visual.texture_size)
+	:setRegion(uv.zw * visual.texture_size)
 end
 
 
@@ -166,7 +193,9 @@ function Render:setUV(id,u1,v1,u2,v2)
 	assert(visual,"Visual Quad "..id.." not found")
 	local uv = gncommon.vec4(u1,v1,u2,v2)
 	visual.uv = uv
-	visual.task:setUV(uv.xy / visual.texture_size):setRegion(uv.zw * visual.texture_size)
+	visual.task
+	:setUV(uv.xy / visual.texture_size)
+	:setRegion(uv.zw * visual.texture_size)
 end
 
 
@@ -178,11 +207,28 @@ end
 ---@param index integer
 function Render:setParent(id,parentID,index)
 	assert(self.visuals[id],"Visual Quad "..id.." not found")
-	local quad = self.visuals[id]
-	local parent = self.visuals[parentID]
-	quad.parent = parent
-	quad.index = index
-	parent.children[index] = quad
+	local visual = self.visuals[id]
+	
+	if visual.parent then
+		visual.parent.model:removeChild(visual.model:remove())
+		visual.parent.childCount = visual.parent.childCount - 1
+		visual.parent.children[index] = nil
+		visual.parent = nil
+		visual.index = 1
+	end
+	
+	if parentID ~= 0 then
+		local parent = self.visuals[parentID]
+		visual.parent = parent
+		if parent then
+			parent.model:addChild(visual.model:remove())
+		end
+		visual.index = index
+		parent.children[index] = visual
+		parent.childCount = parent.childCount + 1
+		
+		visual.model:scale(1,1,0.5/math.max(parent.childCount,1))
+	end
 end
 
 return RenderAPI

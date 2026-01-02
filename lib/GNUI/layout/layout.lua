@@ -1,3 +1,4 @@
+---@diagnostic disable: param-type-mismatch
 local config = require("../config")
 
 local Core = require("../"..config.CORE) ---@type GNUI.CoreAPI
@@ -9,7 +10,9 @@ local LayoutAPI = {}
 
 
 ---@class GNUI.Layout
+---@field name string?
 ---@field size Vector2?
+---@field sizing ({[1]:GNUI.Box.SizingMode,[2]:GNUI.Box.SizingMode}|GNUI.Box.SizingMode)?
 ---@field pos Vector2?
 ---@field layout GNUI.Box.LayoutMode?
 ---@field variant string?
@@ -19,23 +22,35 @@ local LayoutAPI = {}
 
 ---@param canvas GNUI.Canvas
 ---@param layout GNUI.Layout
-local function parseLayout(canvas,layout)
+local function parseEntry(canvas,layout)
 	assert(layout,"No layout given")
 	assert(canvas,"No canvas given")
 	local box = Core.newBox(canvas)
-	if layout.size then box:setSize(layout.size.x,layout.size.y) end
+	if layout.size then
+		box:setSize(layout.size.x,layout.size.y)
+		box:setSizing("FIXED","FIXED")
+	elseif layout.sizing then
+		if type(layout.sizing) == "string" then
+			box:setSizing(layout.sizing,layout.sizing)
+		else
+			box:setSizing(layout.sizing[1],layout.sizing[2])
+		end
+	else
+		box:setSizing("FIT","FIT")
+	end
 	if layout.pos then box:setPos(layout.pos.x,layout.pos.y) end
 	if layout.layout then box:setLayout(layout.layout) end
-	if layout.variant then -- Quad Sprite
-		local style = Style.getStyle(box,layout.variant,"normal")
-		if style then
-			box:setSprite(style:newInstance(box))
-		end
+	
+	local style = Style.getStyle(box,layout.variant or "default","normal")
+	if style then
+		box:setSprite(style:newInstance(box))
 	end
+	
+	if layout.name then box:setName(layout.name) box.name = layout.name end
 	
 	if layout[1] then
 		for index, childLayout in ipairs(layout[1]) do
-			box:addChild(parseLayout(canvas,childLayout))
+			box:addChild(parseEntry(canvas,childLayout))
 		end
 	end
 	return box
@@ -46,7 +61,7 @@ end
 ---@param layout GNUI.Layout
 ---@return GNUI.Box
 function LayoutAPI.parse(canvas,layout)
-	return parseLayout(canvas,layout)
+	return parseEntry(canvas,layout)
 end
 
 

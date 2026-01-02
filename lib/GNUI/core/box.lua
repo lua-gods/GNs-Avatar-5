@@ -3,7 +3,7 @@ local gncommon = require("lib.gncommon") ---@type GNCommon
 ---@class GNUI.BoxAPI
 local BoxAPI = {}
 
----@alias FitMode string
+---@alias GNUI.Box.SizingMode string
 ---| "FIXED"
 ---| "FIT"
 ---| "FILL"
@@ -19,7 +19,7 @@ local BoxAPI = {}
 ---
 ---@field pos Vector2
 ---@field size Vector2
----@field sizeFit {x:FitMode,y:FitMode}
+---@field sizing {x:GNUI.Box.SizingMode,y:GNUI.Box.SizingMode}
 ---@field minSize Vector2
 ---@field maxSize Vector2
 ---
@@ -32,15 +32,20 @@ local BoxAPI = {}
 ---@field parent GNUI.Box?
 ---@field childIndex integer
 ---@field children GNUI.Box[]
+---@field namedChildren table<string,GNUI.Box>
 ---@field childAlign Vector2
 ---
 ---@field visible boolean
 ---@field id integer
 ---
+---@field flaggedUpdate boolean
 ---@field sprite GNUI.Sprite?
 ---@field canvas GNUI.Canvas
+---@field [string] GNUI.Box
 local Box = {}
-Box.__index = Box
+Box.__index = function (t,i)
+	return rawget(t,i) or Box[i] or rawget(t,"children")[i] or rawget(t,"namedChildren")[i]
+end
 Box.__style = "box"
 
 function BoxAPI.index(i)
@@ -59,9 +64,12 @@ local nextFree = 1
 function BoxAPI.new(canvas)
 	local self = {
 		pos = vec(0,0),
+		
+		sizing = {x="FIT",y="FIT"},
 		size = vec(-1,-1),
 		minSize = vec(0,0),
 		maxSize = vec(0,0),
+		
 		
 		layout = "HORIZONTAL",
 		
@@ -72,6 +80,7 @@ function BoxAPI.new(canvas)
 		parent = nil,
 		childIndex = 0,
 		children = {},
+		namedChildren = {},
 		childAlign = vec(0,0),
 		
 		id = nextFree,
@@ -86,17 +95,29 @@ function BoxAPI.new(canvas)
 end
 
 
+---@param name string
+---@return GNUI.Box
+function Box:setName(name)
+	if self.parent then
+		self.parent.namedChildren[name] = self
+	end
+	self.name = name
+	return self
+end
+
+
 ---Sets the position of the box,
 ---note that position only applies if the parent box dosent automatically handle it
 ---@overload fun(self: GNUI.Box ,pos : Vector2): GNUI.Box
----@param x number
----@param y number
+---@param x number?
+---@param y number?
 ---@generic self
 ---@param self self
 ---@return self
 function Box:setPos(x,y)
 	---@cast self GNUI.Box
-	self.pos = gncommon.vec2(x,y)
+	self.pos = gncommon.vec2(x,y,self.pos)
+	self:update()
 	return self
 end
 
@@ -110,15 +131,27 @@ end
 ---Sets the size of the box  
 ---NOTE: setting an axis to -1 will make it automatically fit that given axis.
 ---@overload fun(self: GNUI.Box ,size : Vector2): GNUI.Box
----@param x number
----@param y number
+---@param x number?
+---@param y number?
 ---@generic self
 ---@param self self
 ---@return self
 function Box:setSize(x,y)
 	---@cast self GNUI.Box
-	self.size = gncommon.vec2(x,y)
+	self.size = gncommon.vec2(x,y,self.size)
 	self:update()
+	return self
+end
+
+
+---@generic self
+---@param self self
+---@return self
+---@param x GNUI.Box.SizingMode?
+---@param y GNUI.Box.SizingMode?
+function Box:setSizing(x,y)
+	---@cast self GNUI.Box
+	self.sizing = {x=x or self.sizing.x,y=y or self.sizing.y}
 	return self
 end
 
@@ -157,9 +190,13 @@ end
 
 --────────────────────────-< Children Management >-────────────────────────--
 
+---@param box GNUI.Box
 local function updateChildrenIndexes(box)
-	for index, child in ipairs(box.children) do
-		child.childIndex = index
+	for id, child in ipairs(box.children) do
+		child.childIndex = id
+		if child and child.sprite and box.sprite then
+			child.canvas.render:setIndex(child.sprite.id, id)
+		end
 		updateChildrenIndexes(child)
 	end
 end
@@ -172,9 +209,17 @@ end
 function Box:addChild(box)
 	---@cast self GNUI.Box
 	box.parent = self
-	local nextFree = #self.children + 1
-	self.children[nextFree] = box
-	box.childIndex = nextFree
+	local id = #self.children + 1
+	self.children[id] = box
+	box.childIndex = id
+	
+	if box.name then
+		self.namedChildren[box.name] = box
+	end
+	
+	if box and box.sprite and self.sprite then
+		box.canvas.render:setParent(box.sprite.id, self.sprite.id, id)
+	end
 	
 	self:update()
 	return box
@@ -192,11 +237,31 @@ function Box:removeChild(box)
 	if self.children[boxID] == box then
 		local box = self.children[boxID]
 		table.remove(self.children, boxID)
-		updateChildrenIndexes()
+		
+		if box.name then
+			box.namedChildren[box.name] = nil
+		end
+		
+		updateChildrenIndexes(self)
 		box.parent = nil
 	end
 	self:update()
 	return self
+end
+
+
+---@param name string
+---@return GNUI.Box?
+function Box:getChild(name)
+	if tonumber(name) then
+		return self.children[name]
+	else
+		for index, child in ipairs(self.children) do
+			if child.name == name then
+				return child
+			end
+		end
+	end
 end
 
 
@@ -226,14 +291,38 @@ end
 --────────────────────────-< UPDATERS >-────────────────────────--
 function BoxAPI.flushUpdates()
 	for index, box in pairs(queueUpdate) do
+		box.flaggedUpdate = false
 		box:forceUpdate()
 	end
 	queueUpdate = {}
 end
 
 
+---Updates itself and its relatives that will get affected
 function Box:update()
-	queueUpdate[self.id] = self
+	self:updateItself()
+	self.flaggedUpdate = true
+	
+	if self.parent then
+		if (self.parent.sizing.x == "FIT" or self.parent.sizing.y == "FIT") or self.parent.layout then
+			self.parent:updateItself()
+			for index, child in ipairs(self.parent.children) do
+				child:updateItself()
+			end
+		end
+	end
+	
+	for index, child in ipairs(self.children) do
+		child:updateItself()
+	end
+end
+
+
+function Box:updateItself()
+	if not self.flaggedUpdate then
+		self.flaggedUpdate = true
+		queueUpdate[#queueUpdate+1] = self
+	end
 end
 
 
@@ -243,8 +332,11 @@ end
 ---@return self
 function Box:forceUpdate()
 	---@cast self GNUI.Box
+	
+	self:calculateLayout(false)
 	self:calculateSize(false)
 	self:calculateSize(true)
+	self:calculateLayout(true)
 	
 	if self.sprite then
 		local sprite = self.sprite
@@ -260,28 +352,45 @@ end
 ---@param self self
 ---@return self
 function Box:calculateSize(other)
-	local a = (other and "y" or "x")
+	local x = (other and "y" or "x")
 	---@cast self GNUI.Box
-	if self.size[a] == -1 and self.layout then
+	if self.sizing[x] == "FIT" and self.layout then
 		if (self.layout == (other and "VERTICAL" or "HORIZONTAL")) then
 			local totalSize = 0
 			for _, child in ipairs(self.children) do
 				child:calculateSize(other)
-				totalSize = totalSize + child.bakedSize[a]
+				totalSize = totalSize + child.bakedSize[x]
 			end
-			self.bakedSize[a] = totalSize
+			self.bakedSize[x] = totalSize
 		else
 			local max = -math.huge
 			for _, child in ipairs(self.children) do
 				child:calculateSize(other)
-				max = math.max(max, child.bakedSize[a])
+				max = math.max(max, child.bakedSize[x])
 			end
-			self.bakedSize[a] = max
+			self.bakedSize[x] = max
 		end
 	else
-		self.bakedSize[a] = self.size[a]
+		self.bakedSize[x] = self.size[x]
 	end
 	return self
+end
+
+
+function Box:calculateLayout(other)
+	local x = (other and "y" or "x")
+	local y = (other and "x" or "y")
+	if self.layout then
+		if self.layout == (other and "VERTICAL" or "HORIZONTAL") then
+			local pos = 0
+			for _, child in ipairs(self.children) do
+				local childSize = child.bakedSize[x]
+				child.bakedPos[x] = pos
+				child.bakedPos[y] = child.bakedPos[y]
+				pos = pos + childSize
+			end
+		end
+	end
 end
 
 

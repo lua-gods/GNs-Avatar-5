@@ -5,15 +5,13 @@ local screen = GNUI.getScreen()
 
 local box = GNUI.parse(screen,{
 	layout = "HORIZONTAL",
-	pos = vec(100,100),
-	variant="default",
-	{
+	{ -- children
 		{
-			variant="default",
-			size = vec(50,50),
+			name="amogus",
+			size = vec(50,50), -- fixed size
 		},
 		{
-			variant="default",
+			name="lel",
 			size = vec(50,50),
 		},
 	}
@@ -21,6 +19,9 @@ local box = GNUI.parse(screen,{
 
 screen:addChild(box)
 
-events.WORLD_RENDER:register(function (delta)
+function events.WORLD_RENDER(delta)
+	
+	local t = world.getTime()+delta
+	box.amogus:setSize((math.sin(t/5)*0.5+0.5)*50,25)
 	GNUI.flushUpdates()
-end)
+end
