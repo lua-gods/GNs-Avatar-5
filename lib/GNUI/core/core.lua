@@ -6,10 +6,6 @@ local canvas = require("./canvas") ---@type GNUI.CanvasAPI
 ---@class GNUI.CoreAPI
 local CoreAPI = {}
 
-
-function CoreAPI.flushUpdates()
-	box.flushUpdates()
-end
 ---@param canvas GNUI.Canvas
 ---@return GNUI.Box
 function CoreAPI.newBox(canvas) return box.new(canvas) end

@@ -34,9 +34,5 @@ function GNUIAPI.getScreen()
 	end
 end
 
-function GNUIAPI.flushUpdates()
-	Core.flushUpdates()
-end
-
 
 return GNUIAPI

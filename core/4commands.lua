@@ -33,7 +33,7 @@ end
 function mapArea()
 	
 	local SKIP = 40
-	local INTERVAL = 20 * 4
+	local INTERVAL = 20 * 10
 	local STEP_SIZE = 16 * 12 * 2
 	
 	local x = 0

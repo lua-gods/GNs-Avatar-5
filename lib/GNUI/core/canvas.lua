@@ -10,6 +10,7 @@ local CanvasAPI = {}
 ---A root node for boxes
 ---@class GNUI.Canvas : GNUI.Box
 ---@field render GNUI.RenderInstance
+---@field queueUpdate GNUI.Box[]
 local Canvas = {}
 Canvas.__index = function (t,i)
 	return rawget(t,i) or Canvas[i] or Box.index(i)
@@ -24,9 +25,14 @@ function CanvasAPI.new()
 	local self = Box.new()
 	---@cast self GNUI.Canvas
 	self.render = Render.new(self)
+	self.queueUpdate = {}
 	setmetatable(self,Canvas)
 	return self
 end
 
+
+function Canvas:flushUpdates()
+	self:forceUpdate()
+end
 
 return CanvasAPI

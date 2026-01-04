@@ -21,7 +21,7 @@ Quad.__index = function (t,i)
 end
 
 
-function QuadAPI.getIndex() return Quad.__index end
+function QuadAPI.index(i) return Quad[i] end
 
 
 ---A representation of a quad that will get drawn

@@ -413,7 +413,7 @@
 		"setType": true,
 
 		// Parameter settings.
-		"paramName": "All", // Show the name of parameters in function calls.
+		"paramName": "Disable", // Show the name of parameters in function calls.
 		"paramType": true, // Show the type of parameters in function definitions.
 
 		// Show a virtual "await" next to called async functions.

@@ -1,7 +1,9 @@
-local gncommon = require("lib.gncommon") ---@type GNCommon
+local gncommon = require("../../gncommon") ---@type GNCommon
+local utils = require("../utils") ---@type GNUI.utils
 
 ---@class GNUI.BoxAPI
 local BoxAPI = {}
+
 
 ---@alias GNUI.Box.SizingMode string
 ---| "FIXED"
@@ -38,6 +40,9 @@ local BoxAPI = {}
 ---@field visible boolean
 ---@field id integer
 ---
+---@field text string
+---@field wrapText boolean
+---
 ---@field flaggedUpdate boolean
 ---@field sprite GNUI.Sprite?
 ---@field canvas GNUI.Canvas
@@ -51,9 +56,6 @@ Box.__style = "box"
 function BoxAPI.index(i)
 	return Box[i]
 end
-
-
-local queueUpdate = {}
 
 
 local nextFree = 1
@@ -75,7 +77,6 @@ function BoxAPI.new(canvas)
 		
 		bakedPos = vec(0,0),
 		bakedSize = vec(0,0),
-		bakedDim = vec(0,0,0,0),
 		
 		parent = nil,
 		childIndex = 0,
@@ -138,7 +139,8 @@ end
 ---@return self
 function Box:setSize(x,y)
 	---@cast self GNUI.Box
-	self.size = gncommon.vec2(x,y,self.size)
+	local size = gncommon.vec2(x,y,self.size)
+	self.size = size
 	self:update()
 	return self
 end
@@ -158,6 +160,12 @@ function Box:setMinimumSize(x,y)
 end
 
 
+---@return Vector2
+function Box:getMinimumSize()
+	return self.minSize
+end
+
+
 ---@overload fun(self: GNUI.Box ,size : Vector2): GNUI.Box
 ---@param x number?
 ---@param y number?
@@ -169,6 +177,12 @@ function Box:setMaximumSize(x,y)
 	self.maxSize = gncommon.vec2(x,y,self.maxSize)
 	self:update()
 	return self
+end
+
+
+---@return Vector2
+function Box:getMaximumSize()
+	return self.maxSize
 end
 
 
@@ -215,6 +229,7 @@ function Box:setSprite(sprite)
 		self.sprite:setBox(self)
 	end
 	self.sprite = sprite
+	self:update()
 	return self
 end
 
@@ -319,43 +334,67 @@ function Box:setParent(parent)
 end
 
 
---────────────────────────-< UPDATERS >-────────────────────────--
-function BoxAPI.flushUpdates()
-	for index, box in pairs(queueUpdate) do
-		box.flaggedUpdate = false
-		box:forceUpdate()
-	end
-	queueUpdate = {}
+---Returns the parent of the box
+---@return GNUI.Box?
+function Box:getParent()
+	return self.parent
 end
+
+
+---@generic self
+---@param self self
+---@return self
+---@param text string
+function Box:setText(text)
+	---@cast self GNUI.Box
+	self.text = text
+	if self.sprite then
+		self.sprite:setText(text)
+	end
+	return self
+end
+
+
+---sets if the text should wrap around or not
+---@generic self
+---@param self self
+---@return self
+---@param wrap boolean
+function Box:setWrapText(wrap)
+	---@cast self GNUI.Box
+	self.wrapText = wrap
+	return self
+end
+
+
+--────────────────────────-< UPDATERS >-────────────────────────--
 
 
 ---Updates itself and its relatives that will get affected
 function Box:update()
 	self:updateItself()
-	self.flaggedUpdate = true
-	
-	if self.parent then
-		if (self.parent.sizing.x == "FIT" or self.parent.sizing.y == "FIT") or self.parent.layout then
-			self.parent:updateItself()
-			for index, child in ipairs(self.parent.children) do
-				child:updateItself()
-			end
-		end
-	end
-	
-	for index, child in ipairs(self.children) do
-		child:updateItself()
-	end
 end
 
 
 function Box:updateItself()
 	if not self.flaggedUpdate then
 		self.flaggedUpdate = true
-		queueUpdate[self.id] = self
+		if self.canvas then
+			self.canvas.queueUpdate[self.id] = self
+		end
 	end
 end
 
+function Box:updateSprites()
+	if self.sprite then
+		local sprite = self.sprite
+		sprite:setPos(self.bakedPos)
+		sprite:setSize(self.bakedSize)
+	end
+	for _, child in ipairs(self.children) do
+		child:updateSprites()
+	end
+end
 
 ---Forces this element to update
 ---@generic self
@@ -363,7 +402,6 @@ end
 ---@return self
 function Box:forceUpdate()
 	---@cast self GNUI.Box
-	
 	self
 	
 	:solveForFitSizing(false)
@@ -374,11 +412,8 @@ function Box:forceUpdate()
 	:sovleForFillSizing(true)
 	:sovleForLayout(true)
 	
-	if self.sprite then
-		local sprite = self.sprite
-		sprite:setPos(self.bakedPos)
-		sprite:setSize(self.bakedSize)
-	end
+	
+	:updateSprites()
 	return self
 end
 
@@ -395,24 +430,32 @@ function Box:solveForFitSizing(other)
 		child:solveForFitSizing(other)
 	end
 	
+	local textSize = self.text and utils.getTextSize(self.text, x == "y" and self.bakedSize.x or 0, self.wrapText) or vec(0,0)
 	if self.sizing[x] == "FIXED" then
-		self.bakedSize[x] = self.size[x]
-	end
+		self.bakedSize[x] = math.max(self.minSize[x],self.size[x])
 	
-	if self.parent then
-		if (self.parent.layout == (other and "VERTICAL" or "HORIZONTAL")) then
+	elseif self.sizing[x] == "FIT" then
+		if (self.layout == (other and "VERTICAL" or "HORIZONTAL")) then -- is parallel
 			local totalSize = 0
-			totalSize = totalSize + self.bakedSize[x]
-			self.bakedSize[x] = totalSize
+			for _, child in ipairs(self.children) do
+				totalSize = totalSize + child.bakedSize[x]
+			end
+			self.bakedSize[x] = math.max(self.minSize[x],totalSize,textSize[x])
+		
 		else
-			local max = -math.huge
-			max = math.max(max, self.bakedSize[x])
-			self.bakedSize[x] = max
+			local minSize = self.minSize[x]
+			for _, child in ipairs(self.children) do
+				minSize = math.max(minSize,child.bakedSize[x])
+			end
+			self.bakedSize[x] = math.max(minSize,textSize[x])
 		end
-	end
 	
+	elseif self.sizing[x] == "FILL" then
+		self.bakedSize[x] = math.max(self.minSize[x], 0)
+	end
 	return self
 end
+
 
 ---@param other boolean? # tell if its in the X(false) or Y(true) axis
 ---@generic self
@@ -425,39 +468,41 @@ function Box:sovleForFillSizing(other)
 	
 	local parallel = self.layout == (other and "VERTICAL" or "HORIZONTAL")
 	local fillers = {} ---@type GNUI.Box[]
+	local fitters = {} ---@type GNUI.Box[]
 	
 	if parallel then
 		for _, child in ipairs(self.children) do
-			if child.sizing[x] ~= "FILL" then
-				remainingSpace = remainingSpace - child.bakedSize[x]
-			else
-				remainingSpace = remainingSpace - child.minSize[x]
-				child.bakedSize[x] = 0
+			if child.sizing[x] == "FILL"then
 				fillers[#fillers+1] = child
+			elseif child.sizing[x] == "FIT" then
+				fitters[#fitters+1] = child
 			end
+			remainingSpace = remainingSpace - child.bakedSize[x]
 		end
 		
 		if #fillers > 0 then
 			for i = 1, 10, 1 do
-				if remainingSpace <= 0 then break end
+				if remainingSpace < 0.01 then break end
 				local smallest = fillers[1]
-				local smallestSpace = 0
-				local secondSmallest = math.huge
+				local secondSmallest = fillers[1]
 				local spaceToAdd = remainingSpace
 				
 				for _, child in pairs(fillers) do
+					-- find the smallest and 2nd smallest child
 					if child.bakedSize[x] < smallest.bakedSize[x] then
-						secondSmallest = smallest.bakedSize[x]
+						secondSmallest = smallest
 						smallest = child
 					end
-					if child.bakedSize[x] > smallest.bakedSize[x] then
-						secondSmallest = math.min(secondSmallest, child.bakedSize[x])
-						spaceToAdd = secondSmallest - smallestSpace
+					
+					-- set space to add to the difference between the smallest to the 2nd smallest
+					if child.bakedSize[x] > smallest.bakedSize[x] then 
+						secondSmallest.bakedSize[x] = math.max(secondSmallest.bakedSize[x], child.bakedSize[x])
+						spaceToAdd = secondSmallest.bakedSize[x] - smallest.bakedSize[x]
 					end
 				end
 				
+				-- clamp the allowed space to expand to the remaining space divided to all fillers
 				spaceToAdd = math.min(spaceToAdd, remainingSpace / #fillers)
-				
 				for _, child in pairs(fillers) do
 					if child.bakedSize[x] == smallest.bakedSize[x] then
 						child.bakedSize[x] = child.bakedSize[x] + spaceToAdd
@@ -469,11 +514,10 @@ function Box:sovleForFillSizing(other)
 	else
 		for _, child in pairs(self.children) do
 			if child.sizing[x] == "FILL" then
-				child.bakedSize[x] = remainingSpace
+				child.bakedSize[x] = math.max(self.bakedSize[x],child.bakedSize[x])
 			end
 		end
 	end
-	
 	
 	for _, child in ipairs(self.children) do
 		child:sovleForFillSizing(other)
@@ -496,10 +540,14 @@ function Box:sovleForLayout(other)
 			for _, child in ipairs(self.children) do
 				local childSize = child.bakedSize[x]
 				child.bakedPos[x] = pos
-				child.bakedPos[y] = child.bakedPos[y]
+				--child.bakedPos[y] = child.bakedPos[y]
 				pos = pos + childSize
 			end
 		end
+	end
+	
+	for _, child in ipairs(self.children) do
+		child:sovleForLayout(other)
 	end
 	return self
 end

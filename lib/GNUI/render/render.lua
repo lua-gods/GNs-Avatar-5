@@ -8,7 +8,7 @@ local RenderAPI = {}
 ---An abstract class for all the renderers for GNUI
 ---@class GNUI.RenderInstance
 ---@field canvas GNUI.Canvas
----@field visuals table<integer,GNUI.Render.Visual.Quad>
+---@field visuals table<integer,GNUI.Render.Visual>
 ---@field model ModelPart
 local Render = {}
 Render.__index = Render
@@ -80,6 +80,14 @@ end
 ---@field size Vector2
 ---@field free fun()
 ---@field model ModelPart
+---
+---@field texture_path string
+---@field texture_size Vector2
+---@field uv Vector4
+---@field quad SpriteTask
+---
+---@field label TextTask
+---@field text string
 
 function Render:free(id)
 	self.visuals[id]:free()
@@ -87,18 +95,8 @@ function Render:free(id)
 end
 
 
---────────────────────────-< Quad >-────────────────────────--
-
----@class GNUI.Render.Visual.Quad : GNUI.Render.Visual
----@field texture_path string
----@field texture_size Vector2
----@field uv Vector4
----@field task SpriteTask
-
-
-
 ---@return integer
-function Render:newQuadVisual()
+function Render:newVisualQuad()
 	local id = #self.visuals+1
 	local model = self.model:newPart("quad" .. id)
 	local new = {
@@ -109,7 +107,7 @@ function Render:newQuadVisual()
 		childCount = 0,
 		pos = vec(0,0),
 		children = {},
-		task = model:newSprite("sprite"),
+		quad = model:newSprite("sprite"),
 		model = model
 	}
 	
@@ -123,8 +121,9 @@ end
 ---Works for all visual types
 ---@param id integer
 function Render:free(id)
-	self.visuals[id].task:remove()
+	self.visuals[id].quad:remove()
 end
+
 
 
 ---Sets the position of the visual, relative to its parent
@@ -149,7 +148,15 @@ end
 function Render:setSize(id,x,y)
 	local visual = self.visuals[id]
 	visual.size = vec(x,y)
-	visual.task:scale(x/20,y/20,1)
+	
+	if visual.quad then
+		local size = visual.texture_size
+		visual.quad:scale(x/size.x,y/size.y,1)
+	end
+	
+	if visual.label then
+		visual.label:setWidth(x):wrap(true)
+	end
 end
 
 
@@ -166,7 +173,7 @@ end
 ---Sets the texture path of the visual
 ---@param path string
 function Render:setTexture(id,path)
-	assert(textures[path],"Texture "..path.." not found")
+	assert(textures[path],"Texture path \""..path.."\" not found")
 	local visual = self.visuals[id]
 	local texture = textures[path]
 	local textureSize = texture:getDimensions()
@@ -174,7 +181,7 @@ function Render:setTexture(id,path)
 	visual.texture_path = path
 	visual.texture_size = textureSize
 	visual.uv = uv
-	visual.task
+	visual.quad
 	:texture(textures[path],textureSize.x,textureSize.y)
 	:setUV(uv.xy / visual.texture_size)
 	:setRegion(uv.zw * visual.texture_size)
@@ -193,9 +200,20 @@ function Render:setUV(id,u1,v1,u2,v2)
 	assert(visual,"Visual Quad "..id.." not found")
 	local uv = gncommon.vec4(u1,v1,u2,v2)
 	visual.uv = uv
-	visual.task
+	visual.quad
 	:setUV(uv.xy / visual.texture_size)
 	:setRegion(uv.zw * visual.texture_size)
+end
+
+
+function Render:setText(id,text)
+	local visual = self.visuals[id]
+	if not visual.label then
+		visual.label = visual.model:newText("label")
+	end
+	
+	visual.label:text(text)
+	visual.text = text
 end
 
 

@@ -44,7 +44,7 @@ function SpriteAPI.new(box)
 		margin = vec(0,0,0,0),
 		
 		render = box.canvas.render,
-		id = box.canvas.render:newQuadVisual()
+		id = box.canvas.render:newVisualQuad()
 	}
 	
 	setmetatable(self, Sprite)
@@ -86,6 +86,17 @@ function Sprite:setSize(x,y)
 	---@cast self GNUI.Sprite
 	self.size = gncommon.vec2(x,y)
 	self.render:setSize(self.id, self.size.x, self.size.y)
+	return self
+end
+
+
+---@generic self
+---@param self self
+---@return self
+---@param text string
+function Sprite:setText(text)
+	---@cast self GNUI.Sprite
+	self.render:setText(self.id,text)
 	return self
 end
 
@@ -185,6 +196,7 @@ function Sprite:setBox(box)
 	self.box = box
 	if self.box then
 		self:setStyle(self.style)
+		self:setText(self.box.text)
 	end
 	return self
 end

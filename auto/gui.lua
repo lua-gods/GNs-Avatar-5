@@ -1,33 +1,38 @@
-
 local GNUI = require("lib.GNUI.main")
-
 local screen = GNUI.getScreen()
 
+-- creates a new box with children
 local box = GNUI.parse(screen,{
 	layout = "HORIZONTAL",
-	size = vec(250,50),
-	{ -- children
-		{
-			size = vec(50,50), -- fixed size
-		},
-		{
-			name="amogus",
-			sizing="FILL",
-		},
-		{
-			name="ee",
-			size = vec(300,50),
-			sizing="FILL",
-		},
-	}
+	size = vec(200,-1),
+	variant="test",
+	
+	--{ -- children
+	--	{
+	--		text="One Two Three Four",
+	--		sizing={"FILL","FIT"},
+	--		variant="test",
+	--	},
+	--	{
+	--		sizing="FIXED",
+	--		size=vec(30,30),
+	--		variant="test",
+	--	},
+	--	{
+	--		text="Five Six Seven Eight Nine Ten",
+	--		sizing={"FILL","FIT"},
+	--		variant="test",
+	--	}
+	--}
 })
 
 screen:addChild(box)
 
 
+-- can be any event
 function events.WORLD_RENDER(delta)
-	
-	local t = world.getTime()+delta
-	box:setSize((math.sin(t/5)*0.5+0.5)*250+200,50)
-	GNUI.flushUpdates()
+	local t = client.getSystemTime()/50
+	box:setSize((math.sin(t/8)*0.5+0.5)*125+100,30)
+	-- tells GNUI to update, might not be needed in the final version
+	screen:flushUpdates()
 end

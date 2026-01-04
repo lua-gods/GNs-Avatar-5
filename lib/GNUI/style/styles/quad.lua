@@ -16,8 +16,8 @@ QuadStyle.__index = function (t,i)
 end
 
 
-function QuadStyleAPI.getIndex()
-	return QuadStyle.__index
+function QuadStyleAPI.index(i)
+	return QuadStyle[i]
 end
 
 
