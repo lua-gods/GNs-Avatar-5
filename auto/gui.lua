@@ -7,23 +7,23 @@ local box = GNUI.parse(screen,{
 	size = vec(200,10),
 	variant="test",
 	
-	--{ -- children
-	--	{
-	--		text="One Two Three Four",
-	--		sizing={"FILL","FIT"},
-	--		variant="test",
-	--	},
-	--	{
-	--		sizing="FIXED",
-	--		size=vec(30,30),
-	--		variant="test",
-	--	},
-	--	{
-	--		text="Five Six Seven Eight Nine Ten",
-	--		sizing={"FILL","FIT"},
-	--		variant="test",
-	--	}
-	--}
+	{ -- children
+		{
+			text="One Two Three Four",
+			sizing={"FILL","FIT"},
+			variant="test",
+		},
+		{
+			sizing="FIXED",
+			size=vec(30,30),
+			variant="test",
+		},
+		{
+			text="Five Six Seven Eight Nine Ten",
+			sizing={"FILL","FIT"},
+			variant="test",
+		}
+	}
 })
 
 screen:addChild(box)

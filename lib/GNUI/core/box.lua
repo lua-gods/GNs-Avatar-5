@@ -539,7 +539,7 @@ function Box:sovleForLayout(other)
 	---@cast self GNUI.Box
 	local x = (other and "y" or "x")
 	local y = (other and "x" or "y")
-	if self.sizing[x] == "FIXED" then
+	if self.sizing[x] == "FIXED" and (not self.parent or (self.parent and not self.parent.layout)) then
 		self.bakedPos[x] = self.pos[x]
 		self.bakedSize[x] = self.size[x]
 	end

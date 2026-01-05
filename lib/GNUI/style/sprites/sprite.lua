@@ -41,6 +41,7 @@ function SpriteAPI.new(box)
 	assert(box,"no GNUI.Box given")
 	
 	local self = {
+		pos = vec(0,0),
 		size = vec(0,0),
 		padding = vec(0,0,0,0),
 		margin = vec(0,0,0,0),

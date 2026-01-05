@@ -97,19 +97,21 @@ function Nineslice:setTexture(path)
 end
 
 
----@overload fun(self: GNUI.Sprite, xy: Vector2): self
----@param x number
----@param y number
----@generic self
----@param self self
----@return self
-function Nineslice:setPos(x,y)
-	---@cast self GNUI.Sprite.Nineslice
-	self.pos = gncommon.vec2(x,y)
+function Nineslice:updateSprites()
 	local border = self.style.border
 	local size = self.size
 	local pos = self.pos
+	self.render:setSize(self.idTopLeft,  border.x, border.y)
+	self.render:setSize(self.idTop,      size.x-border.x-border.z, border.y)
+	self.render:setSize(self.idTopRight, border.z, border.y)
 	
+	self.render:setSize(self.idLeft,  border.x, size.y-border.y-border.w)
+	self.render:setSize(self.id,      size.x-border.x-border.z, size.y-border.y-border.w)
+	self.render:setSize(self.idRight, border.z, size.y-border.y-border.w)
+	
+	self.render:setSize(self.idBottomLeft,  border.x, border.w)
+	self.render:setSize(self.idBottom,      size.x-border.x-border.z, border.w)
+	self.render:setSize(self.idBottomRight, border.z, border.w)
 	self.render:setPos(self.idTopLeft,  pos.x, pos.y)
 	self.render:setPos(self.idTop,      pos.x+border.x, pos.y)
 	self.render:setPos(self.idTopRight, pos.x+size.x-border.z, pos.y)
@@ -121,6 +123,19 @@ function Nineslice:setPos(x,y)
 	self.render:setPos(self.idBottomLeft,  pos.x, pos.y+size.y-border.w)
 	self.render:setPos(self.idBottom,      pos.x+border.x,pos.y+size.y-border.w)
 	self.render:setPos(self.idBottomRight, pos.x+size.x-border.z,pos.y+size.y-border.w)
+end
+
+
+---@overload fun(self: GNUI.Sprite, xy: Vector2): self
+---@param x number
+---@param y number
+---@generic self
+---@param self self
+---@return self
+function Nineslice:setPos(x,y)
+	---@cast self GNUI.Sprite.Nineslice
+	self.pos = gncommon.vec2(x,y)
+	self:updateSprites()
 	return self
 end
 
@@ -135,20 +150,7 @@ end
 function Nineslice:setSize(x,y)
 	---@cast self GNUI.Sprite.Nineslice
 	self.size = gncommon.vec2(x,y)
-	local border = self.style.border
-	local size = self.size
-	
-	self.render:setSize(self.idTopLeft,  border.x, border.y)
-	self.render:setSize(self.idTop,      size.x-border.x-border.z, border.y)
-	self.render:setSize(self.idTopRight, border.z, border.y)
-	
-	self.render:setSize(self.idLeft,  border.x, size.y-border.y-border.w)
-	self.render:setSize(self.id,      size.x-border.x-border.z, size.y-border.y-border.w)
-	self.render:setSize(self.idRight, border.z, size.y-border.y-border.w)
-	
-	self.render:setSize(self.idBottomLeft,  border.x, border.w)
-	self.render:setSize(self.idBottom,      size.x-border.x-border.z, border.w)
-	self.render:setSize(self.idBottomRight, border.z, border.w)
+	self:updateSprites()
 	return self
 end
 
@@ -176,6 +178,7 @@ function Nineslice:applyStyle()
 		if self.parentID then
 			self:setParent(self.parentID, self.childIndex)
 		end
+		self:updateSprites()
 	end
 end
 
@@ -184,7 +187,6 @@ end
 ---@param index integer
 function Nineslice:setParent(spriteID,index)
 	assert(spriteID,"no spriteID given")
-	print("EOA")
 	
 	self.render:setParent(self.idTopLeft,spriteID,index)
 	self.render:setParent(self.idTop,spriteID,index)
@@ -197,7 +199,6 @@ function Nineslice:setParent(spriteID,index)
 	self.render:setParent(self.idBottomLeft,spriteID,index)
 	self.render:setParent(self.idBottom,spriteID,index)
 	self.render:setParent(self.idBottomRight,spriteID,index)
-	print("A")
 end
 
 
