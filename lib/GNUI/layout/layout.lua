@@ -15,6 +15,7 @@ local LayoutAPI = {}
 ---@field minSize Vector2?
 ---@field sizing ({[1]:GNUI.Box.SizingMode,[2]:GNUI.Box.SizingMode}|GNUI.Box.SizingMode)?
 ---@field pos Vector2?
+---@field gap number?
 ---@field layout GNUI.Box.LayoutMode?
 ---@field text string?
 ---@field wrap boolean?
@@ -53,6 +54,8 @@ local function parseEntry(canvas, layout)
 	if layout.pos then box:setPos(layout.pos.x, layout.pos.y) end
 	if layout.layout then box:setLayout(layout.layout) end
 
+	if layout.gap then box:setChildGap(layout.gap) end
+	
 	local style = Style.getStyle(box, layout.variant or "default", "normal")
 	if style then
 		box:setSprite(style:newInstance(box))

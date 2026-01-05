@@ -24,7 +24,7 @@ local NinesliceAPI = {}
 ---@field idTopRight integer
 ---
 ---@field idLeft integer
----@field id integer
+---@field idCenter integer
 ---@field idRight integer
 ---
 ---@field idBottomRight integer
@@ -52,7 +52,7 @@ function NinesliceAPI.new(box)
 	self.idTopRight = self.render:newVisualQuad()
 	
 	self.idLeft = self.render:newVisualQuad()
-	self.id = self.render:newVisualQuad()
+	self.idCenter = self.render:newVisualQuad()
 	self.idRight = self.render:newVisualQuad()
 	
 	self.idBottomRight = self.render:newVisualQuad()
@@ -87,7 +87,7 @@ function Nineslice:setTexture(path)
 	self.render:setTexture(self.idTopRight,self.texture_path)
 	
 	self.render:setTexture(self.idLeft,self.texture_path)
-	self.render:setTexture(self.id,self.texture_path)
+	self.render:setTexture(self.idCenter,self.texture_path)
 	self.render:setTexture(self.idRight,self.texture_path)
 	
 	self.render:setTexture(self.idBottomLeft,self.texture_path)
@@ -101,23 +101,28 @@ function Nineslice:updateSprites()
 	local border = self.style.border
 	local size = self.size
 	local pos = self.pos
+	self.render:setSize(self.id,      size.x, size.y)
+	
 	self.render:setSize(self.idTopLeft,  border.x, border.y)
 	self.render:setSize(self.idTop,      size.x-border.x-border.z, border.y)
 	self.render:setSize(self.idTopRight, border.z, border.y)
 	
 	self.render:setSize(self.idLeft,  border.x, size.y-border.y-border.w)
-	self.render:setSize(self.id,      size.x-border.x-border.z, size.y-border.y-border.w)
+	self.render:setSize(self.idCenter,      size.x-border.x-border.z, size.y-border.y-border.w)
 	self.render:setSize(self.idRight, border.z, size.y-border.y-border.w)
 	
 	self.render:setSize(self.idBottomLeft,  border.x, border.w)
 	self.render:setSize(self.idBottom,      size.x-border.x-border.z, border.w)
 	self.render:setSize(self.idBottomRight, border.z, border.w)
+	
+	self.render:setPos(self.id,  pos.x, pos.y)
+	
 	self.render:setPos(self.idTopLeft,  pos.x, pos.y)
 	self.render:setPos(self.idTop,      pos.x+border.x, pos.y)
 	self.render:setPos(self.idTopRight, pos.x+size.x-border.z, pos.y)
 	
 	self.render:setPos(self.idLeft,  pos.x, pos.y+border.y)
-	self.render:setPos(self.id,      pos.x+border.x, pos.y+border.y)
+	self.render:setPos(self.idCenter,      pos.x+border.x, pos.y+border.y)
 	self.render:setPos(self.idRight, pos.x+size.x-border.z, pos.y+border.y)
 	
 	self.render:setPos(self.idBottomLeft,  pos.x, pos.y+size.y-border.w)
@@ -168,7 +173,7 @@ function Nineslice:applyStyle()
 		self.render:setUV(self.idTopRight, uv.z-border.z,    uv.y,      uv.z,                uv.y+border.y)
 		
 		self.render:setUV(self.idLeft,  uv.x,                uv.y+border.y,       uv.x+border.x,   uv.w-border.w)
-		self.render:setUV(self.id,      uv.x+border.x,       uv.y+border.y,       uv.z-border.z,   uv.w-border.w)
+		self.render:setUV(self.idCenter,      uv.x+border.x,       uv.y+border.y,       uv.z-border.z,   uv.w-border.w)
 		self.render:setUV(self.idRight, uv.z-border.z,       uv.y+border.y,       uv.z,            uv.w-border.w)
 		
 		self.render:setUV(self.idBottomLeft,  uv.x, uv.w-border.w, uv.x+border.x, uv.w)
@@ -193,12 +198,14 @@ function Nineslice:setParent(spriteID,index)
 	self.render:setParent(self.idTopRight,spriteID,index)
 	
 	self.render:setParent(self.idLeft,spriteID,index)
-	self.render:setParent(self.id,spriteID,index)
+	self.render:setParent(self.idCenter,spriteID,index)
 	self.render:setParent(self.idRight,spriteID,index)
 	
 	self.render:setParent(self.idBottomLeft,spriteID,index)
 	self.render:setParent(self.idBottom,spriteID,index)
 	self.render:setParent(self.idBottomRight,spriteID,index)
+	
+	self.render:setParent(self.id,spriteID,index)
 end
 
 

@@ -21,7 +21,7 @@ local renders = {}
 ---@param canvas GNUI.Canvas
 ---@return GNUI.RenderInstance
 function RenderAPI.new(canvas)
-	local model = models:newPart("GNUIRenderer","SKULL")
+	local model = models:newPart("GNUIRenderer","HUD")
 	local self = {
 		canvas = canvas,
 		visuals = {},
@@ -86,6 +86,7 @@ end
 ---@field uv Vector4
 ---@field quad SpriteTask
 ---
+---@field padding Vector4
 ---@field label TextTask
 ---@field text string
 
@@ -107,6 +108,7 @@ function Render:newVisualQuad()
 		childCount = 0,
 		pos = vec(0,0),
 		children = {},
+		padding = vec(0,0,0,0),
 		quad = model:newSprite("sprite"):setRenderType("CUTOUT_EMISSIVE_SOLID"),
 		model = model
 	}
@@ -157,7 +159,22 @@ function Render:setSize(id,x,y)
 	end
 	
 	if visual.label then
-		visual.label:setWidth(x):wrap(true)
+		visual.label:setWidth(x-visual.padding.x-visual.padding.z):wrap(true)
+	end
+end
+
+
+---@overload fun(self: GNUI.RenderInstance, id: integer, leftTopRightBottom: Vector4): self
+---@param id integer
+---@param left number
+---@param top number
+---@param right number
+---@param bottom number
+function Render:setPadding(id,left,top,right,bottom)
+	local visual = self.visuals[id]
+	visual.padding = gncommon.vec4(left,top,right,bottom)
+	if visual.label then
+		visual.label:setPos(left,top)
 	end
 end
 
@@ -215,7 +232,7 @@ end
 function Render:setText(id,text)
 	local visual = self.visuals[id]
 	if not visual.label then
-		visual.label = visual.model:newText("label")
+		visual.label = visual.model:newText("label"):setPos(-visual.padding.x,-visual.padding.y)
 	end
 	
 	visual.label:text(text)

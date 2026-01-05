@@ -4,8 +4,11 @@ local screen = GNUI.getScreen()
 -- creates a new box with children
 local box = GNUI.parse(screen,{
 	layout = "HORIZONTAL",
-	size = vec(200,10),
+	size = vec(200,-1),
+	sizing = {"FIXED","FIT"},
 	variant="test",
+	padding = vec(2,2,2,2),
+	gap = 5,
 	
 	{ -- children
 		{
@@ -14,8 +17,8 @@ local box = GNUI.parse(screen,{
 			variant="test",
 		},
 		{
-			sizing="FIXED",
-			size=vec(30,30),
+			sizing={"FIXED","FILL"},
+			size=vec(30,-1),
 			variant="test",
 		},
 		{
@@ -28,11 +31,12 @@ local box = GNUI.parse(screen,{
 
 screen:addChild(box)
 
+box:setPos(10,10)
 
 -- can be any event
 function events.WORLD_RENDER(delta)
 	local t = client.getSystemTime()/50
-	box:setSize((math.sin(t/8)*0.5+0.5)*25+50,30)
+	box:setSize((math.sin(t/8)*0.5+0.5)*45+140,-1)
 	--:setPos(math.random(1,10),0)
 	-- tells GNUI to update, might not be needed in the final version
 	screen:flushUpdates()

@@ -21,8 +21,6 @@ local SpriteAPI = {}
 ---@field color Vector3
 ---@field pos Vector2
 ---@field size Vector2
----@field padding Vector4
----@field margin Vector4
 ---
 ---@field render GNUI.RenderInstance
 ---@field id integer?
@@ -105,70 +103,18 @@ function Sprite:setText(text)
 end
 
 
----@overload fun(self: GNUI.Sprite, ltrb: Vector4): self
----@overload fun(self: GNUI.Sprite, lt: Vector2, rn: Vector2): self
+---@overload fun(self: GNUI.Sprite ,leftTopRightBottom: Vector4): GNUI.Sprite
 ---@param left number
 ---@param top number
 ---@param right number
 ---@param bottom number
----@generic self
----@param self self
----@return self
-function Sprite:setMargin(left,top,right,bottom)
-	---@cast self GNUI.Sprite
-	self.margin = gncommon.vec4(left,top,right,bottom)
-	self.box:update()
-	return self
-end
-
-
-
----@return Vector4
-function Sprite:getMargin()
-	local margin = self.margin
-	if self.style then
-		local style = self.style
-		margin = vec(
-			math.max(margin.x, style.margin.x),
-			math.max(margin.y, style.margin.y),
-			math.max(margin.z, style.margin.z),
-			math.max(margin.w, style.margin.w)
-		)
-	end
-	return margin
-end
-
-
----@overload fun(self: GNUI.Sprite, ltrb: Vector4): self
----@overload fun(self: GNUI.Sprite, lt: Vector2, rn: Vector2): self
----@param left number
----@param top number
----@param right number
----@param bottom number
----@generic self
----@param self self
----@return self
+---@return GNUI.Sprite
 function Sprite:setPadding(left,top,right,bottom)
 	---@cast self GNUI.Sprite
 	self.padding = gncommon.vec4(left,top,right,bottom)
-	self.box:update()
+	self.render:setPadding(self.id, self.padding.x, self.padding.y, self.padding.z, self.padding.w)
 	return self
-end
-
-
----@return Vector4
-function Sprite:getPadding()
-	local padding = self.padding
-	if self.style then
-		local style = self.style
-		padding = vec(
-			math.max(padding.x, style.padding.x),
-			math.max(padding.y, style.padding.y),
-			math.max(padding.z, style.padding.z),
-			math.max(padding.w, style.padding.w)
-		)
-	end
-	return padding
+	
 end
 
 
@@ -193,6 +139,7 @@ function Sprite:applyStyle()
 		self:setText(self.box.text)
 		self:setPos(self.box.pos)
 		self:setSize(self.box.size)
+		self.render:setPadding(self.id, self.box.padding.x, self.box.padding.y, self.box.padding.z, self.box.padding.w)
 	else
 		self:setText("")
 	end
@@ -207,6 +154,7 @@ function Sprite:setBox(box)
 	---@cast self GNUI.Sprite
 	self.box = box
 	if self.box then
+		self:setPadding(box:getPadding())
 		self:applyStyle()
 	end
 	return self
