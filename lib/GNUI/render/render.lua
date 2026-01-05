@@ -103,11 +103,11 @@ function Render:newVisualQuad()
 		type = "quad",
 		render = self,
 		id = id,
-		index = 1,
+		index = 10,
 		childCount = 0,
 		pos = vec(0,0),
 		children = {},
-		quad = model:newSprite("sprite"),
+		quad = model:newSprite("sprite"):setRenderType("CUTOUT_EMISSIVE_SOLID"),
 		model = model
 	}
 	
@@ -151,7 +151,9 @@ function Render:setSize(id,x,y)
 	
 	if visual.quad then
 		local size = visual.texture_size
-		visual.quad:scale(x/size.x,y/size.y,1)
+		if size then
+			visual.quad:scale(x/size.x,y/size.y,1)
+		end
 	end
 	
 	if visual.label then
@@ -173,6 +175,7 @@ end
 ---Sets the texture path of the visual
 ---@param path string
 function Render:setTexture(id,path)
+	assert(path,"No texture path given")
 	assert(textures[path],"Texture path \""..path.."\" not found")
 	local visual = self.visuals[id]
 	local texture = textures[path]
@@ -191,6 +194,9 @@ end
 ---NOTE: Quad exclusive function
 ---
 ---Sets the UV of the visual
+---@overload fun(self: GNUI.RenderInstance, id: integer, uv1uv2: Vector4): self
+---@overload fun(self: GNUI.RenderInstance, id: integer, uv1: Vector2, uv2: Vector2): self
+---@param id integer
 ---@param u1 number
 ---@param v1 number
 ---@param u2 number
@@ -201,8 +207,8 @@ function Render:setUV(id,u1,v1,u2,v2)
 	local uv = gncommon.vec4(u1,v1,u2,v2)
 	visual.uv = uv
 	visual.quad
-	:setUV(uv.xy / visual.texture_size)
-	:setRegion(uv.zw * visual.texture_size)
+	:setUV(uv.xy/visual.texture_size)
+	:setRegion((uv.zw-uv.xy))
 end
 
 
@@ -237,6 +243,7 @@ function Render:setParent(id,parentID,index)
 	
 	if parentID ~= 0 then
 		local parent = self.visuals[parentID]
+		assert(parent,"Visual Quad with ID: "..tostring(parentID).." not found")
 		visual.parent = parent
 		if parent then
 			parent.model:addChild(visual.model:remove())

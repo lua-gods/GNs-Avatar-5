@@ -32,6 +32,8 @@ function QuadAPI.new(box)
 	local self = Sprite.new(box)
 	---@cast self GNUI.Sprite.Quad
 	
+	self.id = self.render:newVisualQuad()
+	
 	setmetatable(self, Quad)
 	return self
 end
@@ -59,7 +61,7 @@ function Quad:setTexture(path)
 end
 
 
-function Quad:updateAll()
+function Quad:applyStyle()
 	if self.style then
 		local style = self.style
 		self.render:setTexture(self.id,style.texture_path)

@@ -26,7 +26,8 @@ function NinesliceStyleAPI.new()
 	local self = SpriteStyle.new()
 	---@cast self GNUI.Sprite.Nineslice.Style
 	self.texture_path = ""
-	self.uv = gncommon.vec4(0,0,0,0)
+	self.uv = vec(0,0,0,0)
+	self.border = vec(0,0,0,0)
 	setmetatable(self,NinesliceStyle)
 	return self
 end
@@ -76,7 +77,19 @@ function NinesliceStyle:setUV(x1,y1,x2,y2)
 end
 
 
-
+---@overload fun(self: GNUI.Sprite.Nineslice.Style, leftTop: Vector2, rightBottom: Vector2): self
+---@param left number
+---@param top number
+---@param right number
+---@param bottom number
+---@generic self
+---@param self self
+---@return self
+function NinesliceStyle:setBorder(left,top,right,bottom)
+	---@cast self GNUI.Sprite.Nineslice.Style
+	self.border = gncommon.vec4(left,top,right,bottom)
+	return self
+end
 
 
 return NinesliceStyleAPI

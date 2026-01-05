@@ -72,7 +72,6 @@ function BoxAPI.new(canvas)
 		minSize = vec(0,0),
 		maxSize = vec(math.huge,math.huge),
 		
-		
 		layout = "HORIZONTAL",
 		
 		bakedPos = vec(0,0),
@@ -227,6 +226,12 @@ function Box:setSprite(sprite)
 	---@cast self GNUI.Box
 	if self.sprite then
 		self.sprite:setBox(self)
+		
+		for index, value in ipairs(self.children) do
+			if value.sprite then
+				value.sprite:setParent(self.sprite.id, index)
+			end
+		end
 	end
 	self.sprite = sprite
 	self:update()
@@ -264,7 +269,7 @@ function Box:addChild(box)
 	end
 	
 	if box and box.sprite and self.sprite then
-		box.canvas.render:setParent(box.sprite.id, self.sprite.id, id)
+		box.sprite:setParent(self.sprite.id, id)
 	end
 	
 	self:update()
@@ -534,6 +539,10 @@ function Box:sovleForLayout(other)
 	---@cast self GNUI.Box
 	local x = (other and "y" or "x")
 	local y = (other and "x" or "y")
+	if self.sizing[x] == "FIXED" then
+		self.bakedPos[x] = self.pos[x]
+		self.bakedSize[x] = self.size[x]
+	end
 	if self.layout then
 		if self.layout == (other and "VERTICAL" or "HORIZONTAL") then
 			local pos = 0

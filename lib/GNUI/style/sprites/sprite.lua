@@ -15,6 +15,8 @@ local SpriteAPI = {}
 ---@class GNUI.Sprite
 ---@field style GNUI.Sprite.Style
 ---@field box GNUI.Box?
+---@field childIndex integer
+---@field parentID integer
 ---
 ---@field color Vector3
 ---@field pos Vector2
@@ -42,6 +44,7 @@ function SpriteAPI.new(box)
 		size = vec(0,0),
 		padding = vec(0,0,0,0),
 		margin = vec(0,0,0,0),
+		childIndex = 1,
 		
 		render = box.canvas.render,
 		id = box.canvas.render:newVisualQuad()
@@ -177,13 +180,21 @@ function Sprite:setStyle(style)
 	
 	if self.style ~= style then
 		self.style = style
-		self:updateAll()
+		self:applyStyle()
 	end
 	return self
 end
 
 
-function Sprite:updateAll()
+function Sprite:applyStyle()
+	self:setStyle(self.style)
+	if self.box then
+		self:setText(self.box.text)
+		self:setPos(self.box.pos)
+		self:setSize(self.box.size)
+	else
+		self:setText("")
+	end
 end
 
 
@@ -195,10 +206,19 @@ function Sprite:setBox(box)
 	---@cast self GNUI.Sprite
 	self.box = box
 	if self.box then
-		self:setStyle(self.style)
-		self:setText(self.box.text)
+		self:applyStyle()
 	end
 	return self
+end
+
+
+---@param id integer
+---@param index integer
+function Sprite:setParent(id,index)
+	print("E")
+	self.childIndex = index
+	self.parentID = id
+	self.render:setParent(self.id,id,index)
 end
 
 return SpriteAPI

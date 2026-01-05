@@ -1,3 +1,4 @@
+---@diagnostic disable: param-type-mismatch
 --[[______   __
   / ____/ | / /  by: GNanimates / https://gnon.top / Discord: @gn68s
  / / __/  |/ / name: GNUI Nineslice Module
@@ -59,6 +60,7 @@ function NinesliceAPI.new(box)
 	self.idBottomLeft = self.render:newVisualQuad()
 	
 	setmetatable(self, Nineslice)
+	self:setBox(box)
 	return self
 end
 
@@ -95,44 +97,108 @@ function Nineslice:setTexture(path)
 end
 
 
-function Nineslice:updateAll()
+---@overload fun(self: GNUI.Sprite, xy: Vector2): self
+---@param x number
+---@param y number
+---@generic self
+---@param self self
+---@return self
+function Nineslice:setPos(x,y)
+	---@cast self GNUI.Sprite.Nineslice
+	self.pos = gncommon.vec2(x,y)
+	local border = self.style.border
+	local size = self.size
+	local pos = self.pos
+	
+	self.render:setPos(self.idTopLeft,  pos.x, pos.y)
+	self.render:setPos(self.idTop,      pos.x+border.x, pos.y)
+	self.render:setPos(self.idTopRight, pos.x+size.x-border.z, pos.y)
+	
+	self.render:setPos(self.idLeft,  pos.x, pos.y+border.y)
+	self.render:setPos(self.id,      pos.x+border.x, pos.y+border.y)
+	self.render:setPos(self.idRight, pos.x+size.x-border.z, pos.y+border.y)
+	
+	self.render:setPos(self.idBottomLeft,  pos.x, pos.y+size.y-border.w)
+	self.render:setPos(self.idBottom,      pos.x+border.x,pos.y+size.y-border.w)
+	self.render:setPos(self.idBottomRight, pos.x+size.x-border.z,pos.y+size.y-border.w)
+	return self
+end
+
+
+
+---@overload fun(self: GNUI.Sprite, xy: Vector2): self
+---@param x number
+---@param y number
+---@generic self
+---@param self self
+---@return self
+function Nineslice:setSize(x,y)
+	---@cast self GNUI.Sprite.Nineslice
+	self.size = gncommon.vec2(x,y)
+	local border = self.style.border
+	local size = self.size
+	
+	self.render:setSize(self.idTopLeft,  border.x, border.y)
+	self.render:setSize(self.idTop,      size.x-border.x-border.z, border.y)
+	self.render:setSize(self.idTopRight, border.z, border.y)
+	
+	self.render:setSize(self.idLeft,  border.x, size.y-border.y-border.w)
+	self.render:setSize(self.id,      size.x-border.x-border.z, size.y-border.y-border.w)
+	self.render:setSize(self.idRight, border.z, size.y-border.y-border.w)
+	
+	self.render:setSize(self.idBottomLeft,  border.x, border.w)
+	self.render:setSize(self.idBottom,      size.x-border.x-border.z, border.w)
+	self.render:setSize(self.idBottomRight, border.z, border.w)
+	return self
+end
+
+
+function Nineslice:applyStyle()
 	if self.style then
 		local style = self.style
+		local border = self.style.border
+		local uv = style.uv
+		
 		self:setTexture(style.texture_path)
-		self.render:setUV(self.id,style.uv.x,style.uv.y,style.uv.z,style.uv.w)
+		
+		self.render:setUV(self.idTopLeft,  uv.x,             uv.y,      uv.x+border.x,       uv.y+border.y)
+		self.render:setUV(self.idTop,      uv.x+border.x,    uv.y,      uv.z-border.z,       uv.y+border.y)
+		self.render:setUV(self.idTopRight, uv.z-border.z,    uv.y,      uv.z,                uv.y+border.y)
+		
+		self.render:setUV(self.idLeft,  uv.x,                uv.y+border.y,       uv.x+border.x,   uv.w-border.w)
+		self.render:setUV(self.id,      uv.x+border.x,       uv.y+border.y,       uv.z-border.z,   uv.w-border.w)
+		self.render:setUV(self.idRight, uv.z-border.z,       uv.y+border.y,       uv.z,            uv.w-border.w)
+		
+		self.render:setUV(self.idBottomLeft,  uv.x, uv.w-border.w, uv.x+border.x, uv.w)
+		self.render:setUV(self.idBottom,      uv.x+border.x, uv.w-border.w, uv.z-border.z, uv.w)
+		self.render:setUV(self.idBottomRight, uv.z-border.z, uv.w-border.w, uv.z, uv.w)
+		
+		if self.parentID then
+			self:setParent(self.parentID, self.childIndex)
+		end
 	end
 end
 
 
-
----@overload fun(self: GNUI.Sprite, xy: Vector2): self
----@param x number
----@param y number
----@generic self
----@param self self
----@return self
-function Sprite:setPos(x,y)
-	---@cast self GNUI.Sprite
-	self.pos = gncommon.vec2(x,y)
-	self.render:setPos(self.id, self.pos.x, self.pos.y)
-	return self
+---@param spriteID integer
+---@param index integer
+function Nineslice:setParent(spriteID,index)
+	assert(spriteID,"no spriteID given")
+	print("EOA")
+	
+	self.render:setParent(self.idTopLeft,spriteID,index)
+	self.render:setParent(self.idTop,spriteID,index)
+	self.render:setParent(self.idTopRight,spriteID,index)
+	
+	self.render:setParent(self.idLeft,spriteID,index)
+	self.render:setParent(self.id,spriteID,index)
+	self.render:setParent(self.idRight,spriteID,index)
+	
+	self.render:setParent(self.idBottomLeft,spriteID,index)
+	self.render:setParent(self.idBottom,spriteID,index)
+	self.render:setParent(self.idBottomRight,spriteID,index)
+	print("A")
 end
-
-
----@overload fun(self: GNUI.Sprite, xy: Vector2): self
----@param x number
----@param y number
----@generic self
----@param self self
----@return self
-function Sprite:setSize(x,y)
-	---@cast self GNUI.Sprite
-	self.size = gncommon.vec2(x,y)
-	self.render:setSize(self.id, self.size.x, self.size.y)
-	return self
-end
-
-
 
 
 return NinesliceAPI
