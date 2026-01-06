@@ -240,6 +240,19 @@ function Render:setText(id,text)
 end
 
 
+---@param id integer
+---@param alignment -1|0|1
+function Render:setTextAlignment(id,alignment)
+	local visual = self.visuals[id]
+	if not visual.label then
+		visual.label = visual.model:newText("label")
+	end
+	if visual.label then
+		visual.label:alignment(alignment == -1 and "LEFT" or alignment == 0 and "CENTER" or "RIGHT")
+	end
+end
+
+
 ---NOTE: For all parent types
 ---
 ---Sets the parent of the visual

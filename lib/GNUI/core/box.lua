@@ -1,5 +1,8 @@
+local config = require("../config") ---@type GNUI.config
 local gncommon = require("../../gncommon") ---@type GNCommon
 local utils = require("../utils") ---@type GNUI.utils
+local Event = require("../"..config.EVENT) ---@type Event
+
 
 ---@class GNUI.BoxAPI
 local BoxAPI = {}
@@ -45,11 +48,18 @@ local BoxAPI = {}
 ---@field id integer
 ---
 ---@field text string
+---@field textAlignmnet -1|0|1
 ---@field wrapText boolean
 ---
 ---@field flaggedUpdate boolean
 ---@field sprite GNUI.Sprite?
 ---@field canvas GNUI.Canvas
+---
+---@field CURSOR_PRESENCE_CHANGED Event
+---@field KEY_INPUT Event
+---@field CHAR_INPUT Event
+---@field MOUSE_INPUT Event
+---
 ---@field [string] GNUI.Box
 local Box = {}
 Box.__index = function (t,i)
@@ -94,7 +104,15 @@ function BoxAPI.new(canvas)
 		id = nextFree,
 		visible = true,
 		
+		textAlignment = 0,
+		wrapText = true,
+		
 		canvas = canvas,
+		
+		CURSOR_PRESENCE_CHANGED = Event.new(),
+		KEY_INPUT = Event.new(),
+		CHAR_INPUT = Event.new(),
+		MOUSE_INPUT = Event.new(),
 	}
 	nextFree = nextFree + 1
 	
@@ -132,8 +150,20 @@ end
 
 ---@return Vector2
 function Box:getPos()
-	return self.pos
+	return self.bakedPos
 end
+
+
+function Box:getGlobalPos()
+	local pos = self.bakedPos
+	local parent = self.parent
+	while parent do
+		pos = pos + parent.bakedPos
+		parent = parent.parent
+	end
+	return pos
+end
+
 
 ---@generic self
 ---@param self self
@@ -433,6 +463,17 @@ function Box:setText(text)
 end
 
 
+---@generic self
+---@param self self
+---@return self
+---@param alignment -1|0|1
+function Box:setTextAlignment(alignment)
+	---@cast self GNUI.Box
+	self.textAlignment = alignment
+	return self
+end
+
+
 ---sets if the text should wrap around or not
 ---@generic self
 ---@param self self
@@ -444,6 +485,20 @@ function Box:setWrapText(wrap)
 	return self
 end
 
+--────────────────────────-<  >-────────────────────────--
+
+---@param pos Vector2
+---@return boolean
+function Box:isPosInbounds(pos)
+	local globalPos = self:getGlobalPos()
+	local otherEnd = globalPos + self.bakedSize
+	
+	if pos.x > globalPos.x and pos.x < otherEnd.x
+	and pos.y > globalPos.y and pos.y < otherEnd.y then
+		return true
+	end
+	return false
+end
 
 --────────────────────────-< UPDATERS >-────────────────────────--
 

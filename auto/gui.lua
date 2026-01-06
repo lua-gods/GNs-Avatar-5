@@ -37,7 +37,20 @@ box:setPos(10,10)
 function events.WORLD_RENDER(delta)
 	local t = client.getSystemTime()/50
 	box:setSize((math.sin(t/8)*0.5+0.5)*45+140,-1)
-	--:setPos(math.random(1,10),0)
+	
+	screen:setCursorPos(client:getMousePos()/client:getGuiScale())
 	-- tells GNUI to update, might not be needed in the final version
 	screen:flushUpdates()
 end
+
+events.KEY_PRESS:register(function (key, state)
+	screen:inputKey(key, state)
+end)
+
+events.MOUSE_PRESS:register(function (button, state)
+	screen:inputMouse(button, state)
+end)
+
+events.MOUSE_SCROLL:register(function (amount)
+	screen:inputMouse(0,amount)
+end)

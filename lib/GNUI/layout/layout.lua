@@ -18,6 +18,7 @@ local LayoutAPI = {}
 ---@field gap number?
 ---@field layout GNUI.Box.LayoutMode?
 ---@field text string?
+---@field textAlign (-1|0|1)?
 ---@field wrap boolean?
 ---@field variant string?
 ---
@@ -62,6 +63,7 @@ local function parseEntry(canvas, layout)
 	end
 
 	if layout.text then box:setText(layout.text) end
+	if layout.textAlign then box:setTextAlignment(layout.textAlign) end
 	
 	if layout.wrap then box:setWrapText(layout.wrap) end
 
