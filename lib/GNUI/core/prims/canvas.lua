@@ -1,8 +1,8 @@
 ---@diagnostic disable: return-type-mismatch
 local gncommon = require("lib.gncommon") ---@type GNCommon
 local Box = require("./box") ---@type GNUI.BoxAPI
-local config = require("../config") ---@type GNUI.config
-local Render = require("../"..config.RENDER) ---@type GNUI.RenderAPI
+local config = require("../../config") ---@type GNUI.config
+local Render = require("../../"..config.RENDER) ---@type GNUI.RenderAPI
 
 
 ---@class GNUI.CanvasAPI

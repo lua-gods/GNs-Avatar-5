@@ -47,6 +47,10 @@ events.KEY_PRESS:register(function (key, state)
 	screen:inputKey(key, state)
 end)
 
+events.CHAR_TYPED:register(function (char, modifiers, codepoint)
+	screen:inputChar(char)
+end)
+
 events.MOUSE_PRESS:register(function (button, state)
 	screen:inputMouse(button, state)
 end)

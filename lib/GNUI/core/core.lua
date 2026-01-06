@@ -1,5 +1,5 @@
-local box = require("./box") ---@type GNUI.BoxAPI
-local canvas = require("./canvas") ---@type GNUI.CanvasAPI
+local box = require("./prims/box") ---@type GNUI.BoxAPI
+local canvas = require("./prims/canvas") ---@type GNUI.CanvasAPI
 
 ---Holds all instantiations for elements in GNUI
 ---and utility functions with them

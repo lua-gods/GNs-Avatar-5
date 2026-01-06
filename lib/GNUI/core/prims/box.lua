@@ -1,8 +1,10 @@
-local config = require("../config") ---@type GNUI.config
-local gncommon = require("../../gncommon") ---@type GNCommon
-local utils = require("../utils") ---@type GNUI.utils
-local Event = require("../"..config.EVENT) ---@type Event
+local config = require("../../config") ---@type GNUI.config
+local gncommon = require("../../../gncommon") ---@type GNCommon
+local utils = require("../../utils") ---@type GNUI.utils
+local Event = require("../../"..config.EVENT) ---@type Event
 
+local Layout = require("../../" .. config.LAYOUT) ---@class GNUI.LayoutAPI
+local Style = require("../../" .. config.STYLE) ---@class GNUI.StyleAPI
 
 ---@class GNUI.BoxAPI
 local BoxAPI = {}
@@ -18,6 +20,20 @@ local BoxAPI = {}
 ---| "VERTICAL"
 ---| "HORIZONTAL"
 ---| nil
+
+
+---@class GNUI.Box.Event.CharInput
+---@field register fun(self,func:fun(char: string))
+
+---@class GNUI.Box.Event.KeyInput
+---@field register fun(self,func:fun(scancode:integer, state:integer))
+
+---@class GNUI.Box.Event.MouseInput
+---@field register fun(self,func:fun(button:integer,state:integer))
+
+
+---@class GNUI.Box.Event.CursorPresenceChanged
+---@field register fun(self,func:fun(inside: boolean))
 
 
 ---@class GNUI.Box
@@ -55,10 +71,10 @@ local BoxAPI = {}
 ---@field sprite GNUI.Sprite?
 ---@field canvas GNUI.Canvas
 ---
----@field CURSOR_PRESENCE_CHANGED Event
----@field KEY_INPUT Event
----@field CHAR_INPUT Event
----@field MOUSE_INPUT Event
+---@field CURSOR_PRESENCE_CHANGED GNUI.Box.Event.CursorPresenceChanged
+---@field KEY_INPUT GNUI.Box.Event.KeyInput
+---@field CHAR_INPUT GNUI.Box.Event.CharInput
+---@field MOUSE_INPUT GNUI.Box.Event.MouseInput
 ---
 ---@field [string] GNUI.Box
 local Box = {}
@@ -341,6 +357,28 @@ function Box:setSprite(sprite)
 	return self
 end
 
+
+---Sets the style of the sprite of this box, if no sprite exists, it will create one for that given style
+---
+---if no style is given, it will simply reapply the style of the sprite back to itself
+---@generic self
+---@param self self
+---@return self
+---@param style GNUI.Sprite.Style?
+function Box:setStyle(style)
+	---@cast self GNUI.Box
+	if not self.sprite and style then
+		self.sprite = style:newInstance(self)
+	end
+	
+	if self.sprite then
+		if style then
+			self.sprite:setStyle(style)
+		end
+		self.sprite:applyStyle()
+	end
+	return self
+end
 
 --────────────────────────-< Children Management >-────────────────────────--
 
@@ -707,5 +745,54 @@ function Box:sovleForLayout(other)
 	return self
 end
 
+
+--────────────────────────-< Layout Parser >-────────────────────────--
+
+
+function BoxAPI.parse(layout,canvas)
+	local box = BoxAPI.new(canvas)
+
+	local hasSizeX, hasSizeY = false, false
+	if layout.size then
+		box:setSize(layout.size.x, layout.size.y)
+		hasSizeX = layout.size.x ~= -1
+		hasSizeY = layout.size.y ~= -1
+	end
+	if layout.minSize then box:setMinimumSize(layout.minSize.x, layout.minSize.y) end
+	if layout.sizing then
+		if type(layout.sizing) == "string" then
+			box:setSizing(layout.sizing, layout.sizing)
+		else
+			box:setSizing(layout.sizing[1], layout.sizing[2])
+		end
+	else
+		if box.text then
+			box:setSizing("FILL", "FIT")
+		else
+			box:setSizing(hasSizeX and "FIXED" or "FIT", hasSizeY and "FIXED" or "FIT")
+		end
+	end
+	if layout.pos then box:setPos(layout.pos.x, layout.pos.y) end
+	if layout.layout then box:setLayout(layout.layout) end
+	if layout.gap then box:setChildGap(layout.gap) end
+	
+	local style = Style.getStyle(box, layout.variant or "default", "normal")
+	if style then
+		box:setSprite(style:newInstance(box))
+	end
+
+	if layout.text then box:setText(layout.text) end
+	if layout.textAlign then box:setTextAlignment(layout.textAlign) end
+	if layout.wrap then box:setWrapText(layout.wrap) end
+
+	if layout.name then
+		box:setName(layout.name)
+		box.name = layout.name
+	end
+
+	return box
+end
+
+Layout.registerType("box", BoxAPI.parse)
 
 return BoxAPI

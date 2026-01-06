@@ -14,6 +14,9 @@ local Style = require("./"..config.STYLE) ---@type GNUI.StyleAPI
 ---@class GNUIAPI
 local GNUIAPI = {}
 
+for index, path in ipairs(utils.listFiles("./widgets")) do
+	require(path)
+end
 
 ---@param canvas GNUI.Canvas
 ---@param data GNUI.Layout
