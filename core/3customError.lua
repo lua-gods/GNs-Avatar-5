@@ -1,6 +1,10 @@
 ---@diagnostic disable: undefined-field
 local BetterErrorAPI = require("lib.betterError")
 
+if true then
+	return
+end
+
 if events.ERROR then
 	events.ERROR:register(function (error)
 		local json = BetterErrorAPI.parseError(error)
