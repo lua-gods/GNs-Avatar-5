@@ -8,6 +8,7 @@ local box = GNUI.parse(screen,{
 	
 	layout = "HORIZONTAL",
 	size = vec(200,-1),
+	childAlign = vec(-1,0),
 	sizing = {"FIXED","FIT"},
 	padding = vec(2,2,2,2),
 	gap = 5,
