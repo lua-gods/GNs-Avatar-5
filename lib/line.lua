@@ -1,14 +1,17 @@
 --[[______   __
   / ____/ | / /  by: GNanimates / https://gnon.top / Discord: @gn68s
- / / __/  |/ / name: GNlineLib v2.1.0
+ / / __/  |/ / name: GNlineLib v2.2.0
 / /_/ / /|  /  desc: Allows you to draw lines in the world at ease.
 \____/_/ |_/ source: https://github.com/lua-gods/GNs-Avatar-4/blob/main/lib/line.lua ]]
 ---@diagnostic disable: param-type-mismatch
 --[────────────────────────────────────────-< CONFIG >-────────────────────────────────────────]--
+local MAX_LINE_UPDATES = 1000
+
 local MODEL = models:newPart("gnlinelibline", "WORLD"):scale(16, 16, 16)
-local TEXTURE = textures["1x1white"] or textures:newTexture("1x1white", 1, 1):setPixel(0, 0,
-	vec(1, 1, 1))
-local MAX_MS = 1000 / 200 -- replace 60 with max fps cap process
+
+local TEXTURE = textures["1x1white"] or textures:newTexture("1x1white", 1, 1):setPixel(0, 0, vec(1, 1, 1))
+local MAX_MS = 1000 / 200 -- replace 200 with max fps cap process
+
 --[────────────────────────────────────────-< END OF CONFIG >-────────────────────────────────────────]--
 
 local lines = {} ---@type Line[]
@@ -40,6 +43,7 @@ end
 ---@field length number # The distance between the first and second ends
 ---@field width number # The width of the line in meters
 ---@field color Vector4 # The color of the line in RGBA
+---@field opacity number # how transparent the line is
 ---@field depth number # The offset depth of the line. 0 is normal, 0.5 is farther and -0.5 is closer
 ---@field package _queue_update boolean # Whether or not the line should be updated in the next frame
 ---@field model SpriteTask
@@ -145,19 +149,28 @@ function Line:setRenderType(render_type)
 	return self
 end
 
----Sets the color of the line.
+
+---set how transparent the line is.
+---@param a number
+---@return Line
+function Line:setOpacity(a)
+	self.opacity = a
+	self.model:setColor(self.color,a)
+	return self
+end
+
+
+---Sets the color of the line. accepts RGB, RGBA or HEX string
 ---@overload fun(self : Line, rgb : Vector3): Line
----@overload fun(self : Line, rgb : Vector4): Line
 ---@overload fun(self : Line, string : string): Line
 ---@param r number
 ---@param g number
 ---@param b number
----@param a number
 ---@return Line
-function Line:setColor(r, g, b, a)
+function Line:setColor(r, g, b)
 	local rt, yt, bt = type(r), type(g), type(b)
 	if rt == "number" and yt == "number" and bt == "number" then
-		self.color = vectors.vec4(r, g, b, a or 1)
+		self.color = vectors.vec4(r, g, b)
 	elseif rt == "Vector3" then
 		self.color = r:augmented()
 	elseif rt == "Vector4" then
@@ -169,12 +182,15 @@ function Line:setColor(r, g, b, a)
 		"Invalid Color parameter, expected Vector3, (number, number, number) or Hexcode, instead got (" ..
 		rt .. ", " .. yt .. ", " .. bt .. ")")
 	end
-	self.model:setColor(self.color)
+	self.model:setColor(self.color,self.opacity)
 	return self
 end
 
 ---Sets the depth of the line.
----Note: this is an offset to the depth of the object. meaning 0 is normal, `0.5` is farther and `-0.5` is closer
+---
+---this is an offset to the depth of the object. meaning 0 is normal, `0.5` is farther and `-0.5` is closer
+---
+---NOTE: dont put it too far from `0`, go in `0.01` steps
 ---@param z number
 ---@return Line
 function Line:setDepth(z)
@@ -190,6 +206,8 @@ function Line:free()
 	self = nil
 end
 
+
+---Sets the visibility of the line.
 ---@param visible boolean
 ---@return Line
 function Line:setVisible(visible)
@@ -202,6 +220,8 @@ function Line:setVisible(visible)
 end
 
 ---Queues itself to be updated in the next frame.
+---
+---gets called automatically if you change a property of the line.
 ---@return Line
 function Line:update()
 	if self.visible then
@@ -211,6 +231,8 @@ function Line:update()
 end
 
 ---Immediately updates the line without queuing it.
+---
+---call this if you want to update the line immidiately.
 ---@return Line
 function Line:immediateUpdate()
 	local a = self.a
@@ -230,14 +252,14 @@ end
 local lk
 MODEL:setPreRender(function()
 	local c = client:getCameraPos()
-	if (c - cpos):lengthSquared() > 0.1 then
+	if (c - cpos):lengthSquared() > 0.01 then
 		cpos = c
 		for _, l in pairs(lines) do
 			l:update()
 		end
 	end
 	local time = client:getSystemTime() -- gets the starting time
-	for i = 1, 1000, 1 do
+	for i = 1, MAX_LINE_UPDATES, 1 do
 		local k, l = next(queueUpdate, lk)
 		lk = k
 		if l then

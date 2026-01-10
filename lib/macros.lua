@@ -65,7 +65,7 @@ function Macro:setActive(active,...)
 			else
 				if hasInit then
 					local initName = self.id.."init"
-					
+					self.initName = initName
 					events.TICK:register(function ()
 						self.events.ENTITY_INIT:invoke()
 						events.TICK:remove(initName)
@@ -90,6 +90,9 @@ function Macro:setActive(active,...)
 			for name in pairs(self.events) do
 				if events[name] then
 					events[name]:remove(self.id)
+				end
+				if self.initName then
+					events.TICK:remove(self.initName)
 				end
 			end
 			self.events.ON_EXIT:invoke(...)

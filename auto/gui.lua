@@ -1,3 +1,5 @@
+# flags: host_only
+
 local GNUI = require("lib.GNUI.main")
 local screen = GNUI.getScreen()
 

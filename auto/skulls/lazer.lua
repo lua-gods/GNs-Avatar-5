@@ -16,24 +16,26 @@ local face2dir = {
 }
 local SCALE = 0.845
 
-models.lazer.hat:scale(SCALE,SCALE,SCALE)
+models.skull.lazer.hat:scale(SCALE,SCALE,SCALE)
 
 ---@type SkullIdentity|{}
 local identity = {
 	name = "Laser",
 	id = "laser",
-	modelBlock = models.lazer.hat,
-	modelHat = models.lazer.hat,
+	modelBlock = models.skull.lazer.hat,
+	modelHat = models.skull.lazer.hat,
 	modelHud = Skull.makeIcon(textures["textures.item_icons"],1,0),
-	modelEntity = models.lazer.hat,
+	modelEntity = models.skull.lazer.hat,
 	
 	processHat = {
 		ON_READY = function (skull, model)
+			
+			-- pregenerate a line for every bounce
 			skull.Lines = {}
 			for i = 1, MAX_BOUNCE, 1 do
 				local group = {
-					Line.new():setWidth(0.075):setColor(1,0,0),
-					Line.new():setWidth(0.05):setColor(1,1,1):setDepth(-0.01)
+					Line.new():setWidth(0.075):setColor(1,0,0), -- red line
+					Line.new():setWidth(0.05):setColor(1,1,1):setDepth(-0.01) -- white line
 				}
 				skull.Lines[i] = group
 			end
@@ -43,6 +45,7 @@ local identity = {
 			local pos = skull.entity:getPos(delta):add(0,skull.entity:getEyeHeight()+0.4)
 			local points = {pos}
 			
+			-- gather the points
 			for i = 1, MAX_BOUNCE, 1 do
 				local to = pos + dir * REACH_DISTANCE
 				local block,hit,side = raycast:block(pos,to)
@@ -61,7 +64,7 @@ local identity = {
 				if points[i] and points[i+1] then
 					group[1]:setAB(points[i], points[i+1]):setVisible(true)
 					group[2]:setAB(points[i], points[i+1]):setVisible(true)
-				else
+				else -- hide all lines afterwards
 					group[1]:setVisible(false)
 					group[2]:setVisible(false)
 				end

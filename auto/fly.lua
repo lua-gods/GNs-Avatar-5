@@ -57,7 +57,9 @@ flyMacro = macro.new(function (events, ...)
 end)
 
 function pings.fly(toggle)
-	flyMacro:setActive(toggle)
+	if player:isLoaded() then
+		flyMacro:setActive(toggle)
+	end
 end
 
 if host:isHost() then

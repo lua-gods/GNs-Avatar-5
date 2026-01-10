@@ -1,2 +1,3 @@
-
-require("lib.animation")
+if false then
+	require("lib.animation")
+end

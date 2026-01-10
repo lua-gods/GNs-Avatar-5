@@ -2,7 +2,7 @@ local GNanim = require("lib.GNanimClassic")
 
 local animState = GNanim.new():setBlendTime(0.0)
 
-local RANDOM_PITCH = 0
+local RANDOM_PITCH = 0.1
 
 local ANIM_IDLE = animations.player.sword
 local ANIM_ATTACK = animations.player.swordAttack1:setBlendDuration(0.1)
@@ -31,7 +31,7 @@ events.TICK:register(function ()
 	if isHoldingSword and player:getSwingArm() and player:getSwingTime() == 0 then
 		setAnimation(alternate and ANIM_ATTACK_TWO or ANIM_ATTACK)
 		alternate = not alternate
-		sounds["sounds.swing"]:pitch(math.lerp(1-RANDOM_PITCH,1+RANDOM_PITCH,math.random()) * SWORD_PITCH):pos(player:getPos()):play()
+		sounds["sounds.swing"]:pitch(math.lerp(1-RANDOM_PITCH,1+RANDOM_PITCH,math.random())):pos(player:getPos()):play()
 	end
 	models.player.Roll:setPos(0,0,player:isCrouching() and 5 or 0)
 end)
