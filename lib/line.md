@@ -132,7 +132,16 @@ by default this is "CUTOUT_EMISSIVE_SOLID".
 
 ### Returns `Line`
 
-## `Line:setColor(r, g, b, a)`
+## `Line:setOpacity(a)`
+Sets how transparent the line is.  
+
+### Arguments
+
+- `number` `a`
+
+### Returns `Line`
+
+## `Line:setColor(r, g, b)`
 Sets the color of the line.  
 ### Arguments
 - `number` `r`
