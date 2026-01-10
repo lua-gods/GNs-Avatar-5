@@ -150,8 +150,6 @@ Sets the color of the line.
 
 - `number` `b`
 
-- `number` `a`
-
 ### Returns `Line`
 
 ## `Line:setColor(string)`
