@@ -19,6 +19,7 @@ local box = GNUI.parse(screen,{
 			sizing={"FILL","FIT"},
 		},
 		{
+			type="button",
 			sizing={"FIXED","FILL"},
 			size=vec(30,-1),
 		},
