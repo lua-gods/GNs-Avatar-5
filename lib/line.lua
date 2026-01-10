@@ -68,8 +68,7 @@ function Line.new(preset)
 	new.width = preset.width or 0.125
 	new.color = preset.color and preset.color:copy() or vec(1, 1, 1)
 	new.depth = preset.depth or 1
-	new.model = MODEL:newSprite("line" .. next_free):setTexture(TEXTURE, 1, 1):setRenderType(
-	"EMISSIVE_SOLID"):setScale(0, 0, 0)
+	new.model = MODEL:newSprite("line" .. next_free):setTexture(TEXTURE, 1, 1):setRenderType("CUTOUT_EMISSIVE_SOLID"):setScale(0, 0, 0)
 	new.id = next_free
 	lines[next_free] = new
 	return new
