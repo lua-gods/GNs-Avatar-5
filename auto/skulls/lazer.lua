@@ -34,8 +34,8 @@ local identity = {
 			skull.Lines = {}
 			for i = 1, MAX_BOUNCE, 1 do
 				local group = {
-					Line.new():setWidth(0.075):setColor(1,0,0), -- red line
-					Line.new():setWidth(0.05):setColor(1,1,1):setDepth(-0.01) -- white line
+					Line.new():setWidth(0.05):setColor(1,0,0):setOpacity(0.1), -- red line
+					Line.new():setWidth(0.025):setColor(1,1,1):setDepth(-0.01) -- white line
 				}
 				skull.Lines[i] = group
 			end

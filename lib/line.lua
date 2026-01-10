@@ -1,6 +1,6 @@
 --[[______   __
   / ____/ | / /  by: GNanimates / https://gnon.top / Discord: @gn68s
- / / __/  |/ / name: GNlineLib v2.2.0
+ / / __/  |/ / name: GNlineLib v2.2.1
 / /_/ / /|  /  desc: Allows you to draw lines in the world at ease.
 \____/_/ |_/ source: https://github.com/lua-gods/GNs-Avatar-4/blob/main/lib/line.lua ]]
 ---@diagnostic disable: param-type-mismatch
@@ -42,7 +42,7 @@ end
 ---@field dir_override Vector3? # Overrides the dir of the line, useful for non world parent parts
 ---@field length number # The distance between the first and second ends
 ---@field width number # The width of the line in meters
----@field color Vector4 # The color of the line in RGBA
+---@field color Vector3 # The color of the line in RGBA
 ---@field opacity number # how transparent the line is
 ---@field depth number # The offset depth of the line. 0 is normal, 0.5 is farther and -0.5 is closer
 ---@field package _queue_update boolean # Whether or not the line should be updated in the next frame
@@ -50,7 +50,7 @@ end
 local Line = {}
 Line.__index = Line
 Line.__type = "gn.line"
-Line._VERSION = "2.0.2"
+Line._VERSION = "2.2.1"
 
 ---Creates a new line.
 ---@param preset Line?
@@ -67,6 +67,7 @@ function Line.new(preset)
 	new.width = preset.width or 0.125
 	new.width = preset.width or 0.125
 	new.color = preset.color and preset.color:copy() or vec(1, 1, 1)
+	new.opacity = preset.opacity or 1
 	new.depth = preset.depth or 1
 	new.model = MODEL:newSprite("line" .. next_free):setTexture(TEXTURE, 1, 1):setRenderType("CUTOUT_EMISSIVE_SOLID"):setScale(0, 0, 0)
 	new.id = next_free
@@ -154,7 +155,7 @@ end
 ---@return Line
 function Line:setOpacity(a)
 	self.opacity = a
-	self.model:setColor(self.color,a)
+	self.model:setColor(self.color:augmented(a))
 	return self
 end
 
@@ -169,19 +170,17 @@ end
 function Line:setColor(r, g, b)
 	local rt, yt, bt = type(r), type(g), type(b)
 	if rt == "number" and yt == "number" and bt == "number" then
-		self.color = vectors.vec4(r, g, b)
+		self.color =  vec(r, g, b)
 	elseif rt == "Vector3" then
-		self.color = r:augmented()
-	elseif rt == "Vector4" then
 		self.color = r
 	elseif rt == "string" then
-		self.color = vectors.hexToRGB(r):augmented(1)
+		self.color = vectors.hexToRGB(r)
 	else
 		error(
 		"Invalid Color parameter, expected Vector3, (number, number, number) or Hexcode, instead got (" ..
 		rt .. ", " .. yt .. ", " .. bt .. ")")
 	end
-	self.model:setColor(self.color,self.opacity)
+	self.model:setColor(self.color:augmented(self.opacity))
 	return self
 end
 
@@ -251,14 +250,14 @@ end
 local lk
 MODEL:setPreRender(function()
 	local c = client:getCameraPos()
-	if (c - cpos):lengthSquared() > 0.01 then
+	if (c - cpos):lengthSquared() > 0.001 then
 		cpos = c
 		for _, l in pairs(lines) do
 			l:update()
 		end
 	end
 	local time = client:getSystemTime() -- gets the starting time
-	for i = 1, MAX_LINE_UPDATES, 1 do
+	for i = 1, 1000, 1 do
 		local k, l = next(queueUpdate, lk)
 		lk = k
 		if l then
