@@ -3,8 +3,10 @@ local Color = require("lib.color")
 
 local Line = require("lib.line")
 
+local COLOR = vectors.hexToRGB("#FF0000")
+local THICKNESS = 2
 local REACH_DISTANCE = 64
-local MAX_BOUNCE = 100
+local MAX_BOUNCE = 30
 
 local face2dir = {
    ["north"] = vec(1,1,-1),
@@ -34,8 +36,9 @@ local identity = {
 			skull.Lines = {}
 			for i = 1, MAX_BOUNCE, 1 do
 				local group = {
-					Line.new():setWidth(0.05):setColor(1,0,0):setOpacity(0.1), -- red line
-					Line.new():setWidth(0.025):setColor(1,1,1):setDepth(-0.01) -- white line
+					Line.new():setWidth(THICKNESS*0.075):setColor(COLOR):setOpacity(0.1), -- red line
+					Line.new():setWidth(THICKNESS*0.03):setColor(COLOR):setDepth(-0.005):setOpacity(0.5), -- red line
+					Line.new():setWidth(THICKNESS*0.012):setColor(1,1,1):setDepth(-0.01) -- white line
 				}
 				skull.Lines[i] = group
 			end
@@ -62,18 +65,21 @@ local identity = {
 			for i = 1, MAX_BOUNCE, 1 do
 				local group = skull.Lines[i]
 				if points[i] and points[i+1] then
-					group[1]:setAB(points[i], points[i+1]):setVisible(true)
-					group[2]:setAB(points[i], points[i+1]):setVisible(true)
+					for index, value in ipairs(group) do
+						value:setAB(points[i], points[i+1]):setVisible(true)
+					end
 				else -- hide all lines afterwards
-					group[1]:setVisible(false)
-					group[2]:setVisible(false)
+					for index, value in ipairs(group) do
+						value:setVisible(false)
+					end
 				end
 			end
 		end,
 		ON_EXIT = function (skull, model)
-			for key, value in pairs(skull.Lines) do
-				value[1]:free()
-				value[2]:free()
+			for key, group in pairs(skull.Lines) do
+				for index, value in ipairs(group) do
+						value:free()
+					end
 			end
 		end
 	}
