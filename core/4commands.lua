@@ -30,6 +30,18 @@ function flip()
 end
 
 
+function divisible(x)
+	local out = {}
+	for i = x, 1, -1 do
+		local div = x / i
+		if div == math.floor(div) then -- is divisible
+			out[#out+1] = i
+		end
+	end
+	print(x.." is disvisible by "..table.concat(out,", "))
+end
+
+
 function mapArea()
 	
 	local SKIP = 40
