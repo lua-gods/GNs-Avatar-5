@@ -17,8 +17,6 @@ flyMacro = macro.new(function (events, ...)
 	local vel = vec(0,0,0)
 	local lvel = vec(0,0,0)
 	
-	local accel = vec(0,0,0)
-	
 	local sway = vec(0,0,0)
 	local lsway = vec(0,0,0)
 	
@@ -26,7 +24,7 @@ flyMacro = macro.new(function (events, ...)
 		lvel = vel
 		vel = vectors.rotateAroundAxis(player:getBodyYaw(),player:getVelocity(),vec(0,1,0))
 		
-		spring.vel = spring.vel + (vel - lvel) * 10 + vel
+		spring.vel = spring.vel + (vel - lvel) * 10 + vel * 2
 		
 		lsway = sway
 		sway = spring.pos
