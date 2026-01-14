@@ -6,7 +6,7 @@ local screen = GNUI.getScreen()
 -- creates a new box with children
 local box = GNUI.parse(screen,{
 	
-	layout = "HORIZONTAL",
+	layout = "VERTICAL",
 	size = vec(200,-1),
 	childAlign = vec(-1,0),
 	sizing = {"FIXED","FIT"},
@@ -15,14 +15,34 @@ local box = GNUI.parse(screen,{
 	
 	{ -- children
 		{
+			variant="primary",
 			type="button",
 			text="One Two Three Four",
 			sizing={"FILL","FIT"},
 		},
 		{
+			variant="secondary",
 			type="button",
-			sizing={"FIXED","FILL"},
-			size=vec(30,-1),
+			text="One Two Three Four",
+			sizing={"FILL","FIT"},
+		},
+		{
+			variant="destructive",
+			type="button",
+			text="One Two Three Four",
+			sizing={"FILL","FIT"},
+		},
+		{
+			variant="dark",
+			type="button",
+			text="One Two Three Four",
+			sizing={"FILL","FIT"},
+		},
+		{
+			variant="blue",
+			type="button",
+			text="One Two Three Four",
+			sizing={"FILL","FIT"},
 		},
 		{
 			text="Five Six Seven Eight Nine Ten",

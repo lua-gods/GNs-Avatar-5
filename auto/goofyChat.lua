@@ -1,5 +1,3 @@
-# flags: host_only
-
 local NAME = "GN" -- any name
 local IGN = "GNamimates" -- must be your IGN for DMs to work
 local INITIAL_CHAR = "@"
