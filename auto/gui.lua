@@ -45,6 +45,12 @@ local box = GNUI.parse(screen,{
 			sizing={"FILL","FIT"},
 		},
 		{
+			variant="bevel",
+			type="button",
+			text="Bevel",
+			sizing={"FILL","FIT"},
+		},
+		{
 			text="Five Six Seven Eight Nine Ten",
 			sizing={"FILL","FIT"},
 		},
