@@ -14,25 +14,34 @@ local identity = {
 }
 
 local ogPrint = _G.print
-local MAX_LOGS = 16
-local SACLE = 0.5
+local MAX_LOGS = 50
+local SACLE = 0.25
 
 
 identity.processBlock = {
 	ON_INIT = function (skull, model)
+		skull.t = 0
 		skull.label = model:newText("Logs")
 		:setBackgroundColor(0,0,0,0.5)
 		:scale(SACLE)
 		local logs = {}
 		_G.print = function (...)
-			table.insert(logs, table.concat({...}, " "))
-			skull.label:setText(table.concat(logs, "\n"))
-			if #logs > MAX_LOGS then
-				table.remove(logs, 1)
+			if skull.t == 0 then
+				table.insert(logs, table.concat({...}, " "))
+				skull.label:setText(table.concat(logs, "\n"))
+				if #logs > MAX_LOGS then
+					table.remove(logs, 1)
+				else
+					skull.label:setPos(-8,(#logs-1)*10*SACLE+2,0)
+				end
 			else
-				skull.label:setPos(-8,(#logs-1)*10*SACLE+2,0)
+				logs = {}
+				skull.t = 0
 			end
 		end
+	end,
+	ON_PROCESS = function (skull, model, deltaFrame, deltaTick)
+		skull.t = skull.t + 1
 	end,
 	ON_EXIT = function (skull, model)
 		_G.print = ogPrint
