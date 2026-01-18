@@ -1,0 +1,19 @@
+---@diagnostic disable: param-type-mismatch
+local Skull = require("lib.skull")
+local Color = require("lib.color")
+
+
+---@type SkullIdentity|{}
+local identity = {
+	name = "TEMPLATE",
+	id = {"TEMPLATE"},
+	modelBlock = models.skull.plushie.block,
+	modelHat = models.skull.plushie.hat,
+	modelHud = Skull.toIcon(models.skull.plushie.icon),
+	modelEntity = models.skull.plushie.entity,
+}
+
+
+
+
+Skull.registerIdentity(identity)
