@@ -21,7 +21,6 @@ events.TICK:register(function ()
 end)
 
 
-
 events.RENDER:register(function (delta, ctx)
 	MODEL_HEAD:setPos(0,player:isCrouching() and -4 or 0)
 	
