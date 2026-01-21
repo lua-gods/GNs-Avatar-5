@@ -149,16 +149,17 @@ end
 local modelUtils = require("lib.modelUtils")
 
 local function modelPreprocess(model)
+	local noDeepCopy = false
 	if type(model) == "table" then
 		if model[1] then
-			model[1]:setParentType("SKULL")
-			return model[1]
+			model = model[1]
+			noDeepCopy = true
 		end
 	end
 	if model then
 		model:setVisible(false)
 		local copy = modelUtils.deepCopy(model)
-		return copy
+		return copy,noDeepCopy
 	end
 end
 local texDataCache = {}
@@ -479,15 +480,10 @@ end
 function SkullAPI.registerIdentity(cfg)
 	local identity                = cfg
 
-	identity.modelBlock           = modelPreprocess(cfg.modelBlock)
-	identity.modelHat             = modelPreprocess(cfg.modelHat)
-	identity.modelHud             = modelPreprocess(cfg.modelHud)
-	identity.modelEntity          = modelPreprocess(cfg.modelEntity)
-
-	identity.noModelBlockDeepCopy = cfg.noModelBlockDeepCopy
-	identity.noModelHatDeepCopy   = cfg.noModelHatDeepCopy
-	identity.noModelHudDeepCopy   = cfg.noModelHudDeepCopy
-	identity.noModelItemDeepCopy  = cfg.noModelItemDeepCopy
+	identity.modelBlock,identity.noModelBlockDeepCopy           = modelPreprocess(cfg.modelBlock)
+	identity.modelHat,identity.noModelHatDeepCopy             = modelPreprocess(cfg.modelHat)
+	identity.modelHud,identity.noModelHudDeepCopy             = modelPreprocess(cfg.modelHud)
+	identity.modelEntity,identity.noModelItemDeepCopy          = modelPreprocess(cfg.modelEntity)
 
 	identity.processBlock         = applyPlaceholders(cfg.processBlock)
 	identity.processHat           = applyPlaceholders(cfg.processHat)

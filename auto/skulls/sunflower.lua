@@ -9,18 +9,17 @@ local NBS = require("lib.nbs")
 local track = NBS.loadFromPath("sunny")
 
 local Tween = require("lib.tween")
-
-animations.sunflower.idle:speed(0.5):play()
-models.sunflower.blocko:setPrimaryRenderType("CUTOUT")
+animations["models.skull.sunflower"].idle:speed(0.5):play()
+models.skull.sunflower.blocko:setPrimaryRenderType("CUTOUT")
 ---@type SkullIdentity|{}
 local identity = {
 	name = "Sunflower",
 	id = "sunflower",
 	support = "minecraft:flower_pot",
-	modelBlock = {models.sunflower.blocko:scale(SCALE,SCALE,SCALE):setPos(0,-10,0)},
-	modelHat = {models.sunflower.blocko},
-	modelHud = {models.sunflower.blocko},
-	modelEntity = {models.sunflower.blocko},
+	modelBlock = {models.skull.sunflower.blocko:scale(SCALE,SCALE,SCALE):setPos(0,-10,0)},
+	modelHat = {models.skull.sunflower.blocko},
+	modelHud = models.skull.sunflower.blocko,
+	modelEntity = {models.skull.sunflower.blocko},
 	
 	processBlock = {
 		ON_READY = function (skull, model)
@@ -35,7 +34,7 @@ local identity = {
 					easing="outSine",
 					tick=function (v, t)
 						local s = 1/v
-						skull.model:scale(s,v,s)
+						model:scale(s,v,s)
 					end,
 					id=skull.identity
 				}
