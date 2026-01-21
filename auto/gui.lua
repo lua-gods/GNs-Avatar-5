@@ -60,6 +60,10 @@ local box = GNUI.parse(screen,{
 			text="Five Six Seven Eight Nine Ten",
 			sizing={"FILL","FIT"},
 		},
+		{
+			type="textField",
+			sizing={"FILL","FIT"},
+		},
 	}
 })
 
@@ -78,7 +82,13 @@ function events.WORLD_RENDER(delta)
 	screen:flushUpdates()
 end
 
-events.KEY_PRESS:register(function (key, state) screen:inputKey(key, state) end)
+events.KEY_PRESS:register(function (key, state)
+	local allow = screen:inputKey(key, state)
+	if not allow then
+		host:setChatText("")
+	end
+	return not allow
+end)
 events.CHAR_TYPED:register(function (char, modifiers, codepoint) screen:inputChar(char) end)
 events.MOUSE_PRESS:register(function (button, state) screen:inputMouse(button, state) end)
 events.MOUSE_SCROLL:register(function (amount) screen:inputMouse(0,amount)end)

@@ -111,3 +111,69 @@ function mapArea()
 		events.WORLD_TICK:remove("mapArea")
 	end
 end
+
+local PRECISION_MS = 50 -- 0.01
+local FRAMES_TO_AVERAGE = 500
+local MS_MARGIN = 10
+local SEARCH_SPEED = 100000
+local BIAS = 0.1682 -- precalculated, can be calculated by benchmarking nothing
+
+---@param fun fun()
+function benchmark(fun)
+	renderer:setCameraPos(300000,0,0)
+	local repeats = 10
+	local timer = 0
+	local searchSpeed = SEARCH_SPEED
+	local lastTime,time,msTook,msTookMin,msTookMax
+	
+	events.WORLD_RENDER:register(function (delta)
+		lastTime = client:getSystemTime()
+		for i = 1, repeats, 1 do
+			fun()
+		end
+		time = client:getSystemTime()
+		msTook = (time - lastTime)
+		if PRECISION_MS > msTook then
+			repeats = repeats + math.floor((searchSpeed/math.max(1, msTook)))
+		else
+			repeats = math.floor(repeats / math.max(1, msTook-PRECISION_MS))
+		end
+		if msTook == 1 then searchSpeed = searchSpeed / 2 end
+		host:setActionbar("optimal repeats: "..repeats.." ms: "..msTook.." fps: "..math.floor(1000/msTook))
+	
+		if PRECISION_MS < msTook and PRECISION_MS + MS_MARGIN > msTook then
+			
+			timer = 0
+			print("optimal repeats: ",repeats,"for:",PRECISION_MS,"ms")
+			
+			events.WORLD_RENDER:remove("benchmark_stage_1")
+			msTookMin = math.huge
+			msTookMax = 0
+			local msTrack = {}
+			events.WORLD_RENDER:register(function (delta)
+				lastTime = client:getSystemTime()
+				for i = 1, repeats, 1 do
+					fun()
+				end
+				time = client:getSystemTime()
+				msTook = (time - lastTime)
+				timer = timer + 1
+				msTrack[#msTrack+1] = msTook
+				msTookMin = math.min(msTook,msTookMin)
+				msTookMax = math.max(msTook,msTookMax)
+				host:setActionbar("ms: "..msTook.." fps: "..math.floor(1000/msTook))
+				
+				if timer > FRAMES_TO_AVERAGE then
+					local msAvg = 0
+					for index, record in ipairs(msTrack) do
+						msAvg = msAvg + record
+					end
+					msAvg = msAvg / #msTrack
+					print("μsMin",msTookMin/repeats/.001-BIAS,"μsMax",msTookMax/repeats/.001-BIAS,"μsAvg",(msAvg/repeats/.001)-BIAS)
+					events.WORLD_RENDER:remove("benchmark_stage_2")
+					renderer:setCameraPos()
+				end
+			end,"benchmark_stage_2")
+		end
+	end,"benchmark_stage_1")
+end

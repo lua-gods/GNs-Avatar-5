@@ -17,18 +17,18 @@ Events.newEvent = Events.new
 
 ---Registers a function as a listener to the event when it triggers.
 ---@param func function
----@param name string
+---@param name any
 function Events:register(func, name) self[#self + 1] = {name or func, func} end
 
 ---Clears all the registered listeners.
 function Events:clear() for key in pairs(self) do self[key] = nil end end
 
 ---Removes the listener with the given name.
----@param name string|function
+---@param name any|function
 function Events:remove(name) for id, value in pairs(self) do if value[1] == name then self[id] = nil end end end
 
 ---Returns the amount of events with the given name.
----@param name string
+---@param name any
 ---@return integer
 function Events:getRegisteredCount(name)
 	local c = 0
