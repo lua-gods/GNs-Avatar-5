@@ -1,8 +1,9 @@
-
-
+--[[______   __
+  / ____/ | / /  by: GNanimates / https://gnon.top / Discord: @gn68s
+ / / __/  |/ / name: GN anim blend, a lightweight animation blending service library
+/ /_/ / /|  /  desc: call on start of the script
+\____/_/ |_/ source: link ]]
 local ogIndex = figuraMetatables.Animation.__index
-
-local ENABLED = false
 
 local DEFAULT_DURATION = 0.2
 local DEFAULT_BLEND_CALLBACK = function (t)

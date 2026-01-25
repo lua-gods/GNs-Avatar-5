@@ -1,5 +1,9 @@
 # flags: host_only
 
+if false then
+	return
+end
+
 local GNUI = require("lib.GNUI.main")
 local screen = GNUI.getScreen()
 
@@ -29,27 +33,6 @@ local box = GNUI.parse(screen,{
 			size = vec(0,30),
 		},
 		{
-			variant="destructive",
-			type="button",
-			text="One Two Three Four",
-			sizing={"FILL","FIT"},
-			size = vec(0,30),
-		},
-		{
-			variant="dark",
-			type="button",
-			text="One Two Three Four",
-			sizing={"FILL","FIT"},
-			size = vec(0,30),
-		},
-		{
-			variant="blue",
-			type="button",
-			text="One Two Three Four",
-			sizing={"FILL","FIT"},
-			size = vec(0,30),
-		},
-		{
 			variant="bevel",
 			type="button",
 			text="Bevel",
@@ -63,14 +46,15 @@ local box = GNUI.parse(screen,{
 		{
 			type="textField",
 			sizing={"FILL","FIT"},
+			multiline=true
 		},
 	}
 })
 
 screen:addChild(box)
 
-
 box:setPos(10,10)
+screen.display:setParentType("HUD")
 
 -- can be any event
 function events.WORLD_RENDER(delta)
@@ -82,6 +66,7 @@ function events.WORLD_RENDER(delta)
 	screen:flushUpdates()
 end
 
+
 events.KEY_PRESS:register(function (key, state)
 	local allow = screen:inputKey(key, state)
 	if not allow then
@@ -89,6 +74,7 @@ events.KEY_PRESS:register(function (key, state)
 	end
 	return not allow
 end)
+
 events.CHAR_TYPED:register(function (char, modifiers, codepoint) screen:inputChar(char) end)
 events.MOUSE_PRESS:register(function (button, state) screen:inputMouse(button, state) end)
 events.MOUSE_SCROLL:register(function (amount) screen:inputMouse(0,amount)end)

@@ -177,3 +177,22 @@ function benchmark(fun)
 		end
 	end,"benchmark_stage_1")
 end
+
+function checkPing()
+	if player:isLoaded() then
+		local time = client:getSystemTime()
+		local hash = math.random(100000000,1000000000)
+		host:sendChatCommand("msg @s PING"..hash)
+		events.CHAT_RECEIVE_MESSAGE:register(function (message, json)
+			if message == player:getName().." whispers to you: PING"..hash then
+				local newTime = client:getSystemTime()
+				print("ping: ",(newTime-time).."ms")
+				host:setChatMessage(1,nil)
+				events.CHAT_RECEIVE_MESSAGE:remove("pingCheck")
+				return false
+			end
+		end,"pingCheck")
+	else
+		warn("Player isnt loaded, try again")
+	end
+end
