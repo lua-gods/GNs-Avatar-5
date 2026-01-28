@@ -196,3 +196,54 @@ function checkPing()
 		warn("Player isnt loaded, try again")
 	end
 end
+
+
+function giveItem(item,count)
+	count = count or 1
+	local newItem = world.newItem(item,count)
+	local itemString = newItem:toStackString()
+	for i = 0, 35, 1 do -- all player slots
+		local slotItem = host:getSlot(i)
+		if slotItem:toStackString() == itemString
+		or slotItem.id == "minecraft:air" then
+			local currentCount = slotItem:getCount()
+			local amountToAdd = math.min(count,slotItem:getMaxCount() - slotItem:getCount())
+			host:setSlot(i, world.newItem(item, currentCount + amountToAdd))
+			count = count - amountToAdd
+		end
+		if count <= 0 then
+			sounds:playSound("minecraft:entity.item.pickup",client:getCameraPos():add(client:getCameraDir()),1,2)
+			return
+		end
+	end
+	warn("Unable to give item, inventory full")
+end
+
+
+function queryItems(query)
+	local items = {}
+	if query:sub(1,1) == "#" then -- tags query
+		for i, name in ipairs(client.getRegistry("minecraft:item")) do
+			for index, tag in ipairs(world.newItem(name):getTags()) do
+				if tag:find(query:sub(2,-1)) then
+					items[#items+1] = name
+					break
+				end
+			end
+		end
+	end
+	for i, name in ipairs(client.getRegistry("minecraft:item")) do
+		if name:find(query) then
+			items[#items+1] = name
+		end
+	end
+	
+	local pack = ""
+	for _, name in ipairs(items) do
+		pack = pack .. '{Count:1b,id:"'..name..'"},'
+	end
+	local bundle = ([[bundle{display:{Name:'[{"text":"","italic":false},{"translate":"item.minecraft.bundle"},{"text":%s}]'},Items:[%s]}]])
+	:format(toJson(" of "..query),pack)
+	host:setClipboard(bundle)
+	giveItem(bundle,1)
+end

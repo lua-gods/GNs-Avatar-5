@@ -1,6 +1,6 @@
 # flags: host_only
 
-if false then
+if true then
 	return
 end
 
