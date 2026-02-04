@@ -1,6 +1,6 @@
 # flags: host_only
 
-if true then
+if false then
 	return
 end
 
@@ -56,6 +56,7 @@ screen:addChild(box)
 box:setPos(10,10)
 screen.display:setParentType("HUD")
 
+
 -- can be any event
 function events.WORLD_RENDER(delta)
 	local t = client.getSystemTime()/50
@@ -66,6 +67,14 @@ function events.WORLD_RENDER(delta)
 	screen:flushUpdates()
 end
 
+local key = keybinds:newKeybind("balls","key.keyboard.h")
+
+key.press = function ()
+	print(getmetatable(screen))
+	screen[1]:setVisible(not screen[1].visible)
+end
+
+--────────────────────────────────────────-< GNUI Boilerplate >-────────────────────────────────────────--
 
 events.KEY_PRESS:register(function (key, state)
 	local allow = screen:inputKey(key, state)

@@ -6,6 +6,8 @@ avatar:store("color","#5ac54f")
 avatar:store("hair_color","#5ac54f")
 avatar:store("horn_color","#2a2f4e")
 avatar:store("eye_height",3)
+avatar:store("gender","he/him")
+avatar:store("S255_HSV",true)
 
 avatar:store("shijiHats",{
 	color1="#ff0000",
@@ -13,8 +15,6 @@ avatar:store("shijiHats",{
 	color3="#0000ff",
 	color4="#ffffff",
 })
---avatar:store("shijihats",{color1="#5ac54f"})
-avatar:store("S255_HSV",math.random() < 0.5)
 
 local zlib = require("lib.zlib")
 

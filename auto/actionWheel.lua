@@ -6,7 +6,7 @@ local KEY_ESCAPE = keybinds:newKeybind("escape","key.keyboard.escape")
 
 local unlocked = false
 
-KEY_ACTION_WHEEL:gui(true)
+KEY_ACTION_WHEEL:gui(false)
 KEY_ESCAPE:gui(true)
 
 KEY_ESCAPE.press = function ()

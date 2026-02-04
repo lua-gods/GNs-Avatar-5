@@ -746,7 +746,7 @@ events.SKULL_RENDER:register(function(delta, block, item, entity, ctx)
 				instance = SkullAPI.getIdentity(identity.id):newHatInstance()
 				instance.matrix = instance.baseModel:partToWorldMatrix()
 				instance.entity = entity
-				instance.vars = playerVars[uuid] or {}
+				instance.vars = {}
 				instance.item = item
 				instance.uuid = uuid
 				instance.params = identity.params or {}
@@ -756,6 +756,7 @@ events.SKULL_RENDER:register(function(delta, block, item, entity, ctx)
 				hatInstances[identify] = instance
 			else
 				instance.lastSeen = tick
+				instance.vars = entity:isLoaded() and entity:getVariable() or {}
 			end
 			drawInstances[#drawInstances + 1] = instance
 		end
@@ -780,6 +781,7 @@ events.SKULL_RENDER:register(function(delta, block, item, entity, ctx)
 				entityInstances[identify] = instance
 			else
 				instance.lastSeen = tick
+				instance.vars = entity:isLoaded() and entity:getVariable() or {}
 			end
 			drawInstances[#drawInstances + 1] = instance
 		end
