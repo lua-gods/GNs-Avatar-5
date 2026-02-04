@@ -70,8 +70,7 @@ end
 local key = keybinds:newKeybind("balls","key.keyboard.h")
 
 key.press = function ()
-	print(getmetatable(screen))
-	screen[1]:setVisible(not screen[1].visible)
+	screen[1][1]:setColor(math.random(),math.random(),math.random())
 end
 
 --────────────────────────────────────────-< GNUI Boilerplate >-────────────────────────────────────────--
