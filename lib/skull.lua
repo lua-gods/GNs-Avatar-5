@@ -508,7 +508,7 @@ function SkullAPI.registerIdentity(cfg)
 end
 
 local nextInt = 0
-function getNextInt()
+local function getNextInt()
 	nextInt = nextInt + 1 % 2 ^ 32
 	return nextInt
 end
