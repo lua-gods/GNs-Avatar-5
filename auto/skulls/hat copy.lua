@@ -26,5 +26,14 @@ local identity = {
 }
 
 
+identity.processHat = {
+	ON_INIT = function (skull, model)
+		model
+		:pos(0,6.5,0)
+		:scale(0.4)
+	end
+}
+
+
 
 Skull.registerIdentity(identity)

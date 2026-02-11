@@ -83,6 +83,17 @@ events.KEY_PRESS:register(function (key, state)
 	return not allow
 end)
 
+local keymap = {}
+local mapmap = {}
+local key = keybinds:newKeybind("GNUU","key.keyboard.a")
+for _, keyString in ipairs(client.getEnum("keybinds")) do
+	key:setKey(keyString)
+	mapmap[string.lower(key:getKeyName())] = key:getKey()
+	keymap[string.lower(key:getKeyName())] = key:getID()
+end
+
+host:setClipboard(toJson({mapmap,keymap}))
+
 events.CHAR_TYPED:register(function (char, modifiers, codepoint) screen:inputChar(char) end)
 events.MOUSE_PRESS:register(function (button, state) screen:inputMouse(button, state) end)
 events.MOUSE_SCROLL:register(function (amount) screen:inputMouse(0,amount)end)
