@@ -286,6 +286,12 @@ end
 
 MusicPlayer.speed = MusicPlayer.setSpeed
 
+
+function MusicPlayer:getSpeed()
+	return self.playbackSpeed
+end
+
+
 ---Sets the tempo the songs played will use. leaving it nil will use the song's default tempo.
 ---NOTE: the tempo is in ticks per second. not Beats per Minute
 ---@param tempo number
@@ -297,6 +303,10 @@ end
 
 MusicPlayer.tempo = MusicPlayer.setTempoOverride
 
+function MusicPlayer:getTempo()
+	return self.songTempo
+end
+
 ---Sets the octave transposition of the song.
 ---@param shift integer
 ---@return NBS.MusicPlayer
@@ -306,6 +316,11 @@ function MusicPlayer:setOctaveShift(shift)
 end
 
 MusicPlayer.octaveShift = MusicPlayer.setOctaveShift
+
+
+function MusicPlayer:getOctaveShift()
+	return self.transposition
+end
 
 
 ---@overload fun(self: NBS.MusicPlayer,xyz: Vector3): NBS.MusicPlayer
@@ -378,7 +393,7 @@ function MusicPlayer:setVolume(volume)
 	return self
 end
 
-MusicPlayer.masterVolume = MusicPlayer.setVolume
+MusicPlayer.volume = MusicPlayer.setVolume
 
 function MusicPlayer:getVolume()
 	return self.masterVolume
