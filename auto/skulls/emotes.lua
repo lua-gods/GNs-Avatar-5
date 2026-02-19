@@ -60,9 +60,10 @@ local processETC = {
 		local name = skull.params[1]
 		model:setParentType("SKULL")
 		if danceByName[name] then
-			model:play("player."..name)
+			print(name)
+			model:play("models.player."..name)
 		else
-			model:play("player."..danceByID[3])
+			model:play("models.player."..danceByID[3])
 		end
 		
 		model:setSpeed(speed)

@@ -9,6 +9,13 @@ for index, value in ipairs(sounds:getCustomSounds()) do
 	end
 end
 
+
+function pings.s(e,x,y,z)
+	e = (e - 1) % (i - 1) + 1
+	sounds[soundNames[e]]:pos(x,y,z):play():volume(0.6)
+end
+
+
 local api = {}
 local e = 0
 function api.playRandom(pos)

@@ -104,36 +104,39 @@ end
 ---@param entry AvatarNBT.Model
 ---@param model ModelPart
 local function parseNBTModelData(entry,model)
-	if not model then return end
-	makeDefaults(model)
-	if entry.anim then
-		---@param index integer
-		for index, timeline in ipairs(entry.anim) do
-			local id=timeline.id+1
-			local identity=animationIdentities[id]
-			if timeline.data then
-				timeline.data.scl=timeline.data.scl and parseAnimationTrack(timeline.data.scl)
-				timeline.data.rot=timeline.data.rot and parseAnimationTrack(timeline.data.rot)
-				timeline.data.pos=timeline.data.pos and parseAnimationTrack(timeline.data.pos)
+	if model then
+		makeDefaults(model)
+		if entry.anim then
+			---@param index integer
+			for index, timeline in ipairs(entry.anim) do
+				local id=timeline.id+1
+				local identity=animationIdentities[id]
+				if timeline.data then
+					timeline.data.scl=timeline.data.scl and parseAnimationTrack(timeline.data.scl)
+					timeline.data.rot=timeline.data.rot and parseAnimationTrack(timeline.data.rot)
+					timeline.data.pos=timeline.data.pos and parseAnimationTrack(timeline.data.pos)
+				end
+				timeline.len=identity.len or 0
+				timeline.loop=identity.loop
+				--timeline.identity=animationIdentities[id]
+				animiationTimelines[id]=animiationTimelines[id] or {}
+				animiationTimelines[id][model]=timeline
 			end
-			timeline.len=identity.len or 0
-			timeline.loop=identity.loop
-			--timeline.identity=animationIdentities[id]
-			animiationTimelines[id]=animiationTimelines[id] or {}
-			animiationTimelines[id][model]=timeline
 		end
 	end
-	
+		
 	if entry.chld then
 		for index, child in ipairs(entry.chld) do
 			local name=child.name
-			parseNBTModelData(child,model[name])
+			if model then
+				parseNBTModelData(child,model[name])
+			end
 		end
 	end
 end
 
 
-parseNBTModelData(nbt.models,models)
+parseNBTModelData(nbt.models,ROOT_MODEL)
 
 
 --[────────────────────────────────────────-< Animation Player >-────────────────────────────────────────]--

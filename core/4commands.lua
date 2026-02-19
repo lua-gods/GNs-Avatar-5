@@ -182,7 +182,7 @@ function checkPing()
 	if player:isLoaded() then
 		local time = client:getSystemTime()
 		local hash = math.random(100000000,1000000000)
-		host:sendChatCommand("msg @s PING"..hash)
+		host:sendChatCommand("msg GNUI PING"..hash)
 		events.CHAT_RECEIVE_MESSAGE:register(function (message, json)
 			if message == player:getName().." whispers to you: PING"..hash then
 				local newTime = client:getSystemTime()

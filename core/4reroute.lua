@@ -1,4 +1,6 @@
 
+ROOT_MODEL = models
+
 models = models.models
 
 local ogIndex = figuraMetatables.AnimationAPI.__index
