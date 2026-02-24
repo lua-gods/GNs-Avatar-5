@@ -1,10 +1,12 @@
 # flags: host_only
 
-if false then
+if true then
 	return
 end
 
-local GNUI = require("lib.GNUI.main")
+local GNUI = require("lib.GNUI.init")
+GNUI.setup()
+
 local screen = GNUI.getScreen()
 
 -- creates a new box with children

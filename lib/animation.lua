@@ -5,6 +5,9 @@
 \____/_/ |_/ source: link ]]
 --[────────────────────────────────────────-< AvatarNBT Documentation >-────────────────────────────────────────]--
 
+if true then
+	return
+end
 
 ---@class AvatarNBT.Vector3 : Vector3
 ---@field [0] number

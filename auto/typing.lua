@@ -1,12 +1,16 @@
 local tweens = require("lib.tween")
+local zlib = require("lib.zlib")
 
-local LABEL_WORLD = models:newPart("LabelWorld", "WORLD")
-	 :setMatrix(matrices.mat4() * 0.1)
+local LABEL_WORLD = models:newPart("LabelWorld", "WORLD"):setMatrix(matrices.mat4() * 0.1)
+
+local VOICE_INTERVAL = 0.09
 
 local COLOR = vectors.hexToRGB("#4DB52A")
 local ALT_COLOR = vectors.hexToRGB("#B52AA3")
 local OUTLINE_COUNT = 16
 local OUTLINE_SIZE = 0.4
+
+
 
 local fixes = client.getTextWidth(".")
 local function getWidth(text)
@@ -100,9 +104,11 @@ function Label.new(text, pos, rot, scale, shake, drippy, alt)
 	end
 
 	local c = 1
+	
+	local voiceCooldown = 0
 	local cooldown = 0
 	local lastTime = client:getSystemTime()
-	local speed = #text > 15 and 0.025 or 0.03
+	local speed = #text > 15 and 0.03 or 0.06
 
 	local duration = speed * #text + 1
 
@@ -111,18 +117,32 @@ function Label.new(text, pos, rot, scale, shake, drippy, alt)
 		local delta = (time - lastTime) / 1000
 		lastTime = time
 		cooldown = cooldown + delta
-
+		
+		voiceCooldown = voiceCooldown + delta
+		if voiceCooldown > VOICE_INTERVAL then
+			sounds[alt and "sounds.fspeak" or "sounds.speak"]
+			:pos(pos / 16)
+			:volume(0.2)
+			:play()
+			:setAttenuation(0.01)
+			voiceCooldown = 0
+		end
+		
 		local finalSpeed = speed
 
 		local char = self.char[c]
 		if char == "." then
 			finalSpeed = 1
+			voiceCooldown = 0
 		elseif char == " " then
 			finalSpeed = finalSpeed * 1.5
 		elseif char == "," then
+			voiceCooldown = 0
 			finalSpeed = 0.5
 		end
+		
 		if cooldown > finalSpeed then
+			
 			cooldown = 0
 			local task = self.tasks[c]
 			local pos = task:getPos()
@@ -188,9 +208,7 @@ function Label.new(text, pos, rot, scale, shake, drippy, alt)
 					}
 				end,
 			}
-
-			sounds[alt and "sounds.fspeak" or "sounds.speak"]:pos(pos / 16):volume(0.2):play()
-
+			
 			c = c + 1
 			if c > #self.tasks then
 				events.WORLD_RENDER:remove("AAA")
@@ -202,7 +220,7 @@ end
 function pings.mitext(text, scale, shake, drippy, alt)
 	if player:isLoaded() then
 		local diff = (player:getPos() - client:getCameraPos()).x_z:normalize()
-		Label.new(text,
+		Label.new(zlib.Deflate.Decompress(text),
 			player:getPos():add(0, player:getEyeHeight() / 1.2, 0) - diff * 0.5,
 			math.deg(math.atan2(diff.x, diff.z)) + 180, scale or 0.75,
 			shake, drippy, alt)
@@ -210,7 +228,7 @@ function pings.mitext(text, scale, shake, drippy, alt)
 end
 
 function mitext(text, scale, shake, drippy, alt)
-	pings.mitext(text, scale, shake or 0, drippy or false, FEMALE or alt)
+	pings.mitext(zlib.Deflate.Compress(text), scale, shake or 0, drippy or false, FEMALE or alt)
 end
 
 events.CHAT_SEND_MESSAGE:register(function(message)
@@ -219,7 +237,7 @@ events.CHAT_SEND_MESSAGE:register(function(message)
 	message:gsub("!%?", function() screamCount = screamCount + 1 end)
 	message:gsub("!!", function() screamCount = screamCount + 1 end)
 
-	pings.mitext(message,
+	pings.mitext(zlib.Deflate.Compress(message),
 		#message > 20 and 0.3 or 0.5,
 		screamCount,
 		(message:find("%.%.$")
