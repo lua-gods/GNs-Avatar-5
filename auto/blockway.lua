@@ -52,5 +52,6 @@ end
 
 function pings.blockway(speed)
 	isBlockway = speed
+	macro:setActive(false)
 	macro:setActive(speed ~= 0,speed)
 end

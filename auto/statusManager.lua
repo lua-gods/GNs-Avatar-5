@@ -1,22 +1,15 @@
+local event = require("lib.event")
 
-local STATE = {
-	status = 0
+local SM = {
+	status = 0,
+	STATUS_CHANGED = event.new()
 }
 
-animations.player.afk:setPriority(1)
-
-local STATUS = {
-	{status="idle",icon=":zzz:"},
-	{status="typing...",icon=":mci_book_and_quill:"},
-}
-
-function pings.setStatus(id)
-	local status = {}
-	STATE.status = id
-	if STATUS[id] then
-		status = STATUS[id]
+function pings.status(id)
+	if SM.status ~= id then
+		SM.status = id
+		SM.STATUS_CHANGED:invoke(id)
 	end
-	
 end
 
 if host:isHost() then
@@ -24,28 +17,29 @@ if host:isHost() then
 	
 	
 	events.KEY_PRESS:register(function ()
-		if not host:getScreen() and STATE.status == 1 then
-			STATE.status = 0
+		if not host:getScreen() and SM.status == 1 then
+			SM.status = 0
 		end
 	end)
 	
 	
 	events.TICK:register(function ()
 		if not client:isWindowFocused() then
-			STATE.status = 1
+			SM.status = 1
 			
-		elseif STATE.status ~= 1 then
-			if host:isChatOpen() then
-				STATE.status = 2
+		elseif SM.status ~= 1 then
+			local t = host:getChatText()
+			if t and #t > 0 then
+				SM.status = 2
 			else
-				STATE.status = 0
+				SM.status = 0
 			end
 		end
 		
-		if lastStatus ~= STATE.status then
-			lastStatus = STATE.status
-			pings.setStatus(STATE.status)
+		if lastStatus ~= SM.status then
+			lastStatus = SM.status
+			pings.status(SM.status)
 		end
 	end)
 end
-return STATE
+return SM

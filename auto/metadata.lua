@@ -24,3 +24,7 @@ end)
 avatar:store("compress",function (data)
 	return zlib.Deflate.Compress(data)
 end)
+
+if silly then
+	silly:setFly(true)
+end

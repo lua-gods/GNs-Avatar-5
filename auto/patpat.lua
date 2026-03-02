@@ -4,7 +4,7 @@ local config = {
 	patpatKey = "key.mouse.right",   -- keybind that will be used for patpat
 
 	requireEmptyOffHand = false,
-	patDelay = 5,    -- delay between pats when holding patpat key in ticks
+	patDelay = 1,    -- delay between pats when holding patpat key in ticks
 	holdFor = 10,    -- amount of ticks before patting stops, if this value is smaller than patDelay it might cause issues
 
 	patpatBlocks = { -- list of blocks that can be patted

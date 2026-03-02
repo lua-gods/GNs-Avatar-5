@@ -1,0 +1,43 @@
+local Macro = require("lib.macros")
+
+
+local POWER = 4
+
+
+local keys = {
+	sprint = keybinds:fromVanilla("key.sprint"),
+	sneak = keybinds:fromVanilla("key.sneak"),
+}
+
+
+local thrusterMacro = Macro.new(function (events, ...)
+	if host:isHost() then
+		events.WORLD_TICK:register(function ()
+			silly:setVelocity(player:getLookDir() * POWER)
+		end)
+	end
+end)
+
+
+
+local isThruster = false
+function pings.thruster(state)
+	isThruster = state
+	thrusterMacro:setActive(state)
+end
+
+
+
+if host:isHost() then
+	events.WORLD_TICK:register(function ()
+		if keys.sprint:isPressed() and keys.sneak:isPressed() then
+			if not isThruster then
+				pings.thruster(true)
+			end
+		else
+			if isThruster then
+				pings.thruster(false)
+			end
+		end
+	end)
+end
