@@ -14,7 +14,11 @@ local OUTLINE_SIZE = 0.4
 
 local fixes = client.getTextWidth(".")
 local function getWidth(text)
-	return client.getTextWidth("." .. text .. ".") - fixes * 2
+	if text:find("^:[^:]+:$") == ":" then
+		return 8
+	else
+		return client.getTextWidth("." .. text .. ".") - fixes * 2
+	end
 end
 
 
