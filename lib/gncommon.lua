@@ -1,13 +1,31 @@
 ---@class GNCommon
-local util = {}
+local common = {}
 
+
+---@overload fun(hex:string): Vector4
+---@overload fun(rgb: Vector3,a: number?): Vector4
+---@overload fun(rgba: Vector4): Vector4
+---@param r number
+---@param g number
+---@param b number
+---@param a number?
+function common.color(r,g,b,a)
+	local tr,tg,tb,ta=type(r),type(g),type(b),type(a)
+	if (tr == "string") then
+		return vectors.hexToRGB(r):augmented()
+	elseif (tr == "Vector3") then
+		return vec(r.x,r.y,r.z,1)
+	else
+		return vec(r,g,b,a or 1)
+	end
+end
 
 
 ---@overload fun(xy: Vector2,default: Vector2?): Vector2
 ---@param x number?
 ---@param y number?
 ---@param default Vector2?
-function util.vec2(x,y,default)
+function common.vec2(x,y,default)
 	local tx,ty=type(x), type(y)
 	if (tx == "Vector2" and ty == "nil") then
 		return x
@@ -29,7 +47,7 @@ end
 ---@param z number?
 ---@param default Vector3?
 ---@return Vector3
-function util.vec3(x,y,z,default)
+function common.vec3(x,y,z,default)
 	local tx,ty,tz=type(x), type(y), type(z)
 	if (tx == "Vector3" and ty == "nil" and tz == "nil") then
 		return x
@@ -53,7 +71,7 @@ end
 ---@param w number?
 ---@param default Vector4?
 ---@return Vector4
-function util.vec4(x,y,z,w,default)
+function common.vec4(x,y,z,w,default)
 	local tx,ty,tz,tw=type(x), type(y), type(z), type(w)
 	if (tx == "Vector4" and ty == "nil" and tz == "nil" and tw == "nil") then
 		return x
@@ -68,4 +86,4 @@ function util.vec4(x,y,z,w,default)
 end
 
 
-return util
+return common

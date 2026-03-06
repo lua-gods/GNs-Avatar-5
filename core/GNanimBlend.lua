@@ -94,7 +94,6 @@ events.RENDER:register(function (delta, ctx, matrix)
 					activeTime[self] = nil
 					ogIndex(self,"blend")(self,1)
 					ogIndex(self,"stop")(self)
-					trueBlend[self] = nil
 					active[self] = nil
 				end
 			end

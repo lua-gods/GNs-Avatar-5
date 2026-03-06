@@ -11,7 +11,6 @@ local screen = GNUI.getScreen()
 
 -- creates a new box with children
 local box = GNUI.parse(screen,{
-	
 	layout = "VERTICAL",
 	size = vec(200,-1),
 	childAlign = vec(-1,0),
@@ -94,7 +93,6 @@ for _, keyString in ipairs(client.getEnum("keybinds")) do
 	keymap[string.lower(key:getKeyName())] = key:getID()
 end
 
-host:setClipboard(toJson({mapmap,keymap}))
 
 events.CHAR_TYPED:register(function (char, modifiers, codepoint) screen:inputChar(char) end)
 events.MOUSE_PRESS:register(function (button, state) screen:inputMouse(button, state) end)

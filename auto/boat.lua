@@ -122,6 +122,8 @@ local Motorcycle = Macros.new(function (events, vehicle)
 		
 		models.player:setRot()
 		models.player.Base:setRot()
+		models.player.Base.Torso:setRot()
+		models.player.Base.Torso.Waist:setRot()
 		models.player.Base.Torso.Waist.Chest:setRot()
 		models.player.Base.Torso.Waist.Chest.LeftArm:setRot()
 		models.player.Base.Torso.Waist.Chest.RightArm:setRot()
