@@ -10,8 +10,8 @@ local SM = {
 function pings.status(id)
 	if lastStatus ~= id then
 		SM.status = id
+		SM.STATUS_CHANGED:invoke(id,lastStatus)
 		lastStatus = id
-		SM.STATUS_CHANGED:invoke(id)
 	end
 end
 

@@ -9,52 +9,54 @@ GNUI.setup()
 
 local screen = GNUI.getScreen()
 
--- creates a new box with children
-local box = GNUI.parse(screen,{
-	layout = "VERTICAL",
-	size = vec(200,-1),
-	childAlign = vec(-1,0),
-	sizing = {"FIXED","FIT"},
-	padding = vec(2,2,2,2),
-	gap = 0,
-	
-	{ -- children
-		{
-			variant="primary",
-			type="button",
-			text="One Two Three Four",
-			sizing={"FILL","FIT"},
-			size = vec(0,30),
-		},
-		{
-			variant="secondary",
-			type="button",
-			text="One Two Three Four",
-			sizing={"FILL","FIT"},
-			size = vec(0,30),
-		},
-		{
-			variant="bevel",
-			type="button",
-			text="Bevel",
-			sizing={"FILL","FIT"},
-			size = vec(0,30),
-		},
-		{
-			text="Five Six Seven Eight Nine Ten",
-			sizing={"FILL","FIT"},
-		},
-		{
-			type="textField",
-			sizing={"FILL","FIT"},
-			multiline=true
-		},
-	}
+--- parent box to hold all the columns
+local classColumns = GNUI.parse(screen, {
+	variant = "empty",
+	layout = "HORIZONTAL",
+	sizing = { "FIT", "FIT" },
+	gap = 5,
 })
 
-screen:addChild(box)
+-- loop for each class with a given style
+for _, className in ipairs(GNUI.Theme.getClassNames()) do
+	-- create a column container for each widget
+	local variantColumn = GNUI.parse(screen, {
+		layout = "VERTICAL",
+		sizing = { "FIT", "FIT" },
+		minSize = vec(80, 0),
+		variant = "empty",
+	})
+	classColumns:addChild(variantColumn)
 
-box:setPos(10,10)
+	-- create the class header
+	local classHeader = GNUI.parse(screen, {
+		sizing = { "FILL", "FIT" },
+		minSize = vec(0, 15),
+		variant = "empty",
+		text = className,
+	})
+	variantColumn:addChild(classHeader)
+
+	-- loop for each class variant
+	for _, variantName in ipairs(GNUI.Theme.getVariantNames(className)) do
+		
+		-- create that given widget with the given variant
+		local widget = GNUI.parse(screen, {
+			type = className,
+			sizing = { "FILL", "FIT" },
+			minSize = vec(0, 15),
+			variant = variantName,
+			text = variantName,
+		})
+		variantColumn:addChild(widget)
+	end
+end
+classColumns:setPos(5, 5)
+screen:addChild(classColumns)
+
+
+--screen:addChild(box)
+
 screen.display:setParentType("HUD")
 
 

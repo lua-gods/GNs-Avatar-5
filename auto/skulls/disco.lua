@@ -24,6 +24,7 @@ local identity = {
 				beam:setRot(rot)
 				model:addChild(beam)
 			end
+			model.Beam:setVisible(false)
 			skull.beams = beams
 		end,
 		ON_PROCESS = function (skull, model, deltaFrame, deltaTick)

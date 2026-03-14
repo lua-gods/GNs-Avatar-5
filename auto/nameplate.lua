@@ -1,52 +1,122 @@
+--[[______   __
+  / ____/ | / /  by: GNanimates / https://gnon.top / Discord: @gn68s
+ / / __/  |/ / name: Nameplate Generator
+/ /_/ / /|  /  desc: not a library
+\____/_/ |_/ source: link ]]
+
+
 local NAME = "GNanimates"
 
 
-local icanhasnewemojis = false
+local nAPI = {}
+local CLR_FROM = vectors.hexToRGB("#d3fc7e")
+local CLR_TO = vectors.hexToRGB("#33984b")
 
-nameplate.ENTITY:setOutline(true):setBackgroundColor(0,0,0,0)
-
--- check if the new emojis exist
-local ogText = nameplate.ENTITY:getText()
-local ok, result = pcall(nameplate.ENTITY.setText,nameplate.ENTITY,("A"):rep(63)..":back:")
-if ok then icanhasnewemojis = true end
-nameplate.ENTITY:setText(ogText)
--- end of test
+local CLR_STATUS = vectors.hexToRGB("#aaaaaa")
+local CLR_STATUS_UPDATE = vectors.hexToRGB("#d3fc7e")
 
 
--- gradient generation
-local HEX_FROM = "#d3fc7e"
-local HEX_TO = "#33984b"
+--────────────────────────-< Nameplate Name >-────────────────────────--
 
-local from = vectors.hexToRGB(HEX_FROM)
-local to = vectors.hexToRGB(HEX_TO)
-
-
--- prefix
-local final = {
+local nameComponent = {
 	{text="${badges}:@gn:"},
-	{text=":back::@gn_band:",color=HEX_FROM},
-	{text=" "},
+	{text=":back::@gn_band:",color="#"..vectors.rgbToHex(CLR_FROM)},
 }
 
-if not icanhasnewemojis then
-	table.remove(final,2)
-end
-
-local shift = #final
-local lname = #NAME
-for i = 1, lname, 1 do
-	local w = i/lname
-	final[i+shift] = {
-		color="#"..vectors.rgbToHex(math.lerp(from,to,w)),
+local nameLength = #NAME
+for i = 1, nameLength, 1 do
+	local w = i/nameLength
+	nameComponent[#nameComponent+1] = {
+		color="#"..vectors.rgbToHex(math.lerp(CLR_FROM,CLR_TO,w)),
 		text=NAME:sub(i,i),
 	}
 end
 
-nameplate.LIST:setText(toJson(final))
+---@cast nameComponent string
+nameComponent = toJson(nameComponent)
+
+--────────────────────────-< Nameplate Status >-────────────────────────--
+
+local status
+local statusTime
+
+local function updateStatus()
+	local final = '['
+	final=final .. '{"text":"","extra":['..nameComponent..']}'
+	
+	if status then
+		final=final .. ',{"text":"\n"}'
+		final=final .. ',{"text":"['..status..'","color":"gray"}'
+		
+		if statusTime then
+			final=final .. ',{"text":" : ","color":"gray"}'
+			
+			local time = client:getSystemTime()
+			local timeSince = math.floor((time - statusTime) / 1000)
+			
+			local second = timeSince%60
+			local minute = math.floor(timeSince/60)
+			local hour = math.floor(minute/60)
+			minute = minute%60
+			
+			if hour > 0 then
+				final=final .. ',{"text":"'..hour..'","color":"gray"}'
+				final=final .. ',{"text":":","color":"gray"}'
+			end
+			
+			final=final .. ',{"text":"'..minute..'","color":"gray"}'
+			
+			final=final .. ',{"text":":","color":"gray"}'
+			
+			final=final .. ',{"text":"'..(string.format("%02d", second))..'","color":"gray"}'
+		end
+		final=final .. ',{"text":"]","color":"gray"}'
+	end
+	
+	final=final .. ']'
+	nameplate.ALL:setText(final)
+	nameplate.CHAT:setText(nameComponent)
+end
+
+--────────────────────────-< Update Status >-────────────────────────--
+
+local function applyStatus(title,time)
+	status = title
+	statusTime = time
+	events.WORLD_RENDER:remove("nameplateStatus")
+	if status then
+		local time = client:getSystemTime()
+		events.WORLD_RENDER:register(function ()
+			local currentTime = client:getSystemTime()
+			if currentTime-time > 1000  then
+				time = currentTime
+			end
+			updateStatus()
+		end,"nameplateStatus")
+	end
+	updateStatus()
+end
 
 
-final[icanhasnewemojis and 3 or 2].text = ""
+function pings.setNameplateStatus(title,time)
+	applyStatus(title,time)
+end
 
-local json = toJson(final)
-nameplate.ENTITY:setText(json)
-nameplate.CHAT:setText(json)
+
+function nAPI.setStatus(title,time)
+	if host:isHost() then
+		pings.setNameplateStatus(title,time and client:getSystemTime() or nil)
+	end
+end
+
+
+function setStatus(title,time)
+	nAPI.setStatus(title,time)
+end
+
+--────────────────────────-< Bootstrap >-────────────────────────--
+
+nameplate.ENTITY:setOutline(true):setBackgroundColor(0,0,0,0)
+updateStatus()
+
+return nAPI
