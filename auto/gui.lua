@@ -49,6 +49,12 @@ for _, className in ipairs(GNUI.Theme.getClassNames()) do
 			text = variantName,
 		})
 		variantColumn:addChild(widget)
+		
+		--if className == "button" then
+		--	widget.PRESSED:register(function ()
+		--		widget:free()
+		--	end)
+		--end
 	end
 end
 classColumns:setPos(5, 5)
@@ -57,27 +63,12 @@ screen:addChild(classColumns)
 
 --screen:addChild(box)
 
-screen.display:setParentType("HUD")
 
 
--- can be any event
-function events.WORLD_RENDER(delta)
-	local t = client.getSystemTime()/50
-	--box:setSize((math.sin(t/8)*0.5+0.5)*45+140,-1)
-	
-	screen:setCursorPos(client:getMousePos()/client:getGuiScale())
-	-- tells GNUI to update, might not be needed in the final version
-	screen:flushUpdates()
-end
 
-local key = keybinds:newKeybind("balls","key.keyboard.h")
-
-key.press = function ()
-	screen[1][1]:setColor(math.random(),math.random(),math.random())
-end
 
 --────────────────────────────────────────-< GNUI Boilerplate >-────────────────────────────────────────--
-
+-- TODO: make all this boilerplate code a loadable preset instead
 events.KEY_PRESS:register(function (key, state)
 	local allow = screen:inputKey(key, state)
 	if not allow then
@@ -86,16 +77,19 @@ events.KEY_PRESS:register(function (key, state)
 	return not allow
 end)
 
-local keymap = {}
-local mapmap = {}
-local key = keybinds:newKeybind("GNUU","key.keyboard.a")
-for _, keyString in ipairs(client.getEnum("keybinds")) do
-	key:setKey(keyString)
-	mapmap[string.lower(key:getKeyName())] = key:getKey()
-	keymap[string.lower(key:getKeyName())] = key:getID()
-end
-
-
 events.CHAR_TYPED:register(function (char, modifiers, codepoint) screen:inputChar(char) end)
 events.MOUSE_PRESS:register(function (button, state) screen:inputMouse(button, state) end)
 events.MOUSE_SCROLL:register(function (amount) screen:inputMouse(0,amount)end)
+
+
+function events.WORLD_RENDER()
+	local screenID = host:getScreen()
+	if (action_wheel:isEnabled() or screenID) and not screenID == "net.minecraft.class_408" then -- move mouse away if theres already UI open
+		screen:setCursorPos(-1000,-1000)
+	else
+		screen:setCursorPos(client:getMousePos()/client:getGuiScale())
+	end
+	screen:flushUpdates()
+end
+
+screen.display:setParentType("HUD")

@@ -1,3 +1,6 @@
+
+local BUILDER_ITEM = "minecraft:diamond_shovel"
+
 local key = {
 	left = keybinds:fromVanilla("key.attack"),
 	right = keybinds:fromVanilla("key.use"),
@@ -12,10 +15,10 @@ local face2dir = {
 	down  = vec(0,-1,0),
 }
 
-local OFFSET = vec(1,1,0)
+local OFFSET = vec(-2,1,-2)
 
 key.left:onPress(function (modifiers, self)
-	if player:getHeldItem().id == "minecraft:diamond_shovel" then
+	if player:getHeldItem().id == BUILDER_ITEM then
 		host:swingArm()
 		local block,hitPos,face = player:getTargetedBlock()
 		local dir = face2dir[face]
@@ -32,7 +35,7 @@ end)
 
 key.right:onPress(function (modifiers, self)
 	local heldItem = player:getHeldItem()
-	if heldItem.id == "minecraft:diamond_shovel" then
+	if heldItem.id == BUILDER_ITEM then
 		host:swingArm()
 		local block,hitPos,face = player:getTargetedBlock()
 		local dir = face2dir[face]

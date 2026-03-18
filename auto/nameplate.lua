@@ -8,7 +8,7 @@
 local NAME = "GNanimates"
 
 
-local nAPI = {}
+local NameplateAPI = {}
 local CLR_FROM = vectors.hexToRGB("#d3fc7e")
 local CLR_TO = vectors.hexToRGB("#33984b")
 
@@ -80,7 +80,7 @@ end
 
 --────────────────────────-< Update Status >-────────────────────────--
 
-local function applyStatus(title,time)
+function NameplateAPI.setStatus(title,time)
 	status = title
 	statusTime = time
 	events.WORLD_RENDER:remove("nameplateStatus")
@@ -90,33 +90,18 @@ local function applyStatus(title,time)
 			local currentTime = client:getSystemTime()
 			if currentTime-time > 1000  then
 				time = currentTime
+				updateStatus()
 			end
-			updateStatus()
 		end,"nameplateStatus")
 	end
 	updateStatus()
 end
 
 
-function pings.setNameplateStatus(title,time)
-	applyStatus(title,time)
-end
-
-
-function nAPI.setStatus(title,time)
-	if host:isHost() then
-		pings.setNameplateStatus(title,time and client:getSystemTime() or nil)
-	end
-end
-
-
-function setStatus(title,time)
-	nAPI.setStatus(title,time)
-end
 
 --────────────────────────-< Bootstrap >-────────────────────────--
 
 nameplate.ENTITY:setOutline(true):setBackgroundColor(0,0,0,0)
 updateStatus()
 
-return nAPI
+return NameplateAPI

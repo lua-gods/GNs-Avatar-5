@@ -1,7 +1,7 @@
 --[[______   __
   / ____/ | / /  by: GNanimates / https://gnon.top / Discord: @gn68s
- / / __/  |/ / name: DUST LIBRARY
-/ /_/ / /|  /  desc: GN's Particle Library
+ / / __/  |/ / name: GN's Particle Library
+/ /_/ / /|  /  desc: 
 \____/_/ |_/ source: link ]]
 
 --[────────────────────────-< CONFIG >-────────────────────────]--

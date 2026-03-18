@@ -23,16 +23,18 @@ end
 
 
 ---@param modelPart ModelPart
----@param func fun(modelPart:ModelPart)
+---@param func fun(modelPart:ModelPart): boolean?
 local function apply(modelPart,func)
-	func(modelPart)
-	for _, child in ipairs(modelPart:getChildren()) do
-		apply(child,func)
+	local cancel = func(modelPart)
+	if not cancel then
+		for _, child in ipairs(modelPart:getChildren()) do
+			apply(child,func)
+		end
 	end
 end
 
 ---@param modelPart ModelPart
----@param func fun(modelPart:ModelPart)
+---@param func fun(modelPart:ModelPart): boolean?
 ---@return ModelPart
 function utils.apply(modelPart,func)
 	return apply(modelPart,func)

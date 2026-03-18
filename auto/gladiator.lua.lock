@@ -1,0 +1,144 @@
+local function send(...)
+	host:sendChatCommand(table.concat({ ... }, " "))
+end
+
+
+
+local prefixes = {
+	"shadow", "neon", "frost", "crimson", "echo", "void", "blitz", "solar",
+	"potato", "waffle", "sneaky", "sir", "oops", "chicken", "toaster", "noob",
+	"blood", "night", "grim", "chaos", "death", "venom", "obsidian", "iron",
+	"kairo", "zyn", "arlo", "vex", "nyro", "elix", "ryn", "sora",
+}
+
+local suffixes = {
+	"vortex", "specter", "byte", "nova", "phantom", "striker", "rogue", "reaper",
+	"sniper", "warrior", "banana", "lagalot", "lag", "nugget", "toaster", "inator",
+	"hex", "slayer", "pulse", "warden", "circuit", "fury", "rage", "doom",
+}
+
+local function generateUsernames(amount)
+	local result = {}
+
+	for i = 1, amount do
+		local prefix = prefixes[math.random(#prefixes)]
+		local suffix = suffixes[math.random(#suffixes)]
+		local number = math.random(42, 45124)
+
+		local username = prefix .. suffix .. number
+		table.insert(result, username)
+	end
+
+	return result
+end
+
+local players = generateUsernames(500)
+
+local fight = false
+
+
+local page = action_wheel:newPage("")
+
+page:newAction()
+	 :setTitle("Spawn Players")
+	 :setItem("minecraft:tropical_fish_spawn_egg")
+	 :onLeftClick(function()
+		local i = 0
+		local t = 0
+		events.TICK:register(function ()
+			t = t + 1
+			if t > 15 then
+				t = 0
+				i = i + 1
+				if players[i] then
+					send("/player", players[i], "spawn")
+				else
+					events.TICK:remove("spawnerr")
+				end
+			end
+		 end,"spawnerr")
+	 end)
+
+page:newAction()
+	 :setTitle("Survival")
+	 :setItem("minecraft:beef")
+	 :onLeftClick(function()
+		 for _, name in pairs(players) do
+			 send("/gamemode survival", name)
+		 end
+	 end)
+
+
+page:newAction()
+	 :setTitle("Attack")
+	 :setItem("minecraft:diamond_sword")
+	 :onLeftClick(function()
+		 for _, name in pairs(players) do
+			 send("/clear", name)
+			 send("/give", name, "diamond_sword")
+		 end
+	 end)
+
+page:newAction()
+	 :setTitle("FIGHT")
+	 :setItem("minecraft:flint_and_steel")
+	 :onToggle(function(state, self)
+		 fight = state
+	 end)
+
+page:newAction()
+	 :setTitle("Move Forward")
+	 :setItem("minecraft:rabbit_foot")
+	 :onLeftClick(function()
+		 for _, name in pairs(players) do
+			 send("/player", name, "move forward")
+		 end
+	 end)
+
+page:newAction()
+	 :setTitle("Stop Moving")
+	 :setItem("minecraft:anvil")
+	 :onLeftClick(function()
+		 for _, name in pairs(players) do
+			 send("/player", name, "move")
+		 end
+	 end)
+
+
+action_wheel:setPage(page)
+
+
+events.WORLD_TICK:register(function()
+	local worldPlayers = world.getPlayers()
+	for _, name in pairs(players) do
+		local player = worldPlayers[name]
+		if player and player:isLoaded() then
+			local closest = nil
+			local closestDist = math.huge
+			for _, targetName in pairs(players) do
+				if targetName ~= name then
+					local targetPlayer = worldPlayers[targetName]
+					if targetPlayer then
+						local dist = (player:getPos() - targetPlayer:getPos()):length()
+						if dist < closestDist then
+							closestDist = dist
+							closest = (targetPlayer:getPos() * 100):floor() / 100
+						end
+					end
+				end
+			end
+			if closest then
+				send("/player", name, "look at", closest.x, closest.y + 1.4, closest.z)
+			end
+
+			if fight then
+				if math.random() < 0.1 then
+					send("/player", name, "attack")
+				end
+				if math.random() < 0.05 then
+					send("/player", name, "jump")
+				end
+			end
+		end
+	end
+end)
