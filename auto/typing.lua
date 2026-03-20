@@ -17,7 +17,7 @@ local zlib = require("lib.zlib")
 
 --────────────────────────-< CONFIG >-────────────────────────--
 
-local TEST_MODE = true
+local TEST_MODE = false
 local VOICE_INTERVAL = 0.09
 local COLOR = vectors.hexToRGB("#4DB52A")
 local COLOR_OUTLINE = vectors.hexToRGB("#ffffff")
