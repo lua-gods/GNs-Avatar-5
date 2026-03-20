@@ -98,7 +98,6 @@ local function speak(message, pos, rot, scale, shake)
 	:gsub("^%s*","")
 	:gsub("%s*$","")
 	local tasks = {}
-	local char = {}
 	
 	local letters = splitWithColons(text)
 	
@@ -136,7 +135,6 @@ local function speak(message, pos, rot, scale, shake)
 		end
 		offset = offset + width * scale
 		tasks[i] = part
-		char[i] = letter
 	end
 
 	local c = 1
