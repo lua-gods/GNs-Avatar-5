@@ -1,10 +1,21 @@
+
+--────────────────────────-< DEPENDENCIES >-────────────────────────--
 local Nameplate = require("auto.nameplate")
 local sync = require('lib.sync')
 local LocalChecker = require("lib.localChecker")
 
 
-local IDLE_EMOTE = animations["models.player"].FallOverSolid
+--────────────────────────-< CONFIG >-────────────────────────--
+
+local IDLE_EMOTE = animations["models.player"].eyeCloseSit
 local TIME_OFFSET = 1773733683856
+
+--────────────────────────-< END OF CONFIG >-────────────────────────--
+
+IDLE_EMOTE
+:setBlendDuration(0.2)
+:setOverride(true)
+:setPriority(1)
 
 local isLocal = false
 local lastStatus
@@ -15,16 +26,20 @@ local function updateStatus()
 		status = 3
 	end
 	if status == 1 then -- idle
-		Nameplate.setStatus("Idle",time)
-		if lastStatus == 0 then
-			IDLE_EMOTE:speed(1):setBlendDuration(0):play():setLoop("HOLD")
+		Nameplate.setStatus("Unfocused",time)
+		if lastStatus ~= 1 then
+			IDLE_EMOTE:stop():play()
 		end
+	elseif status == 2 then -- typing
+		Nameplate.setStatus("typing..",time)
 	elseif status == 3 then -- local
-		Nameplate.setStatus("Editing",time)
+		Nameplate.setStatus("in Local",time)
 	else
 		Nameplate.setStatus()
-		if lastStatus == 1 or lastStatus == 3 then
-			IDLE_EMOTE:speed(-1):setBlendDuration(0):play():setLoop("ONCE")
+		if lastStatus == 1 then
+			if IDLE_EMOTE then
+				IDLE_EMOTE:stop()
+			end
 		end
 	end
 	if lastStatus ~= status then
@@ -32,6 +47,7 @@ local function updateStatus()
 	end
 end
 
+--────────────────────────-< Update Listeners >-────────────────────────--
 
 LocalChecker.changed:register(function (value)
 	isLocal = value
@@ -50,12 +66,24 @@ sync.changes.timeSince:register(function (value)
 	updateStatus()
 end)
 
+--────────────────────────-< Host Stuff >-────────────────────────--
 if not host:isHost() then return end
 
+-- the part that tells what state the host is in.
 events.TICK:register(function ()
 	if not client:isWindowFocused() then
-		sync.status = 1
+		sync.status = 1 -- idle
 	else
-		sync.status = 0
+		if sync.status ~= 1 then
+			if host:isChatOpen() then
+				sync.status = 2 -- typing
+			else
+				sync.status = 0 -- focursed
+			end
+		else
+			if not host:isChatOpen() then
+				sync.status = 0 -- focused
+			end
+		end
 	end
 end)

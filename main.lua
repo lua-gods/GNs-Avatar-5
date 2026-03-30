@@ -1,7 +1,7 @@
 
 --[ [ <- separate to enable
 
-local core = listFiles("core")
+local core = listFiles("core",true)
 table.sort(core)
 local stop = false
 local addScript = addScript

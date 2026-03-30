@@ -1,4 +1,3 @@
-
 local colors = {
 	vectors.hexToRGB("#d3fc7e"),
 	vectors.hexToRGB("#99e65f"),
@@ -9,49 +8,50 @@ local colors = {
 	vectors.hexToRGB("#0c2e44"),
 }
 
-local function poof(pos,appear)
-	particles:newParticle("minecraft:flash",pos):setColor(0.5,1,0.4)
+local function poof(pos, appear)
+	pos = pos + vec(0,1,0)
+	particles:newParticle("minecraft:flash", pos):setColor(0.5, 1, 0.4)
 	local max_pow = 0.5
 	for ci = 1, #colors, 1 do
 		local clr = colors[ci]
-		local low_pow,high_pow = (ci-1) / #colors * max_pow,ci / #colors * max_pow
+		local low_pow, high_pow = (ci - 1) / #colors * max_pow, ci / #colors * max_pow
 		for i = 1, 50, 1 do
-			local mpow = math.lerp(low_pow,high_pow,math.random())
-			local inv_pow = math.pow((1 - mpow )* max_pow,3)
-			local v = vectors.angleToDir(math.random()*360,math.random()*180)*mpow
-			v:mul(0.5,1,0.5)
+			local mpow = math.lerp(low_pow, high_pow, math.random())
+			local inv_pow = math.pow((1 - mpow) * max_pow, 3)
+			local v = vectors.angleToDir(math.random() * 360, math.random() * 180) * mpow
+			v:mul(0.5, 1, 0.5)
 			local p = particles
-			:newParticle("minecraft:end_rod",pos)
-			
+				 :newParticle("minecraft:end_rod", pos)
+
 			if not appear then
 				p:setVelocity(v)
-				:color(clr)
-				:lifetime(math.pow((1 - mpow )* max_pow,2) * 300)
-				:gravity(-10*(inv_pow))
+					 :color(clr)
+					 :lifetime(math.pow((1 - mpow) * max_pow, 2) * 300)
+					 :gravity(-10 * (inv_pow))
 			else
-				p:pos(pos+v*10)
+				p:pos(pos + v * 10)
 				p:setVelocity(-v)
-				:color(clr)
-				:lifetime(math.pow((1 - mpow )* max_pow,2) * 300)
-				:gravity(0)
+					 :color(clr)
+					 :lifetime(math.pow((1 - mpow) * max_pow, 2) * 300)
+					 :gravity(0)
 			end
 		end
 	end
-	sounds:playSound("minecraft:entity.illusioner.cast_spell",pos,1,1)
-	sounds:playSound("minecraft:entity.generic.extinguish_fire",pos,0.1,0.8)
+	sounds:playSound("minecraft:entity.illusioner.cast_spell", pos, 1, 1)
+	sounds:playSound("minecraft:entity.generic.extinguish_fire", pos, 0.1, 0.8)
 	--sounds:playSound("minecraft:entity.allay.item_taken",pos,1,1)
 	for i = 1, 3, 1 do
-		sounds:playSound("minecraft:particle.soul_escape",pos,1,0.5)
+		sounds:playSound("minecraft:particle.soul_escape", pos, 1, 0.5)
 	end
-	sounds:playSound("minecraft:entity.ghast.shoot",pos,0.2,.75)
+	sounds:playSound("minecraft:entity.ghast.shoot", pos, 0.2, .75)
 end
 
 
 
-local lastPpos = vec(0,0,0)
-local wasPresent = true
-events.WORLD_TICK:register(function ()
-	local isPresent = player:isLoaded()
+
+
+events.WORLD_TICK:register(function()
+	local isPresent = player:isLoaded() and player:getGamemode() ~= "SPECTATOR"
 	if isPresent then
 		lastPpos = player:getPos()
 	end

@@ -1,19 +1,17 @@
-local GNanim = require("lib.GNanimClassic")
-
-local animState = GNanim.new():setBlendTime(0.0)
-
 local RANDOM_PITCH = 0.1
+
+local SWORD_PATH = models.player.Base.Torso.Waist.Chest.CrystalSword.CSHandle.Mesh
 
 local ANIM_IDLE = animations.player.sword
 local ANIM_ATTACK = animations.player.swordAttack1:setBlendDuration(0.1)
 local ANIM_ATTACK_TWO = animations.player.swordAttack2:setBlendDuration(0.1)
 
-local alternate = false
+SWORD_PATH:setPrimaryRenderType("EMISSIVE_SOLID")
+
 models.player.VFX:setVisible(true)
-models.player.Roll.Sword.glow:setPrimaryRenderType("EMISSIVE_SOLID")
 models.player.VFX.Smear1.Smear1Spin:setPrimaryRenderType("EYES"):setColor(0.8,0.8,0.8)
 
-models.player.Roll:setVisible(true)
+local alternate = false
 
 local current
 local function setAnimation(anim)

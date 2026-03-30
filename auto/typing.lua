@@ -17,12 +17,14 @@ local zlib = require("lib.zlib")
 
 --────────────────────────-< CONFIG >-────────────────────────--
 
+local LINE_SEPARATORS = ",;.?!"
+local SHRINK_RATIO = 100
 local TEST_MODE = false
 local VOICE_INTERVAL = 0.09
 local COLOR = vectors.hexToRGB("#4DB52A")
 local COLOR_OUTLINE = vectors.hexToRGB("#ffffff")
 local OUTLINE_COUNT = 8
-local OUTLINE_SIZE = 0.4
+local OUTLINE_THICKNESS = 0.2
 
 --────────────────────────-< END OF CONFIG >-────────────────────────--
 
@@ -41,39 +43,13 @@ end
 
 local function splitWithColons(text)
 	local result = {}
-	local i = 1
-	local len = #text
-	
-	
-
-	while i <= len do
-		-- this unicode catcher dosent seem to work.
-		local from,to = text:find("^[\x00-\x7F\xC2-\xF4][\x80-\xBF]*",i)
-		local char = text:sub(from, to)
-		local charLen = to - from + 1
-		i = from
-		
-		if char == ":" then
-			local j = i + 1
-			while j <= len and text:sub(j, j) ~= ":" do
-				j = j + 1
-			end
-
-			-- If we found a closing colon, combine the whole :word:
-			if j <= len then
-				table.insert(result, text:sub(i, j))
-				i = j + charLen
-			else
-				-- No closing colon, treat ':' as a normal character
-				table.insert(result, char)
-			end
-		else
-			table.insert(result, char)
-		end
-		
-		i = i + charLen
+	local i = 0
+	while i < #text do
+		local part = text:sub(i+1,-1)
+		local char = part:match("^:[%w_]+:") or part:match("^[\x00-\x7F\xC2-\xF4][\x80-\xBF]*") or part:sub(1, 1)
+		result[#result+1] = char
+		i = i + #char
 	end
-
 	return result
 end
 
@@ -87,16 +63,14 @@ local c = 0
 ---@param pos Vector3
 ---@param rot number
 ---@param scale number
----@param shake number
-local function speak(message, pos, rot, scale, shake)
+---@param screaming number
+local function speak(message, pos, rot, scale, screaming)
 	scale = scale or 1
 	pos = pos * 16
 	
-	local from,to = message:find("[^.,]*[.,]?")
+	local from,to = message:find("^[^"..LINE_SEPARATORS.."]*["..LINE_SEPARATORS.." ]*")
 
 	local text = message:sub(from,to)
-	:gsub("^%s*","")
-	:gsub("%s*$","")
 	local tasks = {}
 	
 	local letters = splitWithColons(text)
@@ -105,7 +79,11 @@ local function speak(message, pos, rot, scale, shake)
 	local color2 = '#'..vectors.rgbToHex(COLOR * 0.85)
 	local color3 = '#'..vectors.rgbToHex(COLOR_OUTLINE)
 
-	local offset = -getWidth(text) / 2 * scale
+	
+	local fscale = (SHRINK_RATIO/(getWidth(text)+SHRINK_RATIO)) * scale
+	local outline = OUTLINE_THICKNESS / fscale
+	
+	local offset = -getWidth(text) / 2 * fscale
 	for i = 1, #letters, 1 do
 		c = c + 1
 		local letter = letters[i]
@@ -113,7 +91,7 @@ local function speak(message, pos, rot, scale, shake)
 
 		local part = LABEL_WORLD:newPart("Letter" .. c)
 		part
-		:setPos(vectors.rotateAroundAxis(rot, vec(offset + (width * 0.5) * scale, 0, 0), UP) + pos)
+		:setPos(vectors.rotateAroundAxis(rot, vec(offset + (width * 0.5) * fscale, 0, 0), UP) + pos)
 		:light(15, 15)
 		:rot(0, rot + 180, 0):setVisible(false)
 		
@@ -129,11 +107,11 @@ local function speak(message, pos, rot, scale, shake)
 			else
 				t:setText('{"text":' .. j .. ',"color":"' .. color3 .. '"}')
 				local c = i / OUTLINE_COUNT
-				local o = vec(math.sin(c * math.pi * 2), math.cos(c * math.pi * 2), 0) * OUTLINE_SIZE
+				local o = vec(math.sin(c * math.pi * 2), math.cos(c * math.pi * 2), 0) * outline
 				t:setPos(width * 0.5 + o.x, 4 + o.y, 0.01)
 			end
 		end
-		offset = offset + width * scale
+		offset = offset + width * fscale
 		tasks[i] = part
 	end
 
@@ -184,13 +162,17 @@ local function speak(message, pos, rot, scale, shake)
 				easing = "outQuad",
 				tick = function(v, t)
 					if v > 0 then
-						local e = (1 + math.max(v, 0) * 0.5) * scale
+						local e = (1 + math.max(v, 0) * 0.5) * fscale
 						task
 							 :setVisible(true)
 							 :scale(e, e, e)
 					end
-					local shift = vec(math.random() - 0.5, math.random() - 0.5, math.random() - 0.5) * 0.5 *
-						 shake
+					local shift = vec(0,0,0)
+					if screaming then
+						shift = 
+						vec(math.random() - 0.5, math.random() - 0.5, math.random() - 0.5) 
+						* 0.5 * math.max(0,1-t*3)
+					end
 					task:pos(tpos + shift)
 				end,
 				onFinish = function()
@@ -219,7 +201,7 @@ local function speak(message, pos, rot, scale, shake)
 			}
 
 			tweens.new {
-				from = scale,
+				from = fscale,
 				to = 0,
 				duration = 0.6,
 				tick = function(v, t)
@@ -239,11 +221,11 @@ local function speak(message, pos, rot, scale, shake)
 			if c > #tasks then
 				if (to < #message) then
 					tweens.new {
-						from = scale,
+						from = fscale,
 						to = 0,
 						duration = 1,
 						onFinish = function()
-							speak(message:sub(to+1,-1), pos / 16, rot, scale, shake)
+							speak(message:sub(to+1,-1), pos / 16, rot, scale, screaming)
 						end,
 					}
 				end
@@ -253,14 +235,14 @@ local function speak(message, pos, rot, scale, shake)
 	end, "Miside Text"..id)
 end
 
-function pings.mitext(text, scale, shake)
+function pings.mitext(text, scale, screaming)
 	if player:isLoaded() then
 		local diff = (player:getPos() - client:getCameraPos()).x_z:normalize()
 		speak(
 			zlib.Deflate.Decompress(text),
 			player:getPos():add(0, player:getEyeHeight() / 1.2, 0) - diff * 0.5,
-			math.deg(math.atan2(diff.x, diff.z)) + 180, scale or 0.75,
-			shake
+			math.deg(math.atan2(diff.x, diff.z)) + 180, scale,
+			screaming
 		)
 	end
 end
@@ -270,14 +252,11 @@ function mitext(text, scale, shake)
 end
 
 events.CHAT_SEND_MESSAGE:register(function(message)
-	local screamCount = 0
-	message:gsub("%?!", function() screamCount = screamCount + 1 end)
-	message:gsub("!%?", function() screamCount = screamCount + 1 end)
-	message:gsub("!!", function() screamCount = screamCount + 1 end)
 	
-	pings.mitext(zlib.Deflate.Compress(message),
-		#message > 20 and 0.3 or 0.5,
-		screamCount)
+	pings.mitext(
+		zlib.Deflate.Compress(message),
+		1,
+		(message:find("!") and true))
 	if not TEST_MODE then
 		return message
 	else

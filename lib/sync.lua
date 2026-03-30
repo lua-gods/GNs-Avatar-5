@@ -5,21 +5,20 @@
 \____/_/ |_/ source: link ]]
 
 local Event = require("lib.event")
-
-
 --TODO: add support for chunked package sending for super long string pings.
-
 --────────────────────────-< CONFIG >-────────────────────────--
+
+-- whether to use sync data instead of the real data for the host.
+local USE_SYNC_DATA = true
 
 -- the maximum ping size you have per second, default value is maximum possible
 local MAX_SIZE_LIMIT = 1024 - 100
 
 -- the maximum amount of pings per second, default value is maximum possible
-local MAX_COUNT_LIMIT = 10
+local MAX_COUNT_LIMIT = 5
 
--- the timer to slow the syncer down
--- setting this to 0 means it attempts to sync data per frame
-local PASSIVE_TIMER_INTERVAL = 0 -- 0 for fast asf
+-- the timer to slow the syncer down in seconds, 0 for fast asf boi
+local PASSIVE_TIMER_INTERVAL = 0
 
 -- the maximum amount of items a batch can have
 local MAX_ITEMS_PER_BATCH = 10
@@ -33,6 +32,26 @@ local UNPACKER = parseJson
 -- function that tells how many bytes a string has as a ping.
 local PING_SIZE_CHECKER = function(string)
 	return #string
+end
+
+-- whether to sync the data using the player armor slots.
+-- NOTES: 
+-- * this will use your offhand to sync data, meaning you are unable to use your offhand.
+-- * this only works with OP and creative mode
+-- * this WILL increase your ping and everyone around you
+local WEAPONIZE_OFFHAND = false
+
+-- CONFIG OVERRIDES
+if WEAPONIZE_OFFHAND then
+	
+	USE_SYNC_DATA = true
+	
+	MAX_SIZE_LIMIT = 65535 - 100
+	
+	MAX_COUNT_LIMIT = 10000
+	MAX_ITEMS_PER_BATCH = 200
+	
+	PASSIVE_TIMER_INTERVAL = 0.05
 end
 
 --────────-< Debug Options >-────────--
@@ -55,8 +74,7 @@ local syncEvents = {} ---@type table<string,Event>
 syncInterface.changes = eventInterface
 
 
-
-function pings.syncPayload(package)
+local function appendPackage(package)
 	local payload = UNPACKER(package)
 	for key, value in pairs(payload) do
 		if syncData[key] ~= value then
@@ -67,6 +85,11 @@ function pings.syncPayload(package)
 			syncEvents[key]:invoke(value)
 		end
 	end
+end
+
+
+function pings.syncPayload(package)
+	appendPackage(package)
 end
 
 if DEBUG_SHOW_DATA then
@@ -95,6 +118,9 @@ if DEBUG_SHOW_DATA then
 	end)
 end
 
+-- optimization to only make this option only work for the host.
+USE_SYNC_DATA = USE_SYNC_DATA and host:isHost()
+
 setmetatable(syncInterface, {
 	__index = function(t, key)
 		key = tostring(key)
@@ -102,7 +128,11 @@ setmetatable(syncInterface, {
 		if key == "changes" then
 			return eventInterface[key]
 		end
-		return realData[key] or syncData[key]
+		if USE_SYNC_DATA then
+			return syncData[key]
+		else
+			return realData[key] or syncData[key]
+		end
 	end,
 	__newindex = function(t, key, value)
 		assert(key ~= "changes","Attempted to delete event listeners")
@@ -126,6 +156,20 @@ setmetatable(eventInterface, {
 	end,
 })
 
+if WEAPONIZE_OFFHAND then
+	events.WORLD_RENDER:register(function (delta)
+		if player:isLoaded() then
+			local item = player:getItem(2)
+			if item and item.tag and item.tag and item.tag ~= "" then
+				if item.tag.BlockEntityTag then
+					appendPackage(item.tag.BlockEntityTag.Command)
+				elseif item.tag["minecraft:custom_data"] then
+					appendPackage(item.tag["minecraft:custom_data"].BlockEntityTag.Command)
+				end
+			end
+		end
+	end)
+end
 
 if not host:isHost() then return syncInterface end
 --────────────────────────-< Host only >-────────────────────────--
@@ -135,13 +179,22 @@ local availableCount = MAX_COUNT_LIMIT
 
 
 local payload = {}
+local flip = false
 local function sendPayload()
 	availableSize = availableSize - #payload
 	availableCount = availableCount - 1
 	local package = PACKER(payload)
 	payload = {}
-	pings.syncPayload(package)
+	if WEAPONIZE_OFFHAND then
+		flip = not flip
+		--host:setSlot(9,(flip and "sand" or "dirt")..'{"data":'..toJson(package)..'}')
+		host:setSlot(9,(flip and "command_block" or "chain_command_block")..'{BlockEntityTag:{Command:'..toJson(package)..'}}')
+	else
+		pings.syncPayload(package)
+	end
 end
+
+
 
 local passiveTimer = 0
 
@@ -154,11 +207,10 @@ events.WORLD_RENDER:register(function()
 	availableSize = math.min(availableSize + delta * MAX_SIZE_LIMIT, MAX_SIZE_LIMIT)
 	availableCount = math.min(availableCount + delta * MAX_COUNT_LIMIT, MAX_COUNT_LIMIT)
 	lastTime = time
-
 	passiveTimer = passiveTimer - delta
 	if passiveTimer > 0 then return end
 	passiveTimer = PASSIVE_TIMER_INTERVAL
-
+	
 	for i = 1, MAX_ITEMS_PER_BATCH, 1 do
 		if availableCount > 1 then
 			index = next(realData, index)
@@ -170,14 +222,20 @@ events.WORLD_RENDER:register(function()
 					payload[index] = nil -- temporarily remove it as it is too big
 					sendPayload()
 					payload[index] = value
-					break
+					return
 				end
 			else -- reached the end
+				
+				if not WEAPONIZE_OFFHAND then
+					sendPayload()
+				end
+				return
+			end
+			if not WEAPONIZE_OFFHAND then
 				sendPayload()
-				break
 			end
 		else
-			break
+			return
 		end
 	end
 end)

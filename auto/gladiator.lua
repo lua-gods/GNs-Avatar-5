@@ -21,18 +21,19 @@ local function generateUsernames(amount)
 	local result = {}
 
 	for i = 1, amount do
-		local prefix = prefixes[math.random(#prefixes)]
-		local suffix = suffixes[math.random(#suffixes)]
-		local number = math.random(42, 45124)
+		--local prefix = prefixes[math.random(#prefixes)]
+		--local suffix = suffixes[math.random(#suffixes)]
+		--local number = math.random(42, 45124)
 
-		local username = prefix .. suffix .. number
-		table.insert(result, username)
+		--local username = prefix .. suffix .. number
+		--table.insert(result, username)
+		table.insert(result, tostring(i))
 	end
 
 	return result
 end
 
-local players = generateUsernames(500)
+local players = generateUsernames(100)
 
 local fight = false
 
@@ -46,17 +47,19 @@ page:newAction()
 		local i = 0
 		local t = 0
 		events.TICK:register(function ()
-			t = t + 1
-			if t > 15 then
-				t = 0
-				i = i + 1
-				if players[i] then
-					send("/player", players[i], "spawn")
-				else
-					events.TICK:remove("spawnerr")
+			for e = 1, 1, 1 do
+				t = t + 1
+				if t > 1 then
+					t = 0
+					i = i + 1
+					if players[i] then
+						send("/player", players[i], "spawn")
+					else
+						events.TICK:remove("spawnerr")
+					end
 				end
 			end
-		 end,"spawnerr")
+		end,"spawnerr")
 	 end)
 
 page:newAction()
@@ -75,7 +78,7 @@ page:newAction()
 	 :onLeftClick(function()
 		 for _, name in pairs(players) do
 			 send("/clear", name)
-			 send("/give", name, "diamond_sword")
+			 send("/give", name,"diamond_sword")
 		 end
 	 end)
 
@@ -107,6 +110,7 @@ page:newAction()
 
 action_wheel:setPage(page)
 
+local target = world.getEntity("18af3143-5056-4122-9c8c-9d3eb956c407")
 
 events.WORLD_TICK:register(function()
 	local worldPlayers = world.getPlayers()
@@ -115,7 +119,8 @@ events.WORLD_TICK:register(function()
 		if player and player:isLoaded() then
 			local closest = nil
 			local closestDist = math.huge
-			for _, targetName in pairs(players) do
+			for i = 1, 2, 1 do
+				local targetName = players[math.random(#players)]
 				if targetName ~= name then
 					local targetPlayer = worldPlayers[targetName]
 					if targetPlayer then
@@ -128,12 +133,18 @@ events.WORLD_TICK:register(function()
 				end
 			end
 			if closest then
+				--closest = target:getPos()
 				send("/player", name, "look at", closest.x, closest.y + 1.4, closest.z)
 			end
 
-			if fight then
-				if math.random() < 0.1 then
-					send("/player", name, "attack")
+			if player:isLoaded() then
+				
+				if fight then
+					local is = player:getTargetedEntity(5)
+					if math.random() < 0.1 then
+						
+						send("/player", name, "attack")
+					end
 				end
 				if math.random() < 0.05 then
 					send("/player", name, "jump")

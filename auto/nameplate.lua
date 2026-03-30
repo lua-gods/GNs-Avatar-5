@@ -37,6 +37,10 @@ nameComponent = toJson(nameComponent)
 
 --────────────────────────-< Nameplate Status >-────────────────────────--
 
+local function component(text,color)
+	return ',{"text":"'..tostring(text)..'","color":"'..(color and "#"..vectors.rgbToHex(color) or "gray")..'"}'
+end
+
 local status
 local statusTime
 
@@ -46,31 +50,34 @@ local function updateStatus()
 	
 	if status then
 		final=final .. ',{"text":"\n"}'
-		final=final .. ',{"text":"['..status..'","color":"gray"}'
+		final=final .. component("[")
 		
 		if statusTime then
-			final=final .. ',{"text":" : ","color":"gray"}'
+			
 			
 			local time = client:getSystemTime()
-			local timeSince = math.floor((time - statusTime) / 1000)
+			local timeSince = ((time - statusTime) / 1000)
 			
 			local second = timeSince%60
 			local minute = math.floor(timeSince/60)
 			local hour = math.floor(minute/60)
 			minute = minute%60
 			
+			final=final .. component(status.." ")
+			
 			if hour > 0 then
-				final=final .. ',{"text":"'..hour..'","color":"gray"}'
-				final=final .. ',{"text":":","color":"gray"}'
+				final=final .. component(hour)
+				final=final .. component(":")
 			end
+			final=final .. component(minute,math.lerp(CLR_STATUS_UPDATE,CLR_STATUS,math.clamp(second,0,1)))
 			
-			final=final .. ',{"text":"'..minute..'","color":"gray"}'
+			final=final .. component(":")
 			
-			final=final .. ',{"text":":","color":"gray"}'
-			
-			final=final .. ',{"text":"'..(string.format("%02d", second))..'","color":"gray"}'
+			final=final .. component((string.format("%02d", second)),math.lerp(CLR_STATUS_UPDATE,CLR_STATUS,(timeSince)%1))
 		end
-		final=final .. ',{"text":"]","color":"gray"}'
+		final=final .. component("]")
+	else
+		
 	end
 	
 	final=final .. ']'
@@ -90,8 +97,8 @@ function NameplateAPI.setStatus(title,time)
 			local currentTime = client:getSystemTime()
 			if currentTime-time > 1000  then
 				time = currentTime
-				updateStatus()
 			end
+			updateStatus()
 		end,"nameplateStatus")
 	end
 	updateStatus()
