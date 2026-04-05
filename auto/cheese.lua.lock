@@ -1,0 +1,36 @@
+local WORLD_CHEESE = models:newPart("WORLD_CHEESE", "WORLD")
+
+local CHEESE = models.cheese
+
+local RANGE = 10
+
+animations["models.cheese"].idle:setSpeed(0.3):play()
+
+for i = 1, 1000, 1 do
+	local cheese = CHEESE:copy("queso"..i)
+	WORLD_CHEESE:addChild(cheese)
+	local timer = 0
+	local cheesePos = vec(0, 0, 0)
+
+	events.WORLD_TICK:register(function()
+		local cpos = client:getCameraPos()
+		if timer < 0 then
+			timer = 60
+			local offset = vec(
+				math.lerp(-RANGE,RANGE,math.random()),
+				math.random(1, RANGE),
+				math.lerp(-RANGE,RANGE,math.random())
+			)
+
+			local block, pos = raycast:block(cpos + offset, cpos + offset - vec(0, RANGE * 2, 0))
+			cheesePos = pos
+			cheese:setPos(cheesePos * 16)
+			cheese:setVisible(true)
+		else
+			timer = timer - 1
+		end
+		if vectors.worldToScreenSpace(cheesePos).xy:length() < 0.5 then
+			cheese:setVisible(false)
+		end
+	end)
+end

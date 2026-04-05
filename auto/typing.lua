@@ -252,14 +252,18 @@ function mitext(text, scale, shake)
 end
 
 events.CHAT_SEND_MESSAGE:register(function(message)
-	
-	pings.mitext(
-		zlib.Deflate.Compress(message),
-		1,
-		(message:find("!") and true))
-	if not TEST_MODE then
-		return message
+	if message and not message:find("^/") then
+		pings.mitext(
+			zlib.Deflate.Compress(message),
+			1,
+			(message:find("!") and true))
+		if not TEST_MODE then
+			return message
+		else
+			host:appendChatHistory(message)
+		end
 	else
-		host:appendChatHistory(message)
+		return message
 	end
+	
 end, "milatch")

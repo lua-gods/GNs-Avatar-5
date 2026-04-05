@@ -48,15 +48,17 @@ end
 
 
 
-
-
 events.WORLD_TICK:register(function()
-	local isPresent = player:isLoaded() and player:getGamemode() ~= "SPECTATOR"
+	local isPresent = player:isLoaded()
 	if isPresent then
-		lastPpos = player:getPos()
+		if (player:getGamemode() ~= "SPECTATOR") then
+			lastPpos = player:getPos()
+		end
 	end
 	if wasPresent ~= isPresent then
 		wasPresent = isPresent
-		poof(lastPpos, isPresent)
+		if lastPpos then
+			poof(lastPpos, isPresent)
+		end
 	end
 end)

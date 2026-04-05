@@ -1,10 +1,12 @@
+
 ---@diagnostic disable: assign-type-mismatch
-local macro = require("lib.macros")
+local Sync = require("lib.sync")
+local Macros = require("lib.macros")
 local Spring = require("lib.spring")
 
 local flyMacro
 
-flyMacro = macro.new(function (events, ...)
+flyMacro = Macros.new(function (events, ...)
 	animations.player.armSwingRight:speed(1.7)
 	animations.player.armSwingLeft:speed(1.7)
 	events.ENTITY_INIT:register(function ()
@@ -54,19 +56,12 @@ flyMacro = macro.new(function (events, ...)
 	end)
 end)
 
-function pings.fly(toggle)
-	if player:isLoaded() then
-		flyMacro:setActive(toggle)
-	end
-end
+Sync.changes.isFlying:register(function (state)
+	flyMacro:setActive(state)
+end)
 
 if host:isHost() then
-	local wasFlying = false
 	events.TICK:register(function ()
-		local isFlying = host:isFlying()
-		if isFlying ~= wasFlying then
-			wasFlying = isFlying
-			pings.fly(isFlying)
-		end
+		Sync.isFlying = host:isFlying()
 	end)
 end
