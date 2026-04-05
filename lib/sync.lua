@@ -4,12 +4,15 @@
 / /_/ / /|  /  desc: automatically syncs data
 \____/_/ |_/ source: link ]]
 
+--────────────────────────-< DEPENDENCIES >-────────────────────────--
+
 local Event = require("lib.event")
 --TODO: add support for chunked package sending for super long string pings.
+--TODO: add support for voiding keys
 --────────────────────────-< CONFIG >-────────────────────────--
 
 -- whether to use sync data instead of the real data for the host.
-local USE_SYNC_DATA = true
+local USE_SYNC_DATA_ON_HOST = false
 
 -- the maximum ping size you have per second, default value is maximum possible
 local MAX_SIZE_LIMIT = 1024 - 100
@@ -44,7 +47,7 @@ local WEAPONIZE_OFFHAND = false
 -- CONFIG OVERRIDES
 if WEAPONIZE_OFFHAND then
 	
-	USE_SYNC_DATA = true
+	USE_SYNC_DATA_ON_HOST = true
 	
 	MAX_SIZE_LIMIT = 65535 - 100
 	
@@ -57,10 +60,12 @@ end
 --────────-< Debug Options >-────────--
 
 -- shows the data that is being synced beside the player
-local DEBUG_SHOW_DATA = false
+local DEBUG_SHOW_DATA = true
 
 --────────────────────────-< END OF CONFIG >-────────────────────────--
 
+-- optimization to only make this option only work for the host.
+USE_SYNC_DATA_ON_HOST = USE_SYNC_DATA_ON_HOST and host:isHost()
 
 
 ---@type table<string,Event|any>|{changes:table<any,Event>}
@@ -82,7 +87,9 @@ local function appendPackage(package)
 			if not syncEvents[key] then
 				syncEvents[key] = Event.new()
 			end
-			syncEvents[key]:invoke(value)
+			if USE_SYNC_DATA_ON_HOST then
+				syncEvents[key]:invoke(value)
+			end
 		end
 	end
 end
@@ -118,8 +125,7 @@ if DEBUG_SHOW_DATA then
 	end)
 end
 
--- optimization to only make this option only work for the host.
-USE_SYNC_DATA = USE_SYNC_DATA and host:isHost()
+
 
 setmetatable(syncInterface, {
 	__index = function(t, key)
@@ -128,16 +134,21 @@ setmetatable(syncInterface, {
 		if key == "changes" then
 			return eventInterface[key]
 		end
-		if USE_SYNC_DATA then
+		if USE_SYNC_DATA_ON_HOST then
 			return syncData[key]
 		else
 			return realData[key] or syncData[key]
 		end
 	end,
 	__newindex = function(t, key, value)
-		assert(key ~= "changes","Attempted to delete event listeners")
 		key = tostring(key)
-		realData[key] = value
+		assert(key ~= "changes","Attempted to delete event listeners")
+		if realData[key] ~= value then
+			realData[key] = value
+			if not USE_SYNC_DATA_ON_HOST then
+				syncEvents[key]:invoke(value)
+			end
+		end
 	end,
 })
 
@@ -187,7 +198,6 @@ local function sendPayload()
 	payload = {}
 	if WEAPONIZE_OFFHAND then
 		flip = not flip
-		--host:setSlot(9,(flip and "sand" or "dirt")..'{"data":'..toJson(package)..'}')
 		host:setSlot(9,(flip and "command_block" or "chain_command_block")..'{BlockEntityTag:{Command:'..toJson(package)..'}}')
 	else
 		pings.syncPayload(package)
