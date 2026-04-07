@@ -1,9 +1,9 @@
 {
 	"libraries":[
 		{
-			"name":"GN Class Library",
-			"version":"1.0.0",
-			"main":"/lib/GNClass.lua"
+			"name":"GN Common Library",
+			"version":"v1.0.0",
+			"main":"/lib/gncommon.lua"
 		}
 	]
 }
