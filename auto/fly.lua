@@ -14,7 +14,7 @@ flyMacro = Macros.new(function (events, ...)
 		animations.player.flySideways:play():setSpeed(0)
 	end)
 	
-	local spring = Spring.newVec3(1,0.2,0)
+	local spring = Spring.newVec2(1,0.2,0)
 	
 	local vel = vec(0,0,0)
 	local lvel = vec(0,0,0)

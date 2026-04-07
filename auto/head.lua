@@ -1,5 +1,5 @@
 
-local BLINK_RANGE = vec(0.5,5) * 20
+local BLINK_RANGE = vec(0.5,3) * 20
 local ANIM_X = animations.player.eyeHorizontal
 local ANIM_Y = animations.player.eyeVertical
 local ANIM_BLINK = animations.player.eyeBlink
@@ -20,24 +20,11 @@ events.TICK:register(function ()
 	end
 end)
 
-local hasRender = false
-if host:isHost() then
-	events.WORLD_RENDER:register(function (delta)
-		hasRender = false
-	end)
-end
+
 
 events.RENDER:register(function (delta, ctx)
 	MODEL_HEAD:setPos(0,player:isCrouching() and -4 or 0)
-	if ctx == "RENDER" then
-		hasRender = true
-	end
-	if ctx == "PAPERDOLL" then delta = client:getFrameTime() end
-	-- avoid recalculating in the shadow pass
-	if ctx == "OTHER" or ctx == "FIRST_PERSON" then return end 
-	if hasRender and ctx == "PAPERDOLL" then return end
-	local rot 
-	rot = vanilla_model.BODY:getOriginRot()._y - vanilla_model.HEAD:getOriginRot().xy
+	local rot = player:getRot(delta) - vec(0,player:getBodyYaw(delta))
 	rot.y = ((rot.y + 180) % 360 - 180) / -50
 	rot.x = rot.x / -90
 	---@cast rot Vector2
