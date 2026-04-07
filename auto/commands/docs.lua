@@ -33,7 +33,14 @@ function genDocs(query)
 		print(string.rep("  ", indent - 1) .. "}")
 	end
 
-	local files = type(query) == "table" and getScripts(query) or {query = getScript(query)}
+	local files = {}
+	if type(query) == "table" then
+		for index, value in ipairs(query) do
+			files[value] = getScript(query)
+		end
+	else
+		files = getScripts(query)
+	end
 	
 	local lines = {} ---@type string[]
 	for key, file in pairs(files) do
@@ -352,7 +359,7 @@ function genDocs(query)
 				bake = bake .. "\n"
 			end
 		end
-		local filename = class_data.class_name..".md"
+		local filename = (class_data.class_name or class_name)..".md"
 		file:mkdir("docs")
 		local write = file:openWriteStream("docs/" .. filename)
 		local buffer = data:createBuffer(#bake)

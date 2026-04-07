@@ -2,8 +2,9 @@
 	"libraries":[
 		{
 			"name":"GN Common Library",
+			"main":"/lib/gncommon.lua",
 			"version":"v1.0.0",
-			"main":"/lib/gncommon.lua"
+			"license":"Mozilla Public License Version 2.0"
 		}
 	]
 }
