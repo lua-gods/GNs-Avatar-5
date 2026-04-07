@@ -29,4 +29,4 @@ git submodule update
 File|Author|License
 --|--|--
 lib/Extrude.lua|[Bitslayn](https://github.com/Bitslayn)|[MIT](https://github.com/Bitslayn/FOXSkullAPI/blob/main/LICENSE)
-Everything else|[GN](https://github.com/lua-gods)|[MIT](https://github.com/lua-gods/GNs-Avatar-4/blob/main/LICENSE)
+Everything else|[GN](https://github.com/gn68)|[Mozilla Public License 2.0](https://github.com/lua-gods/GNs-Avatar-4/blob/main/LICENSE)
