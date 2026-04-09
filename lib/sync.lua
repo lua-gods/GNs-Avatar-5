@@ -38,7 +38,7 @@ local PING_SIZE_CHECKER = function(string)
 end
 
 -- whether to sync the data using the player armor slots.
--- NOTES: 
+-- NOTES:
 -- * this will use your offhand to sync data, meaning you are unable to use your offhand.
 -- * this only works with OP and creative mode
 -- * this WILL increase your ping and everyone around you
@@ -46,14 +46,13 @@ local WEAPONIZE_OFFHAND = false
 
 -- CONFIG OVERRIDES
 if WEAPONIZE_OFFHAND then
-	
 	USE_SYNC_DATA_ON_HOST = true
-	
+
 	MAX_SIZE_LIMIT = 65535 - 100
-	
+
 	MAX_COUNT_LIMIT = 10000
 	MAX_ITEMS_PER_BATCH = 200
-	
+
 	PASSIVE_TIMER_INTERVAL = 0.05
 end
 
@@ -87,7 +86,7 @@ local function appendPackage(package)
 			if not syncEvents[key] then
 				syncEvents[key] = Event.new()
 			end
-			if USE_SYNC_DATA_ON_HOST then
+			if USE_SYNC_DATA_ON_HOST or not host:isHost() then
 				syncEvents[key]:invoke(value)
 			end
 		end
@@ -142,7 +141,7 @@ setmetatable(syncInterface, {
 	end,
 	__newindex = function(t, key, value)
 		key = tostring(key)
-		assert(key ~= "changes","Attempted to delete event listeners")
+		assert(key ~= "changes", "Attempted to delete event listeners")
 		if realData[key] ~= value then
 			realData[key] = value
 			if not USE_SYNC_DATA_ON_HOST then
@@ -168,7 +167,7 @@ setmetatable(eventInterface, {
 })
 
 if WEAPONIZE_OFFHAND then
-	events.WORLD_RENDER:register(function (delta)
+	events.WORLD_RENDER:register(function(delta)
 		if player:isLoaded() then
 			local item = player:getItem(2)
 			if item and item.tag and item.tag and item.tag ~= "" then
@@ -198,7 +197,9 @@ local function sendPayload()
 	payload = {}
 	if WEAPONIZE_OFFHAND then
 		flip = not flip
-		host:setSlot(9,(flip and "command_block" or "chain_command_block")..'{BlockEntityTag:{Command:'..toJson(package)..'}}')
+		host:setSlot(9,
+			(flip and "command_block" or "chain_command_block") ..
+			"{BlockEntityTag:{Command:" .. toJson(package) .. "}}")
 	else
 		pings.syncPayload(package)
 	end
@@ -220,7 +221,7 @@ events.WORLD_RENDER:register(function()
 	passiveTimer = passiveTimer - delta
 	if passiveTimer > 0 then return end
 	passiveTimer = PASSIVE_TIMER_INTERVAL
-	
+
 	for i = 1, MAX_ITEMS_PER_BATCH, 1 do
 		if availableCount > 1 then
 			index = next(realData, index)
@@ -235,7 +236,6 @@ events.WORLD_RENDER:register(function()
 					return
 				end
 			else -- reached the end
-				
 				if not WEAPONIZE_OFFHAND then
 					sendPayload()
 				end

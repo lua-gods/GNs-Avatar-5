@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-field
 --[[______   __
   / ____/ | / /  by: GNanimates / https://gnon.top / discord: @gn68s
  / / __/  |/ / name: Macros Library
@@ -10,7 +11,7 @@ local MacrosAPI = {}
 local Event = require("./event")
 
 
-local randomID = function ()
+local randomID = function()
 	return client.intUUIDToString(client.generateUUID())
 end
 
@@ -18,7 +19,7 @@ end
 ---@field isActive boolean
 ---@field events MacroEventsAPI
 ---@field id string
----@field package init fun(events: MacroEventsAPI,...)
+---@field package init fun(events: MacroEventsAPI,...):any?
 local Macro = {}
 Macro.__index = Macro
 
@@ -32,7 +33,7 @@ local MacroEventsAPI = {}
 ---Enables / Disables the macro
 ---@param active boolean
 ---@param ... any
-function Macro:setActive(active,...)
+function Macro:setActive(active, ...)
 	if self.isActive ~= active then
 		self.isActive = active
 		if active then
@@ -42,13 +43,13 @@ function Macro:setActive(active,...)
 				ON_ENTITY_UNLOAD = Event.new(),
 				ON_ENTITY_LOAD = Event.new(),
 			}, MacroEventsAPI)
-			self.init(self.events,...)
-			
+			local out = self.init(self.events, ...)
+
 			local hasInit = false
 			local hasLoadEvent = false
 			for name, value in pairs(self.events) do
 				if events[name] then
-					events[name]:register(function (...)
+					events[name]:register(function(...)
 						value:invoke(...)
 					end, self.id)
 				end
@@ -59,22 +60,22 @@ function Macro:setActive(active,...)
 					hasLoadEvent = true
 				end
 			end
-			
+
 			if player:isLoaded() then
 				self.events.ENTITY_INIT:invoke()
 			else
 				if hasInit then
-					local initName = self.id.."init"
+					local initName = self.id .. "init"
 					self.initName = initName
-					events.TICK:register(function ()
+					events.TICK:register(function()
 						self.events.ENTITY_INIT:invoke()
 						events.TICK:remove(initName)
-					end,initName)
+					end, initName)
 				end
 			end
 			local wasLoaded = 5
 			if hasLoadEvent then
-				events.WORLD_TICK:register(function ()
+				events.WORLD_TICK:register(function()
 					local isLoaded = player:isLoaded()
 					if isLoaded ~= wasLoaded then
 						wasLoaded = isLoaded
@@ -86,6 +87,7 @@ function Macro:setActive(active,...)
 					end
 				end)
 			end
+			return out
 		else
 			for name in pairs(self.events) do
 				if events[name] then
@@ -100,23 +102,20 @@ function Macro:setActive(active,...)
 	end
 end
 
-
-
-
-
----@param init fun(events: MacroEventsAPI,...)
+---@param init fun(events: MacroEventsAPI,...):any?
 ---@return Macro
 function MacrosAPI.new(init)
+	assert(type(init) == "function", "Macro.init must be a function")
 	local new = {
 		init = init,
 		isActive = false,
 		id = randomID(),
-		events = {}
-}
+		events = {},
+	}
 	return setmetatable(new, Macro)
 end
 
-MacroEventsAPI.__index = function (t, k)
+MacroEventsAPI.__index = function(t, k)
 	if not rawget(t, k) then
 		local signal = Event.new()
 		rawset(t, k, signal)

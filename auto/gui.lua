@@ -1,6 +1,6 @@
 # flags: host_only
 
-if true then
+if false then
 	return
 end
 
@@ -39,7 +39,6 @@ for _, className in ipairs(GNUI.Theme.getClassNames()) do
 
 	-- loop for each class variant
 	for _, variantName in ipairs(GNUI.Theme.getVariantNames(className)) do
-		
 		-- create that given widget with the given variant
 		local widget = GNUI.parse(screen, {
 			type = className,
@@ -49,7 +48,7 @@ for _, className in ipairs(GNUI.Theme.getClassNames()) do
 			text = variantName,
 		})
 		variantColumn:addChild(widget)
-		
+
 		--if className == "button" then
 		--	widget.PRESSED:register(function ()
 		--		widget:free()
@@ -69,7 +68,7 @@ screen:addChild(classColumns)
 
 --────────────────────────────────────────-< GNUI Boilerplate >-────────────────────────────────────────--
 -- TODO: make all this boilerplate code a loadable preset instead
-events.KEY_PRESS:register(function (key, state)
+events.KEY_PRESS:register(function(key, state)
 	local allow = screen:inputKey(key, state)
 	if not allow then
 		host:setChatText("")
@@ -77,17 +76,17 @@ events.KEY_PRESS:register(function (key, state)
 	return not allow
 end)
 
-events.CHAR_TYPED:register(function (char, modifiers, codepoint) screen:inputChar(char) end)
-events.MOUSE_PRESS:register(function (button, state) screen:inputMouse(button, state) end)
-events.MOUSE_SCROLL:register(function (amount) screen:inputMouse(0,amount)end)
+events.CHAR_TYPED:register(function(char, modifiers, codepoint) screen:inputChar(char) end)
+events.MOUSE_PRESS:register(function(button, state) screen:inputMouse(button, state) end)
+events.MOUSE_SCROLL:register(function(amount) screen:inputMouse(0, amount) end)
 
 
 function events.WORLD_RENDER()
 	local screenID = host:getScreen()
 	if (action_wheel:isEnabled() or screenID) and not screenID == "net.minecraft.class_408" then -- move mouse away if theres already UI open
-		screen:setCursorPos(-1000,-1000)
+		screen:setCursorPos(-1000, -1000)
 	else
-		screen:setCursorPos(client:getMousePos()/client:getGuiScale())
+		screen:setCursorPos(client:getMousePos() / client:getGuiScale())
 	end
 	screen:flushUpdates()
 end

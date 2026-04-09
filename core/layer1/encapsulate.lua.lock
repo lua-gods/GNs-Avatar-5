@@ -1,0 +1,49 @@
+local Macro = require("lib.macros")
+local Event = require("lib.event")
+local ogEvents = events
+
+MODULES = {}
+local loads = {}
+local moduleContents = {}
+
+local function getPath()
+	local path = select(2, pcall(function() error("", 1) end))
+		:match("^"..string.rep("[^\n]+\n",6).."([^\n]+)\n")
+		:match("^([^\n:]*):")
+		:gsub("^%s*", "")
+	return path
+end
+
+
+function require(modname)
+	modname = modname:gsub("%.","/")
+	local path = getPath()
+	local envPath = path and (path:gsub("[^/]*$", "") .. "/") or ""
+	local finalPath = modname:gsub("^%./", envPath)
+	
+	local module = Macro.new(function (events, ...)
+		local fakeG = {}
+		fakeG = setmetatable({
+			events = events,
+		}, {
+			__index = function (t,i)
+				return rawget(t, i) or _G[i]
+			end,
+			__newindex = function (t,i,v)
+				_G[i] = v
+			end
+		})
+		
+		if not moduleContents[finalPath] then
+			local content = getScript(finalPath)
+			moduleContents[finalPath] = content
+			local module,err = load(content, finalPath, fakeG)
+			loads[finalPath] = module
+		end
+		return loads[finalPath](envPath)
+	end)
+	
+	local out = module:setActive(true)
+	
+	return out
+end

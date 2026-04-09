@@ -1,53 +1,45 @@
 if not host:isHost() then return end
 
-local IGNORE_PROBLEMS = false
-
-if IGNORE_PROBLEMS then return end
-do
-	local ok, result = pcall(addScript,"test","return 5",5)
-	if ok then
-		error("Incompatible addScript method detected")
-	end
+if not addScript or not getScript or not getScripts then
+	warn("Missing script methods. Disabling feature", "Avoid uploading avatar")
 end
-assert(addScript,"Missing addScript method")
-assert(getScripts,"Missing getScripts method")
 
 
 local IGNORE_HOST_SCRIPTS = false
 
-local fileIdentifier = avatar:getName()..".lcl"
+local fileIdentifier = avatar:getName() .. ".lcl"
 
 local hostScripts = {}
 
-local function fnv1a(str,seed)
+local function fnv1a(str, seed)
 	local hash = seed or 2166136261
 	for i = 1, #str do
 		hash = bit32.bxor(hash, str:byte(i))
-		hash = (hash * 16777619) % 2^32
+		hash = (hash * 16777619) % 2 ^ 32
 	end
 	return hash
 end
 
 ---@type table<string,fun(path:string,content:string)>
 local FLAGS = {
-	host_only = function (path, content)
+	host_only = function(path, content)
 		addScript(path)
 		if not IGNORE_HOST_SCRIPTS then
-			addScript(path,content,"RUNTIME")
-			hostScripts[#hostScripts+1] = {
+			addScript(path, content, "RUNTIME")
+			hostScripts[#hostScripts + 1] = {
 				hash = fnv1a(content),
 				path = path,
-				content = content
+				content = content,
 			}
 		end
-	end
+	end,
 }
 
-for _, path in ipairs(listFiles("",true)) do
+for _, path in ipairs(listFiles("", true)) do
 	local content = getScript(path)
 	if content:find("^#") then
-		local header = content:sub(1,(content:find("\n") or (#content+1)) -1)
-		
+		local header = content:sub(1, (content:find("\n") or (#content + 1)) - 1)
+
 		-- parse flags
 		for flag in header:match("flags:([^\n]*)$"):gmatch("[^, ]+") do
 			if FLAGS[flag] then
@@ -62,14 +54,9 @@ config:setName(fileIdentifier)
 if host:isAvatarUploaded() then
 	for index, value in ipairs(config:load("scripts")) do
 		if value.hash == fnv1a(value.content) then
-			addScript(value.path,value.content,"RUNTIME")
+			addScript(value.path, value.content, "RUNTIME")
 		end
 	end
 else
-	config:save("scripts",hostScripts)
+	config:save("scripts", hostScripts)
 end
-
-
-
-
-

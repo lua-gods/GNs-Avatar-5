@@ -1,24 +1,43 @@
 --[[______   __
-  / ____/ | / /  by: GNanimates / https://gnon.top / discord: @gn68s
- / / __/  |/ / name: Event Library
-/ /_/ / /|  /  desc: acts the same way as Figura events, but as instantiatable objects
-\____/_/ |_/ Source: https://github.com/lua-gods/GNs-Figura-Avatar-4/blob/main/lib/event.lua]]
+  / ____/ | / / Name: GN EVENTS LIBRARY v1.1.0
+ / / __/  |/ /  Desc: acts the same way as Figura events, but as instantiatable objects
+/ /_/ / /|  / Author: GNanimates | https://gnon.top | @gn68s
+\____/_/ |_/ License: Mozilla Public License Version 2.0 ]]
 
 ---A Event is a list of functions that can be invoked.
----@class Event
+---@class GN.Event : Event
 local Events = {}
 Events.__index = Events
 
+---@alias GN.EventGroup table<string, GN.Event>
 
 ---@return Event
 function Events.new() return setmetatable({}, Events) end
+
+---@return GN.EventGroup
+function Events.newGroup()
+	local group = {}
+	setmetatable(group, {
+		__newindex = function(t, k, v)
+			k = k:upper()
+			if not rawget(t, k) then rawset(t, k, Events.new()) end
+			rawget(t, k):register(v)
+		end,
+		__index = function(t, k)
+			k = k:upper()
+			if not rawget(t, k) then rawset(t, k, Events.new()) end
+			return rawget(t, k)
+		end,
+	})
+	return group
+end
 
 Events.newEvent = Events.new
 
 ---Registers a function as a listener to the event when it triggers.
 ---@param func function
 ---@param name any
-function Events:register(func, name) self[#self + 1] = {name or func, func} end
+function Events:register(func, name) self[#self + 1] = { name or func, func } end
 
 ---Clears all the registered listeners.
 function Events:clear() for key in pairs(self) do self[key] = nil end end
@@ -39,7 +58,7 @@ end
 
 function Events:__call(...)
 	local flush = {}
-	for _, func in pairs(self) do flush[#flush + 1] = {func[2](...)} end
+	for _, func in pairs(self) do flush[#flush + 1] = { func[2](...) } end
 	return flush
 end
 
