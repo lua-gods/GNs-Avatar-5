@@ -7,7 +7,7 @@
 
 local NAME = "GNanimates"
 
-local USE_HEX = true
+local USE_HEX = false
 
 
 local NameplateAPI = {}
@@ -59,7 +59,7 @@ local function component(text, color)
 end
 
 local function flicker(number)
-	return component((toHex(math.floor(number))),
+	return component(string.format("%02d",math.floor(number)),
 		math.lerp(CLR_STATUS_UPDATE, CLR_STATUS, math.clamp(number % 1, 0, 1)))
 end
 
@@ -78,7 +78,7 @@ local function updateStatus()
 			if statusTime then
 				local time      = client:getSystemTime()
 				local timeSince = ((time - statusTime) / 1000)
-				final           = final .. component(status .. " " .. toHex(timeSince):upper())
+				final           = final .. component(status .. " " .. toHex((timeSince)):upper())
 				final           = final .. component("]")
 			end
 		else

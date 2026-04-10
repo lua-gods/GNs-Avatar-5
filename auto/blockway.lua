@@ -7,7 +7,7 @@ local function blink(invert,speed)
 		to=invert and 0 or 1,
 		duration=0.25/speed,
 		tick=function (v,t)
-			models:setColor(1-v,0,v)
+			models:setColor(1,v,v)
 		end,
 		id="blockway"
 	}
@@ -15,7 +15,6 @@ end
 
 
 local macro = Macro.new(function (events, speed)
-	models:setColor(0,0,1)
 	local sound = sounds["sounds.blockway"]:loop(true):pitch(speed):play()
 	
 	local timer = 0
@@ -28,7 +27,7 @@ local macro = Macro.new(function (events, speed)
 			invert = not invert
 			
 			local v = invert and 0 or 1
-			models:setColor(1-v,0,v)
+			models:setColor(1,v,v)
 		end
 		if timer == 3.5*20 then blink(invert,speed) end
 		if timer == 3*20 then blink(invert,speed) end
