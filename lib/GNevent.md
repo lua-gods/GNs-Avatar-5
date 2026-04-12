@@ -15,11 +15,11 @@ EXPLODE:invoke()
 # Methods
 |Returns|Methods|
 |-|-|
-|`Event`|Events.[new](#Eventsnew)()|
-||Events:[register](#Eventsregisterfunc-name)(func : function, name : any)|
-||Events:[clear](#Eventsclear)()|
-||Events:[remove](#Eventsremovename)(name : string｜function)|
-|`integer`|Events:[getRegisteredCount](#EventsgetRegisteredCountname)(name : string)|
+|`Event`|Events.[new](#eventsnew)()|
+||Events:[register](#eventsregisterfunc-name)(func : function, name : any)|
+||Events:[clear](#eventsclear)()|
+||Events:[remove](#eventsremovename)(name : string｜function)|
+|`integer`|Events:[getRegisteredCount](#eventsgetregisteredcountname)(name : string)|
 ## `Events.new()`
 ### Returns `Event`
 
