@@ -1,7 +1,7 @@
 local Skull = require("lib.skull")
 local Color = require("lib.color")
 
-local Line = require("lib.line")
+local Line = require("lib.GNLine")
 
 local COLOR = vectors.hexToRGB("#FF0000")
 local THICKNESS = 2

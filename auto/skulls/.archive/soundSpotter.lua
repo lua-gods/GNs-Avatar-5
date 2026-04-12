@@ -1,7 +1,7 @@
 local Skull = require("lib.skull")
 local Color = require("lib.color")
 
-local Line = require('lib.line')
+local Line = require('lib.GNLine')
 
 models.skull.hat:scale(1.1,1.1,1.1)
 
