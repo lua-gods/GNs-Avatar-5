@@ -11,9 +11,7 @@ local DELAY = 20
 local life = INTERVAL
 
 function pings.pulse()
-	if not player:isSneaking() then
-		life = INTERVAL
-	end
+	life = INTERVAL
 end
 
 

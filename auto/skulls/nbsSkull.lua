@@ -38,7 +38,7 @@ local function customPlay(musicPlayer,instrument,pos,key,volume,attenuation)
 end
 
 ---@type ChloePianoAPI
-local ChloePianoAPI = world.avatarVars()["b0e11a12-eada-4f28-bb70-eb8903219fe5"] or {playSound=function ()end}
+local ChloePianoAPI = world.avatarVars()["943218fd-5bbc-4015-bf7f-9da4f37bac59"] or {playSound=function ()end}
 
 -- thankyou 4P5 for the snippet bellow (I stole this)
 local NOTES = { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" }
@@ -66,6 +66,8 @@ local PIANO_VALID_INSTRUMENTS = {
 	["minecraft:block.note_block.bell"] = 0,
 }
 
+local sequence = require("lib.sequencer")
+
 ---@param pos Vector3
 ---@return function
 local function makePianoCustomPlay(pos)
@@ -73,7 +75,13 @@ local function makePianoCustomPlay(pos)
 		local spos = tostring(pos)
 		if PIANO_VALID_INSTRUMENTS[instrument] then
 			key = key + PIANO_VALID_INSTRUMENTS[instrument]
-			ChloePianoAPI.playSound(getNoteName(key+21),pos,volume*0.1)
+			--ChloePianoAPI.playNote(tostring(pos),getNoteName(key+21+12),true,pos,volume*0.9)
+			ChloePianoAPI.playMidiNote(tostring(pos),key+21+12,volume*0.9,"MANUAL_RELEASE")
+			sequence.new()
+			:add(20,function ()
+				ChloePianoAPI.releaseMidiNote(tostring(pos),key+21+12)
+			end)
+			:start(events.WORLD_TICK)
 		end
 	end
 end
@@ -102,13 +110,20 @@ return function (musicPlayer,instrument,_,key,volume,attenuation)
 		elseif instrument == "minecraft:block.note_block.hat" then
 			DrumAPI.playNote(spos,"C#2",true,pos,volume)
 		else
-			customPlay(musicPlayer,instrument,pos,key,volume,attenuation)
+			--customPlay(musicPlayer,instrument,pos,key,volume,attenuation)
 		end
 	end
 end
 
 
-
+local function getID(blockEntiyData)
+	if blockEntiyData 
+	and blockEntiyData.SkullOwner 
+	and blockEntiyData.SkullOwner.Id then
+		local id = blockEntiyData.SkullOwner.Id
+		return id
+	end
+end
 
 
 local HALF = vec(0.5,0.5,0.5)
@@ -118,7 +133,7 @@ identity.processBlock = {
 	---@param model ModelPart
 	ON_READY = function (skull, model)
 		if not (#skull.params[1] > 0) then return end
-		ChloePianoAPI = world.avatarVars()["b0e11a12-eada-4f28-bb70-eb8903219fe5"] or {}
+		ChloePianoAPI = world.avatarVars()["943218fd-5bbc-4015-bf7f-9da4f37bac59"] or {}
 		DrumAPI = world.avatarVars()["3dfb6d3b-74e3-4628-9747-1ab586e2fd65"]
 		skull.model:scale(1.01)
 		local musicPlayer = NBS.newMusicPlayer():setPos(skull.matrix:apply() + HALF):setAttenuation(2)
@@ -130,7 +145,7 @@ identity.processBlock = {
 		and supportEntityData.SkullOwner.Id then
 			local id = supportEntityData.SkullOwner.Id
 			local uuid = client.intUUIDToString(id[1],id[2],id[3],id[4])
-			if uuid == "b0e11a12-eada-4f28-bb70-eb8903219fe5"then -- pianos
+			if uuid == "943218fd-5bbc-4015-bf7f-9da4f37bac59"then -- pianos
 				musicPlayer:setPlayCallback(makePianoCustomPlay(skull.support:getPos()))
 			end
 			if uuid == "3dfb6d3b-74e3-4628-9747-1ab586e2fd65" then -- drums

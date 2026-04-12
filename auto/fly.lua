@@ -23,7 +23,8 @@ flyMacro = Macros.new(function(events, ...)
 
 	events.TICK:register(function()
 		lvel = vel
-		vel = vectors.rotateAroundAxis(player:getBodyYaw(), player:getVelocity(), vec(0, 1, 0))
+		vel = player:getVelocity()
+		vel = vectors.rotateAroundAxis(player:getBodyYaw(), vel, vec(0, 1, 0))
 
 		spring.vel = spring.vel + (vel - lvel) * 10 + vel * 2
 

@@ -1,11 +1,11 @@
 local Spring = require("lib.spring")
 
-local BLINK_RANGE = vec(0.5, 3) * 20
+local BLINK_RANGE = vec(1, 5) * 20
 local HEAD_ANIM_X = animations.player.headHorizontal
 local HEAD_ANIM_Y = animations.player.headVertical
 
-local MOVE_RANGE = vec(0.2, 0.8) * 20
-local VARIANCE = 0.03
+local MOVE_RANGE = vec(0.4, 2) * 20
+local VARIANCE = 0.02
 local EYES_ANIM_X = animations.player.eyeHorizontal
 local EYES_ANIM_Y = animations.player.eyeVertical
 
@@ -46,6 +46,7 @@ events.TICK:register(function()
 	end
 end)
 
+animations.player.breathing:speed(0.3):play()
 
 events.RENDER:register(function(delta, ctx)
 	MODEL_HEAD:setPos(0, player:isCrouching() and -4 or 0)

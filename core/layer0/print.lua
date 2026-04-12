@@ -3,7 +3,7 @@ local function getPath()
 end
 
 function warn(...)
-	printJson(toJson {
+	local ok, result = pcall(toJson,{
 		{
 			text = "[warn] : " .. tostring(getPath()):gsub("/", " > ") .. " > \n",
 			color = "yellow",
@@ -13,4 +13,7 @@ function warn(...)
 			color = "gray",
 		},
 	})
+	if ok then
+		printJson(result)
+	end
 end

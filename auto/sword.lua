@@ -9,7 +9,7 @@ local ANIM_ATTACK_TWO = animations.player.swordAttack2:setBlendDuration(0.1)
 SWORD_PATH:setPrimaryRenderType("EMISSIVE_SOLID")
 
 models.player.VFX:setVisible(true)
-models.player.VFX.Smear1.Smear1Spin:setPrimaryRenderType("EYES"):setColor(0.8,0.8,0.8)
+models.player.VFX.Smear1.Smear1Spin:setPrimaryRenderType("EYES")
 
 local alternate = false
 

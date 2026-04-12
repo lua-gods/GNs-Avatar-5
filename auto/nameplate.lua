@@ -5,7 +5,7 @@
 \____/_/ |_/ source: link ]]
 
 
-local NAME = "GNanimates"
+local NAME = "GNᴀɴɪᴍᴀᴛᴇѕ"
 
 local USE_HEX = false
 
@@ -25,15 +25,20 @@ local nameComponent = {
 	{ text = ":back::@gn_band:", color = "#" .. vectors.rgbToHex(CLR_FROM) },
 }
 
-local nameLength = #NAME
-for i = 1, nameLength, 1 do
+local characters = {}
+for character in string.gmatch(NAME, "([%z\1-\127\194-\244][\128-\191]*)") do
+	characters[#characters + 1] = character
+end
+
+local nameLength = #characters
+
+for i=1,#characters do
 	local w = i / nameLength
 	nameComponent[#nameComponent + 1] = {
 		color = "#" .. vectors.rgbToHex(math.lerp(CLR_FROM, CLR_TO, w)),
-		text = NAME:sub(i, i),
+		text = characters[i],
 	}
 end
-
 ---@cast nameComponent string
 nameComponent = toJson(nameComponent)
 

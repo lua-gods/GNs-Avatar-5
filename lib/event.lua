@@ -11,7 +11,7 @@ Events.__index = Events
 
 ---@alias GN.EventGroup table<string, GN.Event>
 
----@return Event
+---@return GN.Event
 function Events.new() return setmetatable({}, Events) end
 
 ---@return GN.EventGroup
