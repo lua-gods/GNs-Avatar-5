@@ -1,4 +1,18 @@
 ### Class Name: `GN.Event`
+
+## Quick Example
+```lua
+-- create an event object
+local EXPLODE = Event.new()
+-- register a listener
+EXPLODE:register(function ()
+    print("BOOM!")
+end)
+-- call the event
+EXPLODE:invoke()
+```
+
+
 # Methods
 |Returns|Methods|
 |-|-|
@@ -18,7 +32,8 @@
 ### Returns `GN.EventGroup`
 
 ## `Events:register(func, name)`
-Registers a function as a listener to the event when it triggers.  
+Registers a function as a listener to the event when it triggers.
+  
 ### Arguments
 - `function` `func`
 
@@ -26,16 +41,19 @@ Registers a function as a listener to the event when it triggers.
 
 
 ## `Events:clear()`
-Clears all the registered listeners.  
+Clears all the registered listeners.
+  
 
 ## `Events:remove(name)`
-Removes the listener with the given name.  
+Removes the listener with the given name.
+  
 ### Arguments
 - `any|function` `name`
 
 
 ## `Events:getRegisteredCount(name)`
-Returns the amount of events with the given name.  
+Returns the amount of events with the given name.
+  
 ### Arguments
 - `any` `name`
 
