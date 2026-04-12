@@ -8,7 +8,7 @@
  - replace rawset(table,index,value) with rawset(table.__tbl,index,value)
 ]]
 
-local Events = require("./event") ---@module "lib.event"
+local Events = require("lib.GNEvent") ---@module "lib.event"
 
 
 ---@class GN.Class

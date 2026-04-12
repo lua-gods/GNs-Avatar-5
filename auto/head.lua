@@ -1,4 +1,4 @@
-local Spring = require("lib.spring")
+local Spring = require("lib.GNSpring")
 
 local BLINK_RANGE = vec(1, 5) * 20
 local HEAD_ANIM_X = animations.player.headHorizontal

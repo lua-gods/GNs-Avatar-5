@@ -1,5 +1,5 @@
-local Macros = require("lib.macros")
-local Spring = require("lib.spring")
+local Macros = require("lib.GNMacros")
+local Spring = require("lib.GNSpring")
 
 local recoilSpring = Spring.new(
 	0.2,

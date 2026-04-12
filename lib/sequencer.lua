@@ -4,7 +4,7 @@
 / /_/ / /|	/	desc: 
 \____/_/ |_/ Source: https://github.com/lua-gods/GNs-Avatar-5/blob/main/lib/sequencer.lua]]
 local n = 0
-local eventLib = require(... ..".event")
+local eventLib = require(... ..".GNEvent")
 
 ---@class Sequence
 ---@field keyframes {time:integer,func:function}[]

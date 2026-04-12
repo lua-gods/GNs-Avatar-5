@@ -1,4 +1,4 @@
-local Event = require("lib.event")
+local Event = require("lib.GNEvent")
 
 local api = {
 	changed = Event.new(),

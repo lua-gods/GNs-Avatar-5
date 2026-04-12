@@ -1,5 +1,5 @@
 ---@diagnostic disable: assign-type-mismatch, undefined-field
-local Spring = require("lib.spring")
+local Spring = require("lib.GNSpring")
 
 
 local tie = models.player.Base.Torso.Body.Tie

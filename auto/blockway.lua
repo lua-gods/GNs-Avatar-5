@@ -1,4 +1,4 @@
-local Macro = require("lib.macros")
+local Macro = require("lib.GNMacros")
 local Tween = require("lib.tween")
 
 local function blink(invert,speed)

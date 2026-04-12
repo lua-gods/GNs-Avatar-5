@@ -1,21 +1,21 @@
 ---@diagnostic disable: undefined-field
 --[[______   __
-  / ____/ | / /  by: GNanimates / https://gnon.top / discord: @gn68s
- / / __/  |/ / name: Macros Library
-/ /_/ / /|  /  desc: lets you contain Figura events and toggle them
-\____/_/ |_/ Source: https://github.com/lua-gods/GNs-Figura-Avatar-4/blob/main/lib/macros.lua  ]]
+  / ____/ | / / Name: GN MACROS LIBRARY v1.0.0
+ / / __/  |/ /  Desc: encapsulates events and initialization into a togglable macro.
+/ /_/ / /|  / Author: GNanimates | https://gnon.top | @gn68s
+\____/_/ |_/ License: Mozilla Public License Version 2.0 ]]
 ---@class MacroAPI
 local MacrosAPI = {}
 
 -- DEPENDENCIES
-local Event = require("./event")
+local Event = require("lib.GNEvent")
 
 
 local randomID = function()
 	return client.intUUIDToString(client.generateUUID())
 end
 
----@class Macro
+---@class GN.Macro
 ---@field isActive boolean
 ---@field events MacroEventsAPI
 ---@field id string
@@ -103,7 +103,7 @@ function Macro:setActive(active, ...)
 end
 
 ---@param init fun(events: MacroEventsAPI,...):any?
----@return Macro
+---@return GN.Macro
 function MacrosAPI.new(init)
 	assert(type(init) == "function", "Macro.init must be a function")
 	local new = {

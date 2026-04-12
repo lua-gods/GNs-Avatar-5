@@ -1,7 +1,7 @@
 ---@diagnostic disable: assign-type-mismatch
-local Sync = require("lib.sync")
-local Macros = require("lib.macros")
-local Spring = require("lib.spring")
+local Sync = require("lib.GNSync")
+local Macros = require("lib.GNMacros")
+local Spring = require("lib.GNSpring")
 
 local flyMacro
 

@@ -1,4 +1,4 @@
-local Macro = require("lib.macros")
+local Macro = require("lib.GNMacros")
 local ModelUtils = require("lib.modelUtils")
 
 local macro = Macro.new(function (events, speed)

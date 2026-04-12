@@ -1,10 +1,9 @@
 ---@diagnostic disable: param-type-mismatch
 --[[______   __
-  / ____/ | / /  by: GNanimates / https://gnon.top / Discord: @gn68s
- / / __/  |/ / name: Spring Library
-/ /_/ / /|  /  desc: 
-\____/_/ |_/ source: link ]]
--- 2nd-order system spring library
+  / ____/ | / / Name: GN SPRING LIBRARY v1.1.0
+ / / __/  |/ /  Desc: an implementation of a 2nd-order system spring
+/ /_/ / /|  / Author: GNanimates | https://gnon.top | @gn68s
+\____/_/ |_/ License: Mozilla Public License Version 2.0 ]]
 -- source: https://www.youtube.com/watch?v=KPoeNZZ6H4s
 
 

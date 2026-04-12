@@ -1,7 +1,7 @@
 
 --────────────────────────-< DEPENDENCIES >-────────────────────────--
 local Nameplate = require("auto.nameplate")
-local sync = require('lib.sync')
+local sync = require('lib.GNSync')
 local LocalChecker = require("lib.localChecker")
 
 

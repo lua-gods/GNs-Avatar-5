@@ -1,12 +1,12 @@
 --[[______   __
-  / ____/ | / /  by: GNanimates / https://gnon.top / Discord: @gn68s
- / / __/  |/ / name: GN Sync Service Library
-/ /_/ / /|  /  desc: automatically syncs data
-\____/_/ |_/ source: link ]]
+  / ____/ | / / Name: GN SYNC LIBRARY v0.1.0
+ / / __/  |/ /  Desc: automatically syncs data using pings aggressively
+/ /_/ / /|  / Author: GNanimates | https://gnon.top | @gn68s
+\____/_/ |_/ License: Mozilla Public License Version 2.0 ]]
 
 --────────────────────────-< DEPENDENCIES >-────────────────────────--
 
-local Event = require("lib.event")
+local Event = require("lib.GNEvent")
 --TODO: add support for chunked package sending for super long string pings.
 --TODO: add support for voiding keys
 --────────────────────────-< CONFIG >-────────────────────────--
