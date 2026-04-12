@@ -1,4 +1,5 @@
 function genDocs(query)
+
 	local border = {
 		number = { "[", "]" },
 		string = { '"', '"' },
@@ -36,7 +37,7 @@ function genDocs(query)
 	local files = {}
 	if type(query) == "table" then
 		for index, value in ipairs(query) do
-			files[value] = getScript(query)
+			files[value] = getScript(value)
 		end
 	else
 		files = getScripts(query)
@@ -246,7 +247,7 @@ function genDocs(query)
 			bake = bake .. "|Type|Field|Description| |\n"
 			bake = bake .. "|-|-|-|-|\n"
 			for _, field in pairs(class_data.fields) do
-				if field.type:find("EventLib") then
+				if field.type:find("GN.Event") then
 					has_events = true
 				else
 					bake = bake ..
@@ -262,7 +263,7 @@ function genDocs(query)
 				bake = bake .. "|Event|Description|\n"
 				bake = bake .. "|-|-|\n"
 				for _, field in pairs(class_data.fields) do
-					if field.type:find("EventLib") then
+					if field.type:find("GN.Event") then
 						bake = bake ..
 						"|`" ..
 						field.name ..
@@ -297,12 +298,12 @@ function genDocs(query)
 				for key, value in pairs(func.parameters) do
 					params_no_type = params_no_type ..
 					value.name .. (key ~= #func.parameters and ", " or "")
+					
 				end
 
 				local class, call, method_name = method.func:match("^([%w_*]+)(.)([%w_*]+)")
-
 				local path = string.gsub(method.func .. "(" .. params_no_type .. ")", "[^%w _]", "")
-				:gsub(" ", "-")
+				:gsub(" ", "-"):lower()
 				bake = bake ..
 				"|" ..
 				(class) .. call .. "[" .. method_name .. "](#" .. path .. ")" .. "(" .. params .. ")"
