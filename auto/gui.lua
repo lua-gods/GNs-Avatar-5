@@ -78,7 +78,7 @@ end)
 
 events.CHAR_TYPED:register(function(char, modifiers, codepoint) screen:inputChar(char) end)
 events.MOUSE_PRESS:register(function(button, state) screen:inputMouse(button, state) end)
-events.MOUSE_SCROLL:register(function(amount) screen:inputMouse(0, amount) end)
+events.MOUSE_SCROLL:register(function(amount) screen:inputScroll(amount,0) end)
 
 
 function events.WORLD_RENDER()
