@@ -69,11 +69,11 @@ screen:addChild(classColumns)
 --────────────────────────────────────────-< GNUI Boilerplate >-────────────────────────────────────────--
 -- TODO: make all this boilerplate code a loadable preset instead
 events.KEY_PRESS:register(function(key, state)
-	local allow = screen:inputKey(key, state)
-	if not allow then
+	local cancel = screen:inputKey(key, state)
+	if cancel then
 		host:setChatText("")
 	end
-	return not allow
+	return cancel
 end)
 
 events.CHAR_TYPED:register(function(char, modifiers, codepoint) screen:inputChar(char) end)

@@ -43,6 +43,7 @@ events.TICK:register(function()
 	
 	if math.abs(headSpring.pos.x) > 4 or math.abs(headSpring.pos.y) > 4 then
 		headSpring.pos = headSpring.target
+		headSpring.vel = headSpring.pos-headSpring.pos
 	end
 end)
 

@@ -4,7 +4,7 @@
 / /_/ / /|  /  desc: allows avatars to load and play .NBS files in their avatar
 \____/_/ |_/ source: https://github.com/lua-gods/GNs-Avatar-4/blob/main/lib/nbs.lua ]]
 
-local hasEvents, Events = pcall(require, "./event")
+local hasEvents, Events = pcall(require, "./GNEvent")
 
 --[────────-< CONFIG >-────────]--
 local MAX_NOTES_PER_TICK = 64
