@@ -1,4 +1,5 @@
 ---@diagnostic disable: undefined-global
+
 if not addScript then
 	if silly_backports then
 		addScript = function(...) return silly_backports.addScript(silly_backports, ...) end

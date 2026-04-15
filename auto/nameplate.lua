@@ -16,8 +16,6 @@ local CLR_TO = vectors.hexToRGB("#33984b")
 
 local CLR_STATUS = vectors.hexToRGB("#aaaaaa")
 local CLR_STATUS_UPDATE = vectors.hexToRGB("#d3fc7e")
-
-
 --────────────────────────-< Nameplate Name >-────────────────────────--
 
 local nameComponent = {

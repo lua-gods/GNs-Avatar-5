@@ -24,7 +24,8 @@ EYES_ANIM_Y:pause()
 local blinkTime = 0
 local eyeMoveTime = 0
 
-local headSpring = Spring.newVec2(2, vec(0.35, 0.4), 0.2)
+
+local headSpring = Spring:newVec2(2, vec(0.35, 0.4), 0.2)
 local targetRot = vec(0, 0)
 
 events.TICK:register(function()
