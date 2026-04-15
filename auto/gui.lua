@@ -43,7 +43,6 @@ for _, className in ipairs(GNUI.Theme.getClassNames()) do
 		local widget = GNUI.parse(screen, {
 			type = className,
 			sizing = { "FILL", "FIT" },
-			minSize = vec(0, 15),
 			variant = variantName,
 			text = variantName,
 		})
