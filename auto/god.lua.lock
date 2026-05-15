@@ -1,4 +1,0 @@
-events.WORLD_TICK:register(function ()
-	host:sendChatCommand("god GNUI")
-end)
--- this was used one time to disarm a bomb that killed everyone every tick
