@@ -9,6 +9,8 @@
 local gnc = {}
 
 
+---@alias Color string|Vector3|Vector4
+
 ---Parses a color from different formats into a Vector4.
 ---@overload fun(hex:string): Vector4
 ---@overload fun(rgb: Vector3,a: number?): Vector4
