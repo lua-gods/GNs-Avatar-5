@@ -2,7 +2,7 @@
   / ____/ | / / Name: GN COMMON LIBRARY v1.0.0
  / / __/  |/ /  Desc: contains all sorts of goodies that are generally useful
 / /_/ / /|  / Author: GNanimates | https://gnon.top | @gn68s
-\____/_/ |_/ License: Mozilla Public License Version 2.0 ]]
+\____/_/ |_/ License: MIT ]]
 ---@diagnostic disable: param-type-mismatch
 
 ---@class GNCommon
@@ -31,7 +31,7 @@ end
 
 ---Unpacks a Vector, Matrix or table into its components
 ---@param x number|Vector.any|Matrix.any
----@return number
+---@return number 
 ---@return number?
 ---@return number?
 ---@return number?
