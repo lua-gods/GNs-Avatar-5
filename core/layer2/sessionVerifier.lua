@@ -24,6 +24,5 @@ else
 	require("session")
 	if SESSION_ID ~= getSession() then
 		pings = {}
-		require("lib.GNSpring"):setActive(false)
 	end
 end

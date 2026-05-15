@@ -28,7 +28,7 @@ local OUTLINE_THICKNESS = 0.2
 
 --────────────────────────-< END OF CONFIG >-────────────────────────--
 
-local LABEL_WORLD = models:newPart("LabelWorld", "WORLD"):setMatrix(matrices.mat4() * 0.1)
+local LABEL_WORLD = models:newPart("LabelWorld", "WORLD"):setMatrix(matrices.mat4() * 0.99)
 
 
 local fixes = client.getTextWidth(".")

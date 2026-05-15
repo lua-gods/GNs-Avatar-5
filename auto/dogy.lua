@@ -17,7 +17,7 @@ local macro = Macro.new(function (events, speed)
 		end
 	end)
 	
-	ModelUtils.apply(models.player, function (modelPart)
+	ModelUtils.apply(models.model, function (modelPart)
 		for key, material in pairs(modelPart:getAllVertices()) do
 			for key, vert in pairs(material) do
 				verts[#verts+1] = {ref = vert, pos = vert:getPos()}

@@ -59,9 +59,6 @@ classColumns:setPos(5, 5)
 screen:addChild(classColumns)
 
 
---screen:addChild(box)
-
-
 
 
 

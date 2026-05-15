@@ -7,6 +7,8 @@
 
 local NAME = "GNᴀɴɪᴍᴀᴛᴇѕ"
 
+local MOTD = "He/Him - :flag_ph:"
+
 local USE_HEX = false
 
 
@@ -42,6 +44,11 @@ nameComponent = toJson(nameComponent)
 
 --────────────────────────-< Nameplate Status >-────────────────────────--
 
+local motdComponent = toJson{
+	text=MOTD.."\n",
+	color="gray"
+}
+
 local function toHex(k)
 	local i = k
 	local buffer = data:createBuffer()
@@ -68,9 +75,13 @@ end
 
 local status
 local statusTime
+local isHovering = false
 
 local function updateStatus()
 	local final = "["
+	if isHovering then
+		final = final .. '{"text":"","extra":[' .. motdComponent .. "]},"
+	end
 	final = final .. '{"text":"","extra":[' .. nameComponent .. "]}"
 
 	if status then
@@ -158,19 +169,22 @@ end
 function NameplateAPI.setStatus(title, time)
 	status = title
 	statusTime = time
-	events.WORLD_RENDER:remove("nameplateStatus")
-	if status then
-		local time = client:getSystemTime()
-		events.WORLD_RENDER:register(function()
-			local currentTime = client:getSystemTime()
-			if currentTime - time > 1000 then
-				time = currentTime
-			end
-			updateStatus()
-		end, "nameplateStatus")
+end
+events.TICK:register(function()
+	local time = client:getSystemTime()
+	local currentTime = client:getSystemTime()
+	if currentTime - time > 1000 then
+		time = currentTime
+	end
+	isHovering = false
+	if player:isLoaded() then
+		local look = client.getCameraEntity():getTargetedEntity(5) == player
+		if look then
+			isHovering = true
+		end
 	end
 	updateStatus()
-end
+end)
 
 --────────────────────────-< Bootstrap >-────────────────────────--
 
