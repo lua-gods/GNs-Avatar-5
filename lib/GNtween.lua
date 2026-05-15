@@ -1,15 +1,18 @@
 ---@diagnostic disable: assign-type-mismatch
---[[______  __ 
-  / ____/ | / /  by: GNanimates | Discord: @GN68s | Youtube: @GNamimates
- / / __/  |/ / name: Tween Library v2.0.1
-/ /_/ / /|  /  desc: a library that makes it easier to create tweens
-\____/_/ |_/ Source: https://github.com/lua-gods/GNs-Avatar-3/blob/main/libraries/tween.lua
-
-NOTE: Figura trims off all comments automatically by default. 
-so all of this comment will be stripped out before being processed by Figura.
+--[[______   __
+  / ____/ | / / Name: GN TWEEN LIBRARY v2.0.0
+ / / __/  |/ /  Desc: A simple tween library
+/ /_/ / /|  / Author: GNanimates | https://gnon.top | @gn68s
+\____/_/ |_/ License: Mozilla Public License Version 2.0 
+--- DEPENDENCIES ---
+GN Easings : 
 ]]
 
-local queries = {}
+
+local Easings = require("./GNEasings")
+
+
+local instances = {}
 local sysTime
 
 local tweenProcessor = models:newPart("TweenProcessor","WORLD") -- set to "WORLD" so it always runs when the player is loaded
@@ -22,7 +25,7 @@ local function process()
 	
 	local toRemove = {}
 	
-	for id, tween in pairs(queries) do
+	for id, tween in pairs(instances) do
 		local duration = (sysTime - tween.start) / tween.duration
 		if duration < 1 then
 			local w = tween.easing(duration)
@@ -31,12 +34,12 @@ local function process()
 			tween.tick(tween.to, 1)
 			toRemove[id] = true
 			tween.onFinish()
-			setActive(next(queries) and true or false)
+			setActive(next(instances) and true or false) -- stops the process if theres no more entries
 		end
 	end
 	
 	for id in pairs(toRemove) do
-		queries[id] = nil
+		instances[id] = nil
 	end
 end
 
@@ -49,7 +52,7 @@ setActive = function (toggle)
 end
 
 
----@class TweenInstanceCreation
+---@class GN.Tween.Instance
 ---@field id string?
 ---
 ---@field from number|Vector.any
@@ -60,14 +63,18 @@ end
 ---@field overshoot number?
 ---@field amplitude number?
 ---
----@field easing EaseTypes|(fun(t: number): number|Vector.any)
+---@field easing GN.Easings|(fun(t: number): number|Vector.any)
 ---
 ---@field tick fun(v : number|Vector.any,t : number)
 ---@field onFinish function?
 
 
+---@class GN.TweenAPI
+local TweenAPI = {}
+
+
 ---An instance of a tween query
----@class TweenInstance
+---@class GN.Tween
 ---@field id string
 ---
 ---@field from number|Vector.any
@@ -83,10 +90,11 @@ end
 ---
 ---@field tick fun(v : number|Vector.any,t : number)
 ---@field onFinish function?
-local TweenInstance = {}
-TweenInstance.__index = TweenInstance
+local Tween = {}
+Tween.__index = Tween
 
 local function placeholder() end
+local function linear(x) return x end
 
 
 ---Creates a new Tween instance
@@ -112,42 +120,44 @@ local function placeholder() end
 ---	period: number?,
 ---	overshoot: number?,
 ---	amplitude: number?,
----	easing: EaseTypes|(fun(t: number): number|Vector.any),
+---	easing: GN.Easings|(fun(t: number): number|Vector.any),
 ---	tick: fun(v : number|Vector.any,t : number),
 ---	onFinish: function?}
----@return TweenInstance
-function Tween.new(cfg)
-	local id = cfg.id or #queries + 1
-	---@type TweenInstance
+---@return GN.Tween
+function TweenAPI.new(cfg)
+	local id = cfg.id or #instances + 1
+	---@type GN.Tween
 	
-	local new = {
+	local self = {
 		start = isActive and sysTime or (client:getSystemTime()/1000),
 		from = cfg.from or 0,
 		to = cfg.to or 1,
 		period = cfg.period or 1,
 		overshoot = cfg.overshoot or 5,
 		duration = cfg.duration or 1,
-		easing = Tween.easings[cfg.easing] or (type(cfg.easing) == "function" and cfg.easing) or linear,
+		easing = Easings[cfg.easing] or (type(cfg.easing) == "function" and cfg.easing) or linear,
 		tick = cfg.tick or placeholder,
 		onFinish = cfg.onFinish or placeholder,
 		id = cfg.id
 	}
-	setmetatable(new, {__index = TweenInstance})
-	new.tick(new.from, 0)
-	queries[id] = new
+	setmetatable(self, {__index = Tween})
+	self.tick(self.from, 0)
+	instances[id] = self
 	
 	setActive(true)
-	return new
+	return self
 end
 
 ---Stops this TweenInstance
-function TweenInstance:stop()
-	Tween.stop(self.id,true)
+function Tween:stop()
+	instances[self.id] = nil
 end
 
 ---Skips the given TweenInsatnce to finish instantly
-function TweenInstance:skip()
-	Tween.stop(self.id)
+function Tween:skip()
+	self.tick(1,1)
+	self.onFinish()
+	instances[self.id] = nil
 end
 
 
@@ -155,9 +165,9 @@ end
 ---@param id string
 ---@param cancel boolean?
 function Tween.stop(id, cancel)
-	queries[id] = nil
-	if not cancel and queries[id] then
-		queries[id].onFinish()
+	instances[id] = nil
+	if not cancel and instances[id] then
+		instances[id].onFinish()
 	end
 end
 

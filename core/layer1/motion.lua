@@ -4,7 +4,7 @@ if not host.setPos then return end
 local ogSilly = silly
 local proxySilly = {}
 
-local gncommon = require("lib.gncommon")
+local gncommon = require("lib.GNcommon")
 
 proxySilly.setPos = function (self,x,y,z) host:setPos(x,y,z) end
 proxySilly.setVelocity = function (self,x,y,z) host:setVelocity(gncommon.vec3(x,y,z):unpack()) end
