@@ -4,10 +4,10 @@
  / / __/  |/ /  Desc: A simple tween library
 / /_/ / /|  / Author: GNanimates | https://gnon.top | @gn68s
 \____/_/ |_/ License: Mozilla Public License Version 2.0 
---- DEPENDENCIES ---
-GN Easings : 
+--────────-< DEPENDENCIES >-────────--
+Place required dependencies in the same folder as this script.
+- GN Easings > https://github.com/lua-gods/GNs-Avatar-5/blob/future/lib/GNEasings.lua
 ]]
-
 
 local Easings = require("./GNEasings")
 
