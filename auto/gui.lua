@@ -4,63 +4,72 @@ if false then
 	return
 end
 
+
 local GNUI = require("lib.GNUI.init")
 GNUI.setup()
 
 local screen = GNUI.getScreen()
 
---- parent box to hold all the columns
-local classColumns = GNUI.parse(screen, {
-	variant = "empty",
-	layout = "HORIZONTAL",
-	sizing = { "FIT", "FIT" },
-	gap = 5,
-})
-
--- loop for each class with a given style
-for _, className in ipairs(GNUI.Theme.getClassNames()) do
-	-- create a column container for each widget
-	local variantColumn = GNUI.parse(screen, {
-		layout = "VERTICAL",
+if false then
+	--- parent box to hold all the columns
+	local classColumns = GNUI.parse(screen, {
+		variant = "empty",
+		layout = "HORIZONTAL",
 		sizing = { "FIT", "FIT" },
-		minSize = vec(80, 0),
-		variant = "empty",
+		gap = 5,
 	})
-	classColumns:addChild(variantColumn)
-
-	-- create the class header
-	local classHeader = GNUI.parse(screen, {
-		sizing = { "FILL", "FIT" },
-		minSize = vec(0, 15),
-		variant = "empty",
-		text = className,
-	})
-	variantColumn:addChild(classHeader)
-
-	-- loop for each class variant
-	for _, variantName in ipairs(GNUI.Theme.getVariantNames(className)) do
-		-- create that given widget with the given variant
-		local widget = GNUI.parse(screen, {
-			type = className,
-			sizing = { "FILL", "FIT" },
-			variant = variantName,
-			text = variantName,
+	
+	-- loop for each class with a given style
+	for _, className in ipairs(GNUI.Theme.getClassNames()) do
+		-- create a column container for each widget
+		local variantColumn = GNUI.parse(screen, {
+			layout = "VERTICAL",
+			sizing = { "FIT", "FIT" },
+			minSize = vec(80, 0),
+			variant = "empty",
 		})
-		variantColumn:addChild(widget)
-
-		--if className == "button" then
-		--	widget.PRESSED:register(function ()
-		--		widget:free()
-		--	end)
-		--end
+		classColumns:addChild(variantColumn)
+	
+		-- create the class header
+		local classHeader = GNUI.parse(screen, {
+			sizing = { "FILL", "FIT" },
+			minSize = vec(0, 15),
+			variant = "empty",
+			text = className,
+		})
+		variantColumn:addChild(classHeader)
+	
+		-- loop for each class variant
+		for _, variantName in ipairs(GNUI.Theme.getVariantNames(className)) do
+			-- create that given widget with the given variant
+			local widget = GNUI.parse(screen, {
+				type = className,
+				sizing = { "FILL", "FIT" },
+				variant = variantName,
+				text = variantName,
+			})
+			variantColumn:addChild(widget)
+	
+			--if className == "button" then
+			--	widget.PRESSED:register(function ()
+			--		widget:free()
+			--	end)
+			--end
+		end
 	end
+	classColumns:setPos(5, 5)
+	screen:addChild(classColumns)
 end
-classColumns:setPos(5, 5)
-screen:addChild(classColumns)
 
 
+local Window = require("lib.GNUI-WindowManager.widgets.window")
 
+local colorPicker = Window.new(screen)
+colorPicker
+:setSize(100, 100)
+:setPos(20,20)
 
+screen:addChild(colorPicker)
 
 --────────────────────────────────────────-< GNUI Boilerplate >-────────────────────────────────────────--
 -- TODO: make all this boilerplate code a loadable preset instead
@@ -88,3 +97,4 @@ function events.WORLD_RENDER()
 end
 
 screen.display:setParentType("HUD")
+

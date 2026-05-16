@@ -175,11 +175,11 @@ local function receive(name, msg, isDm)
    logJson(toJson{
       {
         text = isDm and DM_MARK or CHAT_MARK,
-        color = "reset"
+        color = "white"
       },
       {
         text = name,
-        color = "reset"
+        color = "white"
       },
       {
         text = " » ",
