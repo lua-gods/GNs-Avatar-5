@@ -52,7 +52,7 @@ Spring.__index = Spring
 
 local springs = {}
 
-local TAU = math.pi*2
+local TAU = math.pi * 2
 local PI = math.pi
 
 
@@ -62,7 +62,7 @@ local PI = math.pi
 ---@param dampingCoeficient number?
 ---@param initialResponseStrength number?
 ---@return Spring
-function SpringAPI.new(responseSpeed,dampingCoeficient,initialResponseStrength)
+function SpringAPI.new(responseSpeed, dampingCoeficient, initialResponseStrength)
 	local s = {
 		pos = 0,
 		vel = 0,
@@ -77,7 +77,7 @@ function SpringAPI.new(responseSpeed,dampingCoeficient,initialResponseStrength)
 	s.k1 = s.dampingCoeficient / (PI * s.responseSpeed)
 	s.k2 = 1 / ((2 * PI * s.responseSpeed) * (TAU * s.responseSpeed))
 	s.k3 = s.initialResponseStrength * s.dampingCoeficient / (TAU * s.responseSpeed)
-	
+
 	setmetatable(s, Spring)
 	local id = #springs + 1
 	s.id = id
@@ -85,19 +85,18 @@ function SpringAPI.new(responseSpeed,dampingCoeficient,initialResponseStrength)
 	return s
 end
 
-
 ---@param responseSpeed number|Vector3?
 ---@param dampingCoeficient number|Vector3?
 ---@param initialResponseStrength number|Vector3?
 ---@return Spring3D
-function SpringAPI.newVec3(responseSpeed,dampingCoeficient,initialResponseStrength)
-	local spring = SpringAPI.new(responseSpeed,dampingCoeficient,initialResponseStrength)
+function SpringAPI.newVec3(responseSpeed, dampingCoeficient, initialResponseStrength)
+	local spring = SpringAPI.new(responseSpeed, dampingCoeficient, initialResponseStrength)
 	---@cast spring Spring3D
-	spring.pos = vec(0,0,0)
-	spring.vel = vec(0,0,0)
-	spring.target = vec(0,0,0)
-	spring.ltarget = vec(0,0,0)
-	spring.accel = vec(0,0,0)
+	spring.pos = vec(0, 0, 0)
+	spring.vel = vec(0, 0, 0)
+	spring.target = vec(0, 0, 0)
+	spring.ltarget = vec(0, 0, 0)
+	spring.accel = vec(0, 0, 0)
 	return spring
 end
 
@@ -105,44 +104,40 @@ end
 ---@param dampingCoeficient number|Vector2?
 ---@param initialResponseStrength number|Vector2?
 ---@return Spring2D
-function SpringAPI.newVec2(responseSpeed,dampingCoeficient,initialResponseStrength)
-	local spring = SpringAPI.new(responseSpeed,dampingCoeficient,initialResponseStrength)
+function SpringAPI.newVec2(responseSpeed, dampingCoeficient, initialResponseStrength)
+	local spring = SpringAPI.new(responseSpeed, dampingCoeficient, initialResponseStrength)
 	---@cast spring Spring2D
-	spring.pos = vec(0,0)
-	spring.vel = vec(0,0)
-	spring.target = vec(0,0)
-	spring.ltarget = vec(0,0)
-	spring.accel = vec(0,0)
+	spring.pos = vec(0, 0)
+	spring.vel = vec(0, 0)
+	spring.target = vec(0, 0)
+	spring.ltarget = vec(0, 0)
+	spring.accel = vec(0, 0)
 	return spring
 end
-
 
 function Spring:addVel(x)
 	self.vel = self.vel + x
 end
 
-
 function Spring:free()
 	table.remove(springs, self.id)
 end
 
-
-
 local lastTime = client:getSystemTime()
-models:newPart("SpringProcessor","WORLD").midRender = function (_, context, part)
+models:newPart("SpringProcessor", "WORLD").midRender = function(_, context, part)
 	local time = client:getSystemTime()
 	local delta = (time - lastTime) / 1000
 	lastTime = time
 	delta = math.min(delta, 0.1)
-	for i,s in pairs(springs) do
+	for i, s in pairs(springs) do
 		local taccel = 0
 		if not s.ltarget then
 			taccel = (s.target - s.ltarget) / delta
 		end
 		s.ltarget = s.target
-		
+
 		s.pos = s.pos + delta * s.vel
-		s.vel = s.vel + delta * (s.target + s.k3*taccel - s.pos - s.k1*s.vel - s.k1*s.vel) / s.k2
+		s.vel = s.vel + delta * (s.target + s.k3 * taccel - s.pos - s.k1 * s.vel * 2) / s.k2
 	end
 end
 
