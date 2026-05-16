@@ -13,7 +13,7 @@ local screen = GNUI.getScreen()
 if false then
 	--- parent box to hold all the columns
 	local classColumns = GNUI.parse(screen, {
-		variant = "empty",
+		style = "empty",
 		layout = "HORIZONTAL",
 		sizing = { "FIT", "FIT" },
 		gap = 5,
@@ -26,7 +26,7 @@ if false then
 			layout = "VERTICAL",
 			sizing = { "FIT", "FIT" },
 			minSize = vec(80, 0),
-			variant = "empty",
+			style = "empty",
 		})
 		classColumns:addChild(variantColumn)
 	
@@ -34,7 +34,7 @@ if false then
 		local classHeader = GNUI.parse(screen, {
 			sizing = { "FILL", "FIT" },
 			minSize = vec(0, 15),
-			variant = "empty",
+			style = "empty",
 			text = className,
 		})
 		variantColumn:addChild(classHeader)
@@ -45,7 +45,7 @@ if false then
 			local widget = GNUI.parse(screen, {
 				type = className,
 				sizing = { "FILL", "FIT" },
-				variant = variantName,
+				style = variantName,
 				text = variantName,
 			})
 			variantColumn:addChild(widget)
@@ -62,13 +62,49 @@ if false then
 end
 
 
+
+
 local Window = require("lib.GNUI-WindowManager.widgets.window")
+
 
 local colorPicker = Window.new(screen)
 colorPicker
-:setSize(100, 100)
+:setSize(100, 113)
 :setPos(20,20)
 
+--────────────────────────-< Color Picker Test >-────────────────────────--
+
+local RESOLUTION = 98*client:getGuiScale()
+local gradient = textures:newTexture("gradient", RESOLUTION, RESOLUTION)
+gradient:fill(0,0,RESOLUTION,RESOLUTION,vec(0,0,0,0))
+
+gradient:applyFunc(0, 0, RESOLUTION, RESOLUTION, function(col, x, y)
+	local v = (x + 0.5) / RESOLUTION - 0.5
+	local u = (y + 0.5) / RESOLUTION - 0.5
+
+	local dist = math.sqrt(u*u + v*v) * 2
+	if dist > 1 then
+		return vec(0, 0, 0, 0)
+	end
+
+	local angle = math.atan2(v, u)
+
+	return vectors.hsvToRGB(angle/(math.pi*2),dist,1)
+	:augmented(math.clamp((1-dist)*98,0,1))
+end)
+
+gradient:update()
+
+local content = GNUI.parse(screen, {
+	minSize = vec(5,5),
+	sizing = { "FILL", "FILL" },
+	style = {
+		type = "quad",
+		texturePath = "gradient",
+	},
+})
+colorPicker:setTitle("Color Wheel")
+colorPicker:addContent(content)
 screen:addChild(colorPicker)
 
 --────────────────────────────────────────-< GNUI Boilerplate >-────────────────────────────────────────--
