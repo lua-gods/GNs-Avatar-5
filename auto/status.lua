@@ -4,6 +4,7 @@ local Nameplate = require("auto.nameplate")
 local sync = require('lib.GNSync')
 local LocalChecker = require("lib.localChecker")
 
+if avatar:getMaxTickCount() <= 8192 then return end
 
 --────────────────────────-< CONFIG >-────────────────────────--
 

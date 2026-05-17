@@ -128,7 +128,7 @@ end
 
 setmetatable(syncInterface, {
 	__index = function(t, key)
-		key = tostring(key)
+		key = key
 		-- create a new listener if it doesn't exist.
 		if key == "changes" then
 			return eventInterface[key]
@@ -211,7 +211,7 @@ local passiveTimer = 0
 
 local index
 local lastTime = client:getSystemTime()
-events.WORLD_RENDER:register(function()
+events.TICK:register(function()
 	local time = client:getSystemTime()
 	local delta = (time - lastTime) / 1000
 

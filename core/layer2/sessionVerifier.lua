@@ -21,8 +21,8 @@ if false then SESSION_ID = 0 end
 if host:isHost() then
 	addScript("session","SESSION_ID = "..getSession(),"BOTH")
 else
-	require("session")
-	if SESSION_ID ~= getSession() then
+	local ok = pcall(require,"session")
+	if not ok or SESSION_ID ~= getSession() then
 		pings = {}
 	end
 end

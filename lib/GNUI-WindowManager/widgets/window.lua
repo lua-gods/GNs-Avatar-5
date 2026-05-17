@@ -36,7 +36,7 @@ end
 function WindowAPI.new(canvas)
 	local self = Layout.parse(canvas, {
 		layout = "VERTICAL",
-		sizing = { "FIXED", "FIXED" },
+		sizing = { "FIT", "FIT" },
 
 		{
 			{
@@ -63,7 +63,7 @@ function WindowAPI.new(canvas)
 			{
 				name = "content",
 				style = "none",
-				sizing = { "FILL", "FILL" },
+				sizing = { "FIT", "FIT" },
 			},
 		},
 	})

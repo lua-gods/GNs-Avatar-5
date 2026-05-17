@@ -18,7 +18,7 @@ if false then
 		sizing = { "FIT", "FIT" },
 		gap = 5,
 	})
-	
+
 	-- loop for each class with a given style
 	for _, className in ipairs(GNUI.Theme.getClassNames()) do
 		-- create a column container for each widget
@@ -29,7 +29,7 @@ if false then
 			style = "empty",
 		})
 		classColumns:addChild(variantColumn)
-	
+
 		-- create the class header
 		local classHeader = GNUI.parse(screen, {
 			sizing = { "FILL", "FIT" },
@@ -38,7 +38,7 @@ if false then
 			text = className,
 		})
 		variantColumn:addChild(classHeader)
-	
+
 		-- loop for each class variant
 		for _, variantName in ipairs(GNUI.Theme.getVariantNames(className)) do
 			-- create that given widget with the given variant
@@ -49,7 +49,7 @@ if false then
 				text = variantName,
 			})
 			variantColumn:addChild(widget)
-	
+
 			--if className == "button" then
 			--	widget.PRESSED:register(function ()
 			--		widget:free()
@@ -67,45 +67,136 @@ end
 local Window = require("lib.GNUI-WindowManager.widgets.window")
 
 
-local colorPicker = Window.new(screen)
-colorPicker
-:setSize(100, 113)
-:setPos(20,20)
+
 
 --────────────────────────-< Color Picker Test >-────────────────────────--
 
-local RESOLUTION = 98*client:getGuiScale()
-local gradient = textures:newTexture("gradient", RESOLUTION, RESOLUTION)
-gradient:fill(0,0,RESOLUTION,RESOLUTION,vec(0,0,0,0))
+local ProceduralTexture = require("lib.proceduralTexture")
 
-gradient:applyFunc(0, 0, RESOLUTION, RESOLUTION, function(col, x, y)
-	local v = (x + 0.5) / RESOLUTION - 0.5
-	local u = (y + 0.5) / RESOLUTION - 0.5
+local RESOLUTION = 512
+ProceduralTexture:newTexture("colorWheel", RESOLUTION, RESOLUTION, function(x, y, w, h)
+	local v = (x + 0.5) / w - 0.5
+	local u = (y + 0.5) / h - 0.5
 
-	local dist = math.sqrt(u*u + v*v) * 2
-	if dist > 1 then
-		return vec(0, 0, 0, 0)
-	end
+	local dist = math.sqrt(u * u + v * v) * 2
+	if dist > 1 then return vec(0, 0, 0, 0) end
 
 	local angle = math.atan2(v, u)
-
-	return vectors.hsvToRGB(angle/(math.pi*2),dist,1)
-	:augmented(math.clamp((1-dist)*98,0,1))
+	return vectors.hsvToRGB(angle / (math.pi * 2), dist, 1)
+		 :augmented(math.clamp((1 - dist) * 98, 0, 1))
 end)
 
-gradient:update()
+ProceduralTexture:newTexture("brightness", 80, RESOLUTION, function(x, y, w, h)
+	local i = 1 - y / h
+	return vec(i, i, i, 1)
+end)
+
+ProceduralTexture:newTexture("hue", RESOLUTION, 80, function(x, y, w, h)
+	return vectors.hsvToRGB(0.75 - x / w, 1, 1)
+end)
+
+ProceduralTexture:newTexture("saturation", RESOLUTION, 80, function(x, y, w, h)
+	return vec(x / w, x / w, 1, 1)
+end)
+
+ProceduralTexture:newTexture("alpha", RESOLUTION, 11, function(x, y, w, h)
+	local pattern = 1 - x / w
+	return vec(pattern, pattern, pattern, 1)
+end)
+
+
 
 local content = GNUI.parse(screen, {
-	minSize = vec(5,5),
-	sizing = { "FILL", "FILL" },
-	style = {
-		type = "quad",
-		texturePath = "gradient",
-	},
+  sizing = { "FIT", "FIT" },
+  style = "none",
+  layout = "VERTICAL",
+  {
+    {
+      style = "none",
+      layout = "HORIZONTAL",
+      {
+        {
+          name = "colorwheel",
+          sizing = { "FIXED", "FIXED" },
+          minSize = vec(80, 80),
+          style = {
+            type = "quad",
+            texturePath = "colorWheel",
+          },
+        },
+        {
+          name = "brightnessSlider",
+          type = "slider",
+          isVertical = true,
+          min = 1,
+          max = 255,
+          step = 1,
+          {
+            sizing = { "FILL", "FILL" },
+            style = {
+              type = "quad",
+              texturePath = "brightness",
+            },
+          },
+        },
+      },
+    },
+    {
+      type = "slider",
+      {
+        sizing = { "FILL", "FILL" },
+        style = {
+          type = "quad",
+          texturePath = "hue",
+        },
+      },
+    },
+    {
+      type = "slider",
+      {
+        sizing = { "FILL", "FILL" },
+        style = {
+          type = "quad",
+          texturePath = "saturation",
+        },
+      },
+    },
+    {
+      type = "slider",
+      {
+        sizing = { "FILL", "FILL" },
+        style = {
+          type = "quad",
+          texturePath = "alpha",
+        },
+      },
+    },
+  },
 })
-colorPicker:setTitle("Color Wheel")
-colorPicker:addContent(content)
-screen:addChild(colorPicker)
+
+
+
+local colorWheel = content:getChild("colorwheel")
+
+local brightnessSlider = content:getChild("brightnessSlider")
+---@cast brightnessSlider GNUI.Widget.Slider
+
+brightnessSlider.VALUE_CHANGED:register(function(value)
+	value = 1 - value / 255
+	colorWheel:setColor(value, value, value)
+end)
+
+
+local colorPickerWindow = Window.new(screen)
+colorPickerWindow
+	 :setPos(20, 20)
+
+colorPickerWindow:setTitle("Color Wheel")
+colorPickerWindow:addContent(content)
+screen:addChild(colorPickerWindow)
+
+
+
 
 --────────────────────────────────────────-< GNUI Boilerplate >-────────────────────────────────────────--
 -- TODO: make all this boilerplate code a loadable preset instead
@@ -119,7 +210,7 @@ end)
 
 events.CHAR_TYPED:register(function(char, modifiers, codepoint) screen:inputChar(char) end)
 events.MOUSE_PRESS:register(function(button, state) screen:inputMouse(button, state) end)
-events.MOUSE_SCROLL:register(function(amount) screen:inputScroll(amount,0) end)
+events.MOUSE_SCROLL:register(function(amount) screen:inputScroll(amount, 0) end)
 
 
 function events.WORLD_RENDER()
@@ -127,10 +218,10 @@ function events.WORLD_RENDER()
 	if (action_wheel:isEnabled() or screenID) and not screenID == "net.minecraft.class_408" then -- move mouse away if theres already UI open
 		screen:setCursorPos(-1000, -1000)
 	else
-		screen:setCursorPos(client:getMousePos() / client:getGuiScale())
+		screen:setCursorPos(client:getMousePos() *
+			(client:getScaledWindowSize() / client:getWindowSize()))
 	end
 	screen:flushUpdates()
 end
 
 screen.display:setParentType("HUD")
-

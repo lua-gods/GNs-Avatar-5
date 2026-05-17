@@ -1,3 +1,5 @@
+if avatar:getMaxWorldTickCount() < 20000 then return end
+
 local colors = {
 	vectors.hexToRGB("#d3fc7e"),
 	vectors.hexToRGB("#99e65f"),

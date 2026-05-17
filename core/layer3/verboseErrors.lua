@@ -1,3 +1,4 @@
+if not host:isHost() then return end
 local VERBOSE_ERRORS = true
 
 if VERBOSE_ERRORS then
