@@ -7,7 +7,7 @@
 
 local NAME = "GNᴀɴɪᴍᴀᴛᴇѕ"
 
-local MOTD = "He/Him - :flag_ph:"
+local MOTD = ":flag_ph: he/him"
 
 local USE_HEX = false
 
@@ -16,13 +16,13 @@ local NameplateAPI = {}
 local CLR_FROM = vectors.hexToRGB("#d3fc7e")
 local CLR_TO = vectors.hexToRGB("#33984b")
 
-local CLR_STATUS = vectors.hexToRGB("#aaaaaa")
+local CLR_STATUS = vectors.hexToRGB("#AAAAAA")
 local CLR_STATUS_UPDATE = vectors.hexToRGB("#d3fc7e")
 --────────────────────────-< Nameplate Name >-────────────────────────--
 
 local nameComponent = {
 	{ text = "${badges}:@gn:" },
-	{ text = ":back::@gn_band:", color = "#" .. vectors.rgbToHex(CLR_FROM) },
+--	{ text = ":back::@gn_band:", color = "#" .. vectors.rgbToHex(CLR_FROM) },
 }
 
 local characters = {}
@@ -65,7 +65,7 @@ end
 local function component(text, color)
 	return ',{"text":"' ..
 		 tostring(text) ..
-		 '","color":"' .. (color and "#" .. vectors.rgbToHex(color) or "gray") .. '"}'
+		 '","color":"' .. ("#" .. vectors.rgbToHex(color or CLR_STATUS)) .. '"}'
 end
 
 local function flicker(number)
@@ -176,13 +176,7 @@ events.TICK:register(function()
 	if currentTime - time > 1000 then
 		time = currentTime
 	end
-	isHovering = false
-	if player:isLoaded() then
-		local look = client.getCameraEntity():getTargetedEntity(5) == player
-		if look then
-			isHovering = true
-		end
-	end
+	isHovering = player:isLoaded() and client.getCameraEntity():getTargetedEntity(5) == player
 	updateStatus()
 end)
 

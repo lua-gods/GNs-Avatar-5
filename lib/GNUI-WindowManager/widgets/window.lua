@@ -37,7 +37,7 @@ function WindowAPI.new(canvas)
 	local self = Layout.parse(canvas, {
 		layout = "VERTICAL",
 		sizing = { "FIT", "FIT" },
-
+		style="opaque",
 		{
 			{
 				layout = "HORIZONTAL",
@@ -86,7 +86,7 @@ function WindowAPI.new(canvas)
 		self:free()
 	end)
 
-	setmetatable(self,Window)
+	setmetatable(self, Window)
 	---@cast self GNUI.Widget.Window
 	return self
 end
@@ -98,10 +98,8 @@ function Window:addContent(child)
 	return self
 end
 
-
 function Window:setTitle(title)
 	self:getChild("titlebar"):setText(title)
 end
-
 
 return WindowAPI

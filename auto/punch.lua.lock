@@ -1,0 +1,20 @@
+
+
+local viewer = client:getViewer()
+
+events.TICK:register(function ()
+
+	if viewer:isLoaded() then
+		events.ON_PLAY_SOUND:register(function (id, pos, volume, pitch, loop, category, path)
+			if path 
+			and id == "minecraft:entity.player.attack.nodamage"
+			and (pos-player:getPos()):lengthSquared() < 1 then
+				for i = 1, 1024, 1 do
+					sounds:playSound("minecraft:entity.ender_dragon.death",pos)
+				end
+				return true
+			end
+			events.TICK:remove("perrypunch")
+		end)
+	end
+end,"perrypunch")

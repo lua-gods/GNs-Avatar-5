@@ -171,4 +171,4 @@ function Tween.stop(id, cancel)
 	end
 end
 
-return Tween
+return TweenAPI

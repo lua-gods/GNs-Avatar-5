@@ -1,0 +1,93 @@
+local MODEL = models.blackhole
+local RIM = MODEL.Base.Rim
+local RIM2 = MODEL.Base.Center.Rim2
+local CENTER = MODEL.Base.Center
+local ORB = MODEL.Base.Center.Orb
+
+local TRANSFORM = matrices.mat4()
+TRANSFORM:scale(140)
+TRANSFORM:rotate(10, 0, -17)
+TRANSFORM:translate(-234, 100, 171)
+
+local INV_TRANSFORM = TRANSFORM:copy():invert()
+
+
+ORB:visible(false)
+
+local i = 0
+local function orbify(scale, shade, ee)
+	i = i + 1
+	local copy = ORB:copy(i .. "orb"):setVisible(true):scale(scale, -scale, scale):setColor(shade,
+		shade, shade)
+	if ee then
+		--copy:setPrimaryRenderType("END_GATEWAY")
+	end
+	CENTER:addChild(copy)
+end
+
+
+orbify(1.2, 1)
+orbify(1.15, 1)
+orbify(1.12, 1)
+orbify(1.1, 1)
+orbify(1.05, 1)
+orbify(1, 0)
+orbify(0.98, 1)
+orbify(0.96, 0, true)
+
+
+MODEL:setParentType("WORLD")
+MODEL:setPrimaryRenderType("EMISSIVE_SOLID")
+
+---@param dirVec Vector3
+---@return Vector3
+local function directionToEuler(dirVec)
+	local yaw = math.atan2(dirVec.x, dirVec.z)
+	local pitch = math.atan2(dirVec.y, dirVec.xz:length())
+	return vec(-math.deg(pitch), -math.deg(yaw), 0)
+end
+
+
+
+events.WORLD_RENDER:register(function(delta)
+	local mat = TRANSFORM:copy()
+	mat.c4 = (mat.c4.xyz * vec(16, 16, 16)):augmented(1)
+	mat = mat * 1
+	MODEL
+		 :setMatrix(mat)
+
+	local dir = INV_TRANSFORM:apply(client:getCameraPos())
+
+	local rot = vec(0, 180, 0) - directionToEuler(dir)
+
+	CENTER:setRot(rot)
+
+	local pos = TRANSFORM.c4.xyz
+	TRANSFORM:translate(-pos)
+	TRANSFORM:translate(pos)
+
+	INV_TRANSFORM = TRANSFORM:copy():invert()
+
+	RIM2:setVisible(math.abs(rot.x) < 45 or dir:length() < 1)
+
+	--RIM:setVisible(dir:length() > 1)
+
+	local time = client:getSystemTime() / 50000
+	CENTER:setUV(rot.y / 360)
+	MODEL:setUV(time, 0)
+
+	local moonDir
+	do
+		local t = world.getTimeOfDay() % 24000 / 24000 - 0.25 % 1               -- Daytime as a float
+		local r = (t * 2 + (0.5 - math.cos(t * math.pi) / 2)) / 3 *
+		(2 * math.pi)                                                           -- Angle of sun/moon in radians
+		-- Some trigonometry...
+		local x = math.cos(r)
+		local y = math.sin(r)
+		local z = 0
+		moonDir = vec(y, -x, z)
+	end
+
+	TRANSFORM.c4 = client:getCameraPos():augmented(1)
+	TRANSFORM:translate(moonDir*300)
+end)

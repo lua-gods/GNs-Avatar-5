@@ -91,87 +91,176 @@ ProceduralTexture:newTexture("brightness", 80, RESOLUTION, function(x, y, w, h)
 	return vec(i, i, i, 1)
 end)
 
-ProceduralTexture:newTexture("hue", RESOLUTION, 80, function(x, y, w, h)
-	return vectors.hsvToRGB(0.75 - x / w, 1, 1)
-end)
-
-ProceduralTexture:newTexture("saturation", RESOLUTION, 80, function(x, y, w, h)
-	return vec(x / w, x / w, 1, 1)
-end)
-
-ProceduralTexture:newTexture("alpha", RESOLUTION, 11, function(x, y, w, h)
-	local pattern = 1 - x / w
-	return vec(pattern, pattern, pattern, 1)
+ProceduralTexture:newTexture("saturation", 80, RESOLUTION, function(x, y, w, h)
+	local i = x / w
+	return vec(1, i, i, 1)
 end)
 
 
 
 local content = GNUI.parse(screen, {
-  sizing = { "FIT", "FIT" },
-  style = "none",
-  layout = "VERTICAL",
-  {
-    {
-      style = "none",
-      layout = "HORIZONTAL",
-      {
-        {
-          name = "colorwheel",
-          sizing = { "FIXED", "FIXED" },
-          minSize = vec(80, 80),
-          style = {
-            type = "quad",
-            texturePath = "colorWheel",
-          },
-        },
-        {
-          name = "brightnessSlider",
-          type = "slider",
-          isVertical = true,
-          min = 1,
-          max = 255,
-          step = 1,
-          {
-            sizing = { "FILL", "FILL" },
-            style = {
-              type = "quad",
-              texturePath = "brightness",
-            },
-          },
-        },
-      },
-    },
-    {
-      type = "slider",
-      {
-        sizing = { "FILL", "FILL" },
-        style = {
-          type = "quad",
-          texturePath = "hue",
-        },
-      },
-    },
-    {
-      type = "slider",
-      {
-        sizing = { "FILL", "FILL" },
-        style = {
-          type = "quad",
-          texturePath = "saturation",
-        },
-      },
-    },
-    {
-      type = "slider",
-      {
-        sizing = { "FILL", "FILL" },
-        style = {
-          type = "quad",
-          texturePath = "alpha",
-        },
-      },
-    },
-  },
+
+	style = "none",
+	layout = "VERTICAL",
+	{
+		{
+			type = "box",
+			style="white",
+			minSize = vec(11,11),
+			sizing = {"FILL","FIT"},
+			color = vec(1,0,0),
+		},
+		{
+			style = "none",
+			layout = "HORIZONTAL",
+			{
+				{
+					name = "colorwheel",
+					layout="FIXED",
+					sizing = { "FIXED", "FIXED" },
+					minSize = vec(80, 80),
+					style = {
+						type = "quad",
+						texturePath = "colorWheel",
+					},
+					{
+						type = "button",
+						name="grabber",
+						size = vec(4,4),
+						pos = vec(50,50),
+					}
+				},
+				{
+					name = "brightnessSlider",
+					type = "slider",
+					isVertical = true,
+					min = 1,
+					max = 255,
+					step = 1,
+					{
+						sizing = { "FILL", "FILL" },
+						style = {
+							type = "quad",
+							texturePath = "brightness",
+						},
+					},
+				},
+			},
+		},
+		{
+			layout = "HORIZONTAL",
+			style = "none",
+			sizing = { "FILL", "FIT" },
+			{
+				{
+					name = "brightnessSlider",
+					type = "slider",
+					min = 1,
+					max = 255,
+					step = 1,
+					{
+						sizing = { "FILL", "FILL" },
+						style = {
+							type = "quad",
+							texturePath = "saturation",
+						},
+					},
+				},
+				{
+					type = "button",
+					text = "+",
+					sizing = {"FIT","FILL"}
+				},
+			},
+		},
+		{
+			layout = "HORIZONTAL",
+			style = "none",
+			sizing = { "FILL", "FIT" },
+			{
+				{
+					name = "brightnessSlider",
+					type = "slider",
+					min = 1,
+					max = 255,
+					step = 1,
+				},
+				{
+					type = "button",
+					text = "a",
+					sizing = {"FIT","FILL"}
+				},
+			},
+		},
+		{
+			layout = "HORIZONTAL",
+			style = "none",
+			sizing = { "FILL", "FIT" },
+			{
+				{
+					type = "textField",
+					sizing = { "FILL", "FIT" },
+					placeholder = "#RRGGBB",
+					validator = "hex",
+				},
+				{
+					type = "button",
+					text = "Copy",
+					sizing = {"FIT","FILL"}
+				},
+			},
+		},
+		{
+			layout = "HORIZONTAL",
+			style = "none",
+			sizing = { "FILL", "FIT" },
+			{
+				{
+					type = "textField",
+					sizing = { "FILL", "FIT" },
+					placeholder = "Hue",
+					validator = "integer",
+				},
+				{
+					type = "textField",
+					sizing = { "FILL", "FIT" },
+					placeholder = "Sat",
+					validator = "integer",
+				},
+				{
+					type = "textField",
+					sizing = { "FILL", "FIT" },
+					placeholder = "Val",
+					validator = "integer",
+				},
+			},
+		},
+		{
+			layout = "HORIZONTAL",
+			style = "none",
+			sizing = { "FILL", "FIT" },
+			{
+				{
+					type = "textField",
+					sizing = { "FILL", "FIT" },
+					placeholder = "R",
+					validator = "integer",
+				},
+				{
+					type = "textField",
+					sizing = { "FILL", "FIT" },
+					placeholder = "G",
+					validator = "integer",
+				},
+				{
+					type = "textField",
+					sizing = { "FILL", "FIT" },
+					placeholder = "B",
+					validator = "integer",
+				},
+			},
+		},
+	},
 })
 
 

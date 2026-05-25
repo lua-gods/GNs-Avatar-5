@@ -39,7 +39,11 @@ local function poof(pos, appear)
 			end
 		end
 	end
-	sounds:playSound("minecraft:entity.illusioner.cast_spell", pos, 1, 1)
+	if appear then
+		sounds:playSound("minecraft:event.mob_effect.bad_omen", pos, 1, 1)
+	else
+		sounds:playSound("minecraft:entity.illusioner.cast_spell", pos, 1, 1)
+	end
 	sounds:playSound("minecraft:entity.generic.extinguish_fire", pos, 0.1, 0.8)
 	--sounds:playSound("minecraft:entity.allay.item_taken",pos,1,1)
 	for i = 1, 3, 1 do
@@ -49,9 +53,10 @@ local function poof(pos, appear)
 end
 
 
+local wasPresent = true
 
 events.WORLD_TICK:register(function()
-	local isPresent = player:isLoaded()
+	local isPresent = player:isLoaded() and player:getGamemode() ~= "SPECTATOR"
 	if isPresent then
 		if (player:getGamemode() ~= "SPECTATOR") then
 			lastPpos = player:getPos()

@@ -34,7 +34,7 @@ local UNPACKER = parseJson
 
 -- function that tells how many bytes a string has as a ping.
 local PING_SIZE_CHECKER = function(string)
-	return #string
+	return 3 + #string -- type (byte) + length (short) + bytes, Thankyou Niko the cat
 end
 
 -- whether to sync the data using the player armor slots.

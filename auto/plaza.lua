@@ -23,27 +23,12 @@ end)
 ---@param y number
 ---@param z number
 function tpSilly(x, y, z)
+	x,z = math.floor(x)+0.5, math.floor(z)+0.5
 	local pos = player:getPos()
-	Sequence.new()
-		 :add(0, function()
-			 silly:setPos(pos.x, 1000, pos.z)
-			 silly:setVelocity(0, 0, 0)
-		 end)
-		 :add(2, function()
-			 silly:setPos(x, 1000, z)
-			 silly:setVelocity(0, 0, 0)
-		 end)
-		 :add(4, function()
-			 silly:setPos(x, y, z)
-			 silly:setVelocity(0, 0, 0)
-		 end)
-		 :add(6, function()
-			if player:getPos().y > 900 then
-				silly:setPos(x, y+1, z)
-				silly:setVelocity(0, 0, 0)
-			end
-		 end)
-		 :start(events.TICK)
+	silly:setPos(pos.x, 1000, pos.z,true)
+	silly:setPos(x, 1000, z,true)
+	silly:setPos(x, y+0.2, z,true)
+	silly:setPos(x, y+0.2, z)
 end
 
 function tpSillyCam()
