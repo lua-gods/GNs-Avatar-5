@@ -35,7 +35,7 @@ local saturationTexture = ProceduralTexture:newTexture("saturation", RESOLUTION,
 
 local function applySaturationHue(hue, value)
 	ProceduralTexture:apply(saturationTexture, function(x, y, w, h)
-		return vectors.hsvToRGB(hue, (1 - (x / w)) * value, value):augmented(1)
+		return vectors.hsvToRGB(hue, (1 - (x / w)), value):augmented(1)
 	end)
 end
 
