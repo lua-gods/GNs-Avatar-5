@@ -82,7 +82,7 @@ function WindowAPI.new(canvas)
 
 	local close = self:getChild("close")
 	---@cast close GNUI.Widget.Button
-	close.BUTTON_DOWN:register(function()
+	close.PRESSED:register(function()
 		self:free()
 	end)
 

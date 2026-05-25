@@ -51,7 +51,7 @@ animations.player.breathing:speed(0.3):play()
 
 events.RENDER:register(function(delta, ctx)
 	MODEL_HEAD:setPos(0, player:isCrouching() and -4 or 0)
-	targetRot = player:getRot(delta) - vec(0, player:getBodyYaw(delta))
+	targetRot = player:getRot(delta) - vec(0, player:getVehicle() and player:getVehicle():getRot(delta).y or player:getBodyYaw(delta))
 	targetRot.y = ((targetRot.y + 180) % 360 - 180) / -50
 	targetRot.x = targetRot.x / -90
 	---@cast targetRot Vector2

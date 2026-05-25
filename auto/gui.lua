@@ -12,7 +12,7 @@ local screen = GNUI.getScreen()
 
 if false then
 	--- parent box to hold all the columns
-	local classColumns = GNUI.parse(screen, {
+	local classColumns = screen:parse({
 		style = "empty",
 		layout = "HORIZONTAL",
 		sizing = { "FIT", "FIT" },
@@ -22,7 +22,7 @@ if false then
 	-- loop for each class with a given style
 	for _, className in ipairs(GNUI.Theme.getClassNames()) do
 		-- create a column container for each widget
-		local variantColumn = GNUI.parse(screen, {
+		local variantColumn = screen:parse({
 			layout = "VERTICAL",
 			sizing = { "FIT", "FIT" },
 			minSize = vec(80, 0),
@@ -31,7 +31,7 @@ if false then
 		classColumns:addChild(variantColumn)
 
 		-- create the class header
-		local classHeader = GNUI.parse(screen, {
+		local classHeader = screen:parse({
 			sizing = { "FILL", "FIT" },
 			minSize = vec(0, 15),
 			style = "empty",
@@ -42,7 +42,7 @@ if false then
 		-- loop for each class variant
 		for _, variantName in ipairs(GNUI.Theme.getVariantNames(className)) do
 			-- create that given widget with the given variant
-			local widget = GNUI.parse(screen, {
+			local widget = screen:parse({
 				type = className,
 				sizing = { "FILL", "FIT" },
 				style = variantName,
@@ -63,226 +63,13 @@ end
 
 
 
+local function loadWindow(name)
+	local WindowFactory = require("auto.windows."..name)
+	WindowFactory(screen,GNUI)
+end
 
-local Window = require("lib.GNUI-WindowManager.widgets.window")
+loadWindow("colorPicker")
 
-
-
-
---────────────────────────-< Color Picker Test >-────────────────────────--
-
-local ProceduralTexture = require("lib.proceduralTexture")
-
-local RESOLUTION = 512
-ProceduralTexture:newTexture("colorWheel", RESOLUTION, RESOLUTION, function(x, y, w, h)
-	local v = (x + 0.5) / w - 0.5
-	local u = (y + 0.5) / h - 0.5
-
-	local dist = math.sqrt(u * u + v * v) * 2
-	if dist > 1 then return vec(0, 0, 0, 0) end
-
-	local angle = math.atan2(v, u)
-	return vectors.hsvToRGB(angle / (math.pi * 2), dist, 1)
-		 :augmented(math.clamp((1 - dist) * 98, 0, 1))
-end)
-
-ProceduralTexture:newTexture("brightness", 80, RESOLUTION, function(x, y, w, h)
-	local i = 1 - y / h
-	return vec(i, i, i, 1)
-end)
-
-ProceduralTexture:newTexture("saturation", 80, RESOLUTION, function(x, y, w, h)
-	local i = x / w
-	return vec(1, i, i, 1)
-end)
-
-
-
-local content = GNUI.parse(screen, {
-
-	style = "none",
-	layout = "VERTICAL",
-	{
-		{
-			type = "box",
-			style="white",
-			minSize = vec(11,11),
-			sizing = {"FILL","FIT"},
-			color = vec(1,0,0),
-		},
-		{
-			style = "none",
-			layout = "HORIZONTAL",
-			{
-				{
-					name = "colorwheel",
-					layout="FIXED",
-					sizing = { "FIXED", "FIXED" },
-					minSize = vec(80, 80),
-					style = {
-						type = "quad",
-						texturePath = "colorWheel",
-					},
-					{
-						type = "button",
-						name="grabber",
-						size = vec(4,4),
-						pos = vec(50,50),
-					}
-				},
-				{
-					name = "brightnessSlider",
-					type = "slider",
-					isVertical = true,
-					min = 1,
-					max = 255,
-					step = 1,
-					{
-						sizing = { "FILL", "FILL" },
-						style = {
-							type = "quad",
-							texturePath = "brightness",
-						},
-					},
-				},
-			},
-		},
-		{
-			layout = "HORIZONTAL",
-			style = "none",
-			sizing = { "FILL", "FIT" },
-			{
-				{
-					name = "brightnessSlider",
-					type = "slider",
-					min = 1,
-					max = 255,
-					step = 1,
-					{
-						sizing = { "FILL", "FILL" },
-						style = {
-							type = "quad",
-							texturePath = "saturation",
-						},
-					},
-				},
-				{
-					type = "button",
-					text = "+",
-					sizing = {"FIT","FILL"}
-				},
-			},
-		},
-		{
-			layout = "HORIZONTAL",
-			style = "none",
-			sizing = { "FILL", "FIT" },
-			{
-				{
-					name = "brightnessSlider",
-					type = "slider",
-					min = 1,
-					max = 255,
-					step = 1,
-				},
-				{
-					type = "button",
-					text = "a",
-					sizing = {"FIT","FILL"}
-				},
-			},
-		},
-		{
-			layout = "HORIZONTAL",
-			style = "none",
-			sizing = { "FILL", "FIT" },
-			{
-				{
-					type = "textField",
-					sizing = { "FILL", "FIT" },
-					placeholder = "#RRGGBB",
-					validator = "hex",
-				},
-				{
-					type = "button",
-					text = "Copy",
-					sizing = {"FIT","FILL"}
-				},
-			},
-		},
-		{
-			layout = "HORIZONTAL",
-			style = "none",
-			sizing = { "FILL", "FIT" },
-			{
-				{
-					type = "textField",
-					sizing = { "FILL", "FIT" },
-					placeholder = "Hue",
-					validator = "integer",
-				},
-				{
-					type = "textField",
-					sizing = { "FILL", "FIT" },
-					placeholder = "Sat",
-					validator = "integer",
-				},
-				{
-					type = "textField",
-					sizing = { "FILL", "FIT" },
-					placeholder = "Val",
-					validator = "integer",
-				},
-			},
-		},
-		{
-			layout = "HORIZONTAL",
-			style = "none",
-			sizing = { "FILL", "FIT" },
-			{
-				{
-					type = "textField",
-					sizing = { "FILL", "FIT" },
-					placeholder = "R",
-					validator = "integer",
-				},
-				{
-					type = "textField",
-					sizing = { "FILL", "FIT" },
-					placeholder = "G",
-					validator = "integer",
-				},
-				{
-					type = "textField",
-					sizing = { "FILL", "FIT" },
-					placeholder = "B",
-					validator = "integer",
-				},
-			},
-		},
-	},
-})
-
-
-
-local colorWheel = content:getChild("colorwheel")
-
-local brightnessSlider = content:getChild("brightnessSlider")
----@cast brightnessSlider GNUI.Widget.Slider
-
-brightnessSlider.VALUE_CHANGED:register(function(value)
-	value = 1 - value / 255
-	colorWheel:setColor(value, value, value)
-end)
-
-
-local colorPickerWindow = Window.new(screen)
-colorPickerWindow
-	 :setPos(20, 20)
-
-colorPickerWindow:setTitle("Color Wheel")
-colorPickerWindow:addContent(content)
-screen:addChild(colorPickerWindow)
 
 
 

@@ -18,6 +18,7 @@ local ProceduralTexture = {}
 ProceduralTexture.__index = ProceduralTexture
 
 
+--TODO: make this regional, not globally.
 ---@param texture Texture
 ---@param applyFunc fun(x:integer,y:integer,w:integer,h:integer):Vector4
 function ProceduralTextureAPI:apply(texture,applyFunc)

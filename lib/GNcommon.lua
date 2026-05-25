@@ -129,7 +129,7 @@ function gnc.vec2(x,y,default)
 	elseif (tx == "number" and ty == "number") then
 		return vec(x,y)
 	else
-		error(("Invalid Vector2 parameter, expected (number, number), instead got (%s, %s)"):format(tx,ty),2)
+		error(("Invalid Vector2 parameter, expected (number, number), instead got (%s, %s)"):format(tx,ty),3)
 	end
 end
 
@@ -152,7 +152,7 @@ function gnc.vec3(x,y,z,default)
 	elseif (tx == "number" and ty == "number" and tz == "number") then
 		return vec(x,y,z)
 	else
-		error(("Invalid Vector3 parameter, expected (number, number, number), instead got (%s, %s, %s)"):format(tx,ty,tz),2)
+		error(("Invalid Vector3 parameter, expected (number, number, number), instead got (%s, %s, %s)"):format(tx,ty,tz),3)
 	end
 end
 
@@ -178,7 +178,7 @@ function gnc.vec4(x,y,z,w,default)
 	elseif (tx == "number" and ty == "number" and tz == "number" and tw == "number") then
 		return vec(x,y,z,w)
 	else
-		error(("Invalid Vector4 parameter, expected (number, number, number, number), instead got (%s, %s, %s, %s)"):format(tx,ty,tz,tw),2)
+		error(("Invalid Vector4 parameter, expected (number, number, number, number), instead got (%s, %s, %s, %s)"):format(tx,ty,tz,tw),3)
 	end
 end
 
