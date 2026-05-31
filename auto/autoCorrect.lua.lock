@@ -1,0 +1,13 @@
+local WordAutoCorrectAPI = require("lib.WordAutoCorrect")
+
+
+-- Example Usage
+local dictionary = WordAutoCorrectAPI.loadDictionary("datasets/words.txt")
+local misspelled_word = "waht"
+local suggestions = WordAutoCorrectAPI.spellCheck(misspelled_word)
+print(string.format("Top 10 suggestions for '%s':", misspelled_word))
+for _, suggestion in ipairs(suggestions) do
+	print(string.format("%s (Distance: %d)", suggestion[1], suggestion[2]))
+end
+
+return WordAutoCorrectAPI

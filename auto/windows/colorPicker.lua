@@ -290,12 +290,20 @@ return function(screen, GNUI)
 		elseif from == 5 then -- color from hex field
 		local field = hexField:getActiveField()
 		local alpha = field:sub(8,9)
-			if alpha and #alpha > 0 then
-				hsva = vectors.rgbToHSV(vectors.hexToRGB(field:sub(1,7)))
-				:augmented(tonumber(alpha,16)/255)
+		local ok, result = pcall(vectors.hexToRGB,field:sub(1,7))
+		if ok then
+			hsva = vectors.rgbToHSV(result)
+			if alpha then
+				local result = tonumber(alpha,16)
+				if result then
+					hsva = hsva:augmented(result/255)
+				else
+					hsva = hsva:augmented(1)
+				end
 			else
-				hsva = vectors.rgbToHSV(vectors.hexToRGB(hexField:getActiveField())):augmented(1)
+				hsva = hsva:augmented(1)
 			end
+		end
 		elseif from == 6 then -- color from alpha field
 			local alphaInput = alphaField:getActiveField()
 			if alphaInput and #alphaInput > 0 then
