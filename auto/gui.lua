@@ -1,4 +1,5 @@
 # flags: host_only
+local Sync = require "lib.GNSync"
 
 if false then
 	return
@@ -6,14 +7,13 @@ end
 
 
 local GNUI = require("lib.GNUI.init")
-GNUI.setup()
-
 local screen = GNUI.getScreen()
+
 
 if false then
 	--- parent box to hold all the columns
 	local classColumns = screen:parse({
-		style = "empty",
+		style = "none",
 		layout = "HORIZONTAL",
 		sizing = { "FIT", "FIT" },
 		gap = 5,
@@ -26,7 +26,7 @@ if false then
 			layout = "VERTICAL",
 			sizing = { "FIT", "FIT" },
 			minSize = vec(80, 0),
-			style = "empty",
+			style = "none",
 		})
 		classColumns:addChild(variantColumn)
 
@@ -34,7 +34,7 @@ if false then
 		local classHeader = screen:parse({
 			sizing = { "FILL", "FIT" },
 			minSize = vec(0, 15),
-			style = "empty",
+			style = "none",
 			text = className,
 		})
 		variantColumn:addChild(classHeader)
@@ -65,11 +65,15 @@ end
 
 local function loadWindow(name)
 	local WindowFactory = require("auto.windows."..name)
-	WindowFactory(screen,GNUI)
+	return WindowFactory(screen,GNUI)
 end
 
-loadWindow("colorPicker")
+---@type GNUI.Window.Colorpicker
+local colorPicker = loadWindow("colorPicker")
 
+colorPicker.COLOR_CHANGED:register(function (color)
+	Sync.color = {color.x,color.y,color.z,color.w}
+end)
 
 
 

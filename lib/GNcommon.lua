@@ -8,7 +8,6 @@
 ---@class GNCommon
 local gnc = {}
 
-
 ---@alias Color string|Vector3|Vector4
 
 ---Parses a color from different formats into a Vector4.

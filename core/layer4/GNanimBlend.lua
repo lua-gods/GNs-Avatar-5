@@ -32,6 +32,10 @@ function Animation:play()
 	trueBlend[self] = trueBlend[self] or (ogIndex(self,"getBlend")(self) or 1)
 	activeTime[self] = activeTime[self] or 0
 	active[self] = true
+	if self:getLoop() ~= "LOOP" then -- makes it so animations that usually stop when done will reset back to start when requested as it is playing.
+		ogIndex(self,"stop")(self)
+	end
+	ogIndex(self,"blend")(self,0) -- fixes the single frame flicker when blending
 	ogIndex(self,"play")(self)
 	return self
 end

@@ -3,6 +3,10 @@ local Sync = require("lib.GNSync")
 local Macros = require("lib.GNMacros")
 local Spring = require("lib.GNSpring")
 
+if silly and host:isHost() then
+	silly:setFly(true)
+end
+
 local flyMacro
 
 flyMacro = Macros.new(function(events, ...)

@@ -1,5 +1,5 @@
 --[[______   __
-  / ____/ | / / Name: GN EVENTS LIBRARY v1.1.0
+  / ____/ | / / Name: GN EVENTS LIBRARY v1.1.1
  / / __/  |/ /  Desc: acts the same way as Figura events, but as instantiatable objects
 / /_/ / /|  / Author: GNanimates | https://gnon.top | @gn68s
 \____/_/ |_/ License: Mozilla Public License Version 2.0 ]]
@@ -62,7 +62,7 @@ function Events:__call(...)
 	return flush
 end
 
----@type fun(self: Event, ...: any): string[]
+---@type fun(self: GN.Event, ...: any): string[]
 Events.invoke = Events.__call
 
 function Events.__index(t, i) return rawget(t, i) or rawget(t, i:upper()) or Events[i] end

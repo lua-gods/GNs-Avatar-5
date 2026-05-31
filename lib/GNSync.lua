@@ -1,8 +1,10 @@
 --[[______   __
-  / ____/ | / / Name: GN SYNC LIBRARY v0.1.0
+  / ____/ | / / Name: GN SYNC LIBRARY v0.1.1 BETA
  / / __/  |/ /  Desc: automatically syncs data using pings aggressively
 / /_/ / /|  / Author: GNanimates | https://gnon.top | @gn68s
-\____/_/ |_/ License: Mozilla Public License Version 2.0 ]]
+\____/_/ |_/ License: Mozilla Public License Version 2.0 
+you have an early copy of my library!
+]]
 
 --────────────────────────-< DEPENDENCIES >-────────────────────────--
 
@@ -21,7 +23,7 @@ local MAX_SIZE_LIMIT = 1024 - 100
 local MAX_COUNT_LIMIT = 5
 
 -- the timer to slow the syncer down in seconds, 0 for fast asf boi
-local PASSIVE_TIMER_INTERVAL = 0
+local PASSIVE_TIMER_INTERVAL = 0.5
 
 -- the maximum amount of items a batch can have
 local MAX_ITEMS_PER_BATCH = 10
@@ -34,7 +36,7 @@ local UNPACKER = parseJson
 
 -- function that tells how many bytes a string has as a ping.
 local PING_SIZE_CHECKER = function(string)
-	return 3 + #string -- type (byte) + length (short) + bytes, Thankyou Niko the cat
+	return #string
 end
 
 -- whether to sync the data using the player armor slots.
@@ -66,14 +68,13 @@ local DEBUG_SHOW_DATA = false
 -- optimization to only make this option only work for the host.
 USE_SYNC_DATA_ON_HOST = USE_SYNC_DATA_ON_HOST and host:isHost()
 
-
----@type table<string,Event|any>|{changes:table<any,Event>}
+---@type table<string,any>|{changes:table<any,GN.Event>}
 local syncInterface = {}  --- proxy table interface
 local eventInterface = {} --- proxy table interface for events
 
 local realData = {}
 local syncData = {} -- actual data
-local syncEvents = {} ---@type table<string,Event>
+local syncEvents = {} ---@type table<string,GN.Event>
 
 syncInterface.changes = eventInterface
 
@@ -128,7 +129,7 @@ end
 
 setmetatable(syncInterface, {
 	__index = function(t, key)
-		key = key
+		key = tostring(key)
 		-- create a new listener if it doesn't exist.
 		if key == "changes" then
 			return eventInterface[key]
@@ -136,7 +137,7 @@ setmetatable(syncInterface, {
 		if USE_SYNC_DATA_ON_HOST then
 			return syncData[key]
 		else
-			return realData[key] or syncData[key]
+			return realData[key]
 		end
 	end,
 	__newindex = function(t, key, value)
@@ -145,6 +146,9 @@ setmetatable(syncInterface, {
 		if realData[key] ~= value then
 			realData[key] = value
 			if not USE_SYNC_DATA_ON_HOST then
+				if not syncEvents[key] then
+					syncEvents[key] = Event.new()
+				end
 				syncEvents[key]:invoke(value)
 			end
 		end
@@ -187,6 +191,7 @@ if not host:isHost() then return syncInterface end
 local availableSize = MAX_SIZE_LIMIT
 local availableCount = MAX_COUNT_LIMIT
 
+local passiveTimer = 0
 
 local payload = {}
 local flip = false
@@ -203,15 +208,15 @@ local function sendPayload()
 	else
 		pings.syncPayload(package)
 	end
+	passiveTimer = PASSIVE_TIMER_INTERVAL
 end
 
 
 
-local passiveTimer = 0
 
 local index
 local lastTime = client:getSystemTime()
-events.TICK:register(function()
+events.WORLD_RENDER:register(function()
 	local time = client:getSystemTime()
 	local delta = (time - lastTime) / 1000
 

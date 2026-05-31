@@ -1,7 +1,9 @@
 # flags: host_only
+---@diagnostic disable: return-type-mismatch
 ---@diagnostic disable: param-type-mismatch
 
 local Window = require("lib.GNUI-WindowManager.widgets.window")
+local Event = require("lib.GNEvent")
 
 local ProceduralTexture = require("lib.proceduralTexture")
 
@@ -41,14 +43,18 @@ end
 
 
 
+---@class GNUI.Window.Colorpicker : GNUI.Widget.Window
+---@field COLOR_CHANGED GN.Event
 
 ---@param screen GNUI.Canvas
 ---@param GNUI GNUIAPI
+---@return GNUI.Window.Colorpicker
 return function(screen, GNUI)
 	--────────────────────────-< Color Picker Test >-────────────────────────--
-
+	local colorPickerWindow = Window.new(screen)
+	
 	local content = screen:parse({
-
+		
 		style = "none",
 		layout = "VERTICAL",
 		{
@@ -362,7 +368,10 @@ return function(screen, GNUI)
 		colorWheel:setColor(hsva.zzz)
 		alphaRow:setVisible(not alphaButton.down)
 		
+		local color = vectors.hsvToRGB(hsva.xyz)
 		colorPreview:setColor(vectors.hsvToRGB(hsva.xyz))
+
+		colorPickerWindow.COLOR_CHANGED:invoke(color:augmented(hsva.w))
 	end
 
 
@@ -413,11 +422,12 @@ return function(screen, GNUI)
 	gField.FIELD_CHANGED:register(function (text) applyColor(8) end)
 	bField.FIELD_CHANGED:register(function (text) applyColor(8) end)
 
-	local colorPickerWindow = Window.new(screen)
+	
 	colorPickerWindow:setPos(20, 20)
 
 	colorPickerWindow:setTitle("Color Wheel")
 	colorPickerWindow:addContent(content)
+	colorPickerWindow.COLOR_CHANGED = Event.new()
 	colorPreview:setColor(0, 0, 0)
 	screen:addChild(colorPickerWindow)
 
