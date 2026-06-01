@@ -53,7 +53,7 @@ return function(screen, GNUI)
 	--────────────────────────-< Color Picker Test >-────────────────────────--
 	local colorPickerWindow = Window.new(screen)
 	
-	local content = screen:parse({
+	local content = colorPickerWindow:getChild("content"):parse({
 		
 		style = "none",
 		layout = "VERTICAL",

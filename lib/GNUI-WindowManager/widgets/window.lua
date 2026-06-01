@@ -34,7 +34,7 @@ end
 ---@param canvas GNUI.Canvas
 ---@return GNUI.Widget.Window
 function WindowAPI.new(canvas)
-	local self = Layout.parse(canvas, {
+	local self = canvas:parse({
 		layout = "VERTICAL",
 		sizing = { "FIT", "FIT" },
 		style="opaque",
