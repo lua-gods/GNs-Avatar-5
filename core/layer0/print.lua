@@ -10,7 +10,8 @@ function print(...)
 	local varags = {...}
 	local varagSize = #varags
 	for index, value in ipairs(varags) do
-		if type(value) == "table" then
+		local t = type(value)
+		if t == "table" then
 			content[#content+1] = {
 				text = tostring(value),
 				color="#78bfff",
@@ -19,11 +20,18 @@ function print(...)
 					value=printTable(value,1,true):gsub("\t","  ")
 				}
 			}
+		-- this section of the code dosent trigger lmao, I dont think its possible
+		--elseif t == "nil" then
+		--	content[content+1] = {
+		--		text = "nil",
+		--		color="red",
+		--	}
 		else
 			content[#content+1] = {
 				text = tostring(value)
 			}
 		end
+		
 		if varagSize ~= index then
 			content[#content+1] = {
 				text = " "
