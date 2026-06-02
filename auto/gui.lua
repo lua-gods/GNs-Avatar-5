@@ -7,42 +7,92 @@ local GNUI = require("lib.GNUI.init")
 local screen = GNUI.getScreen()
 
 
-local entries = listFiles("auto/windows/apps")
 
-
-local tooltip = screen:parse{
-	type = "button",
-	text="text"
+local ENTRIES = {
+	{
+		name = "Me",
+		path = "colorPicker",
+		icon = ":tophat:"
+	},
+	{
+		name = "Tint Everything",
+		path = "colorPicker",
+		icon = ":palette:"
+	},
+	{
+		name = "Notepad",
+		path = "colorPicker",
+		icon = ":paper:"
+	},
 }
 
-screen.CHILDREN_ORDER_CHANGED:register(function ()
-	tooltip:setChildIndex(99)
-end)
 
 local toolbar = screen:parse{
 	layout="HORIZONTAL",
 	style="opaque",
 	pos = vec(5,5),
-	{
-		{
-			type = "button",
-			name = "colorPicker",
-			text = ":palette:",
-			wrapText = false,
-		}
-	}
 }
 
-events.TICK:register(function ()
-	tooltip:setChildIndex(99)
+
+local tooltip = screen:parse{
+	style="opaque",
+	text="Text",
+	captureInput = false
+}
+
+
+local HAS_TOOLTIP = false
+
+
+for index, entry in ipairs(ENTRIES) do
+	local btn = toolbar:parse{
+		--name = entry.name,
+		type = "button",
+		minSize = vec(8,8),
+		text = entry.icon,
+		wrapText = false,
+	}
+	local macro = require("auto.windows."..entry.path)
+	entry.macro = macro
+	---@cast btn GNUI.Widget.Button
+	
+	btn.PRESSED:register(function ()
+		entry.macro:setActive(false,screen,GNUI)
+		entry.macro:setActive(true,screen,GNUI)
+	end)
+	
+	btn.CURSOR_PRESENCE_CHANGED:register(function (inside)
+		if inside then
+			HAS_TOOLTIP = true
+			tooltip:setText(entry.name)
+		else
+			HAS_TOOLTIP = false
+		end
+	end)
+end
+
+
+screen.CHILDREN_ORDER_CHANGED:register(function ()
+	tooltip:setChildIndex(99999)
+end)
+
+
+screen.CURSOR_MOVED:register(function (pos, vel)
+	tooltip:setPos(pos:floor() + vec(10,0))
+end)
+
+
+
+
+events.WORLD_TICK:register(function ()
+	local isCursorUnlocked = (host:isCursorUnlocked() or host:isChatOpen())and HAS_TOOLTIP
+	tooltip:setVisible(isCursorUnlocked)
 end)
 
 local function loadWindow(name)
 	local WindowFactory = require("auto.windows."..name)
 	return WindowFactory(screen,GNUI)
 end
-
-
 
 --────────────────────────────────────────-< GNUI Boilerplate >-────────────────────────────────────────--
 -- TODO: make all this boilerplate code a loadable preset instead

@@ -89,5 +89,4 @@ function dice.randomRange(from,to)
 	return math.random() * (to - from) + from
 end
 
-_G.dice = dice
 return dice

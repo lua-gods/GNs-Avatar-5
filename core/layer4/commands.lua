@@ -3,7 +3,7 @@
 ---@param indent integer
 local function _showModelTree(model,indent)
 	if model:getType() == "GROUP" then
-		print((" "):rep(indent) .. model:getName())
+		print(("    "):rep(indent) .. model:getName())
 		for _, v in ipairs(model:getChildren()) do
 			_showModelTree(v,indent + 1)
 		end
@@ -39,6 +39,11 @@ function divisible(x)
 		end
 	end
 	print(x.." is disvisible by "..table.concat(out,", "))
+end
+
+
+function dice(sides)
+	host:sendChatMessage("Rolled a " .. sides .. " sided dice, and got a "..math.random(1,sides))
 end
 
 

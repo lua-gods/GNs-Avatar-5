@@ -56,6 +56,10 @@ function WindowAPI.new(canvas)
 						type = "button",
 						name = "close",
 						text = "x",
+						textOffset = vec(0,1),
+						color=vec(1,0,0),
+						minSize = vec(7,7),
+						wrapText = false,
 						sizing = { "FIT", "FIT" },
 					},
 				},
@@ -83,7 +87,7 @@ function WindowAPI.new(canvas)
 	local close = self:getChild("close")
 	---@cast close GNUI.Widget.Button
 	close.PRESSED:register(function()
-		self:free()
+		self:setVisible(false)
 	end)
 
 	setmetatable(self, Window)

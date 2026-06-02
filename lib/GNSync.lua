@@ -13,25 +13,25 @@ local Event = require("lib.GNEvent")
 --TODO: add support for voiding keys
 --────────────────────────-< CONFIG >-────────────────────────--
 
--- whether to use sync data instead of the real data for the host.
+-- [DEFAULT : false] whether to use sync data instead of the real data for the host.
 local USE_SYNC_DATA_ON_HOST = false
 
--- the maximum ping size you have per second, default value is maximum possible
+-- [DEFAULT : 924] the maximum ping size you have per second, default value is maximum possible
 local MAX_SIZE_LIMIT = 1024 - 100
 
--- the maximum amount of pings per second, default value is maximum possible
+-- [DEFAULT : 5] the maximum amount of pings per second, default value is maximum possible
 local MAX_COUNT_LIMIT = 5
 
--- the timer to slow the syncer down in seconds, 0 for fast asf boi
+-- [DEFAULT : 0.5] the timer to slow the syncer down in seconds, 0 for fast asf boi
 local PASSIVE_TIMER_INTERVAL = 0.5
 
--- the maximum amount of items a batch can have
+-- [DEFAULT : 10] the maximum amount of items a batch can have
 local MAX_ITEMS_PER_BATCH = 10
 
--- function that compresses data into a string from a table
+-- [DEFAULT : toJson] function that compresses data into a string from a table
 local PACKER = toJson
 
--- function that decompresses data from a string to a table
+-- [DEFAULT : parseJson] function that decompresses data from a string to a table
 local UNPACKER = parseJson
 
 -- function that tells how many bytes a string has as a ping.
@@ -61,7 +61,7 @@ end
 --────────-< Debug Options >-────────--
 
 -- shows the data that is being synced beside the player
-local DEBUG_SHOW_DATA = false
+local DEBUG_SHOW_DATA = true
 
 --────────────────────────-< END OF CONFIG >-────────────────────────--
 
@@ -87,7 +87,7 @@ local function appendPackage(package)
 			if not syncEvents[key] then
 				syncEvents[key] = Event.new()
 			end
-			if USE_SYNC_DATA_ON_HOST or not host:isHost() then
+			if USE_SYNC_DATA_ON_HOST or (not host:isHost()) then
 				syncEvents[key]:invoke(value)
 			end
 		end
@@ -137,7 +137,7 @@ setmetatable(syncInterface, {
 		if USE_SYNC_DATA_ON_HOST then
 			return syncData[key]
 		else
-			return realData[key]
+			return realData[key] or syncData[key] --NOTE: dont remove the fallback, its used by remote views
 		end
 	end,
 	__newindex = function(t, key, value)

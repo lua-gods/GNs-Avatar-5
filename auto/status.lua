@@ -1,7 +1,7 @@
 
 --────────────────────────-< DEPENDENCIES >-────────────────────────--
 local Nameplate = require("auto.nameplate")
-local sync = require('lib.GNSync')
+local Sync = require('lib.GNSync')
 local LocalChecker = require("lib.localChecker")
 
 if avatar:getMaxTickCount() <= 8192 then return end
@@ -9,7 +9,7 @@ if avatar:getMaxTickCount() <= 8192 then return end
 --────────────────────────-< CONFIG >-────────────────────────--
 
 local IDLE_EMOTE = animations["models.player"].eyeCloseSit
-local TIME_OFFSET = 1773733683856
+local TIME_OFFSET = 1780386870274
 
 --────────────────────────-< END OF CONFIG >-────────────────────────--
 
@@ -21,20 +21,24 @@ IDLE_EMOTE
 local isLocal = false
 local lastStatus
 local function updateStatus()
-	local status = sync.status
-	local time = sync.timeSince and ((sync.timeSince) * 1000) + TIME_OFFSET
+	local status = Sync.status
+	local time = Sync.timeSince and ((Sync.timeSince) * 1000) + TIME_OFFSET
 	if isLocal then
 		status = 3
 	end
 	if status == 1 then -- idle
-		Nameplate.setStatus("Unfocused",time)
+		Nameplate.setStatus(":zzz:",time)
 		if lastStatus ~= 1 then
 			IDLE_EMOTE:stop():play()
 		end
 	elseif status == 2 then -- typing
-		Nameplate.setStatus("typing..",time)
+		Nameplate.setStatus(":typing_animated:",time)
 	elseif status == 3 then -- local
-		Nameplate.setStatus("in Local",time)
+		Nameplate.setStatus(":cloud::back::no_entry:",time)
+	elseif status == 4 then -- typing command
+		Nameplate.setStatus(":typing_command:",time)
+	elseif status == 5 then -- inventory
+		Nameplate.setStatus(":mcb_chest:",time)
 	else
 		Nameplate.setStatus()
 		if lastStatus == 1 then
@@ -52,18 +56,18 @@ end
 
 LocalChecker.changed:register(function (value)
 	isLocal = value
-	sync.timeSince = math.floor((client:getSystemTime() - TIME_OFFSET) / 1000)
+	Sync.timeSince = math.floor((client:getSystemTime() - TIME_OFFSET) / 1000)
 	updateStatus()
 end)
 
-sync.changes.status:register(function (value)
+Sync.changes.status:register(function (value)
 	updateStatus()
 	if host:isHost() then
-		sync.timeSince = math.floor((client:getSystemTime() - TIME_OFFSET) / 1000)
+		Sync.timeSince = math.floor((client:getSystemTime() - TIME_OFFSET) / 1000)
 	end
 end)
 
-sync.changes.timeSince:register(function (value)
+Sync.changes.timeSince:register(function (value)
 	updateStatus()
 end)
 
@@ -73,18 +77,25 @@ if not host:isHost() then return end
 -- the part that tells what state the host is in.
 events.TICK:register(function ()
 	if not client:isWindowFocused() then
-		sync.status = 1 -- idle
+		Sync.status = 1 -- idle
 	else
-		if sync.status ~= 1 then
+		-- only swap to typing if status is not idle
+		if Sync.status ~= 1 then 
+			local screen = host:getScreen()
 			if host:isChatOpen() then
-				sync.status = 2 -- typing
-			else
-				sync.status = 0 -- focursed
+				if host:getChatText():find("^/") then
+					Sync.status = 4 -- typing command
+				else
+					Sync.status = 2 -- typing
+				end
+			elseif screen == "net.minecraft.class_490" then
+				Sync.status = 5 -- inventory
+			elseif screen == "net.minecraft.class_433" then
+				Sync.status = 0 -- pause menu
 			end
-		else
-			if not host:isChatOpen() then
-				sync.status = 0 -- focused
-			end
+		end
+		if not host:getScreen() then
+			Sync.status = 0 -- focused
 		end
 	end
 end)

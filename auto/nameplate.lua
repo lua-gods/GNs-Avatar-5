@@ -82,10 +82,10 @@ local function updateStatus()
 	if isHovering then
 		final = final .. '{"text":"","extra":[' .. motdComponent .. "]},"
 	end
-	final = final .. '{"text":"","extra":[' .. nameComponent .. "]}"
 
+	final = final .. '{"text":""}'
+	
 	if status then
-		final = final .. ',{"text":"\n"}'
 		final = final .. component("[")
 
 		if USE_HEX then
@@ -153,11 +153,14 @@ local function updateStatus()
 				final = final .. flicker(second)
 			end
 			final = final .. component("]")
+			
+			final = final .. component("\n")
 		end
 	else
 
 	end
-
+	
+	final = final .. ',{"text":"","extra":[' .. nameComponent .. "]}"
 
 	final = final .. "]"
 	nameplate.ALL:setText(final)
