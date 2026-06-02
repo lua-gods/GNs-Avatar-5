@@ -33,6 +33,7 @@ local MacroEventsAPI = {}
 ---Enables / Disables the macro
 ---@param active boolean
 ---@param ... any
+---@return ...
 function Macro:setActive(active, ...)
 	if self.isActive ~= active then
 		self.isActive = active

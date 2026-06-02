@@ -15,6 +15,7 @@ end)
 events.WORLD_RENDER:register(function (delta)
 	for i = 1, hasInbox, 1 do
 		local chat = host:getChatMessage(hasInbox)
+		if not chat then break end
 		local message = " "..chat.message:lower().. " "
 		
 		local mentioned = false

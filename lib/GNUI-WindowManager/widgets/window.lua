@@ -20,6 +20,7 @@ local utils = require(cfg.UTILS) ---@type GNUI.utils
 local WindowAPI = {}
 
 ---@class GNUI.Widget.Window : GNUI.Box
+---@field ON_CLOSE GN.Event
 local Window = {}
 Window.__index = function(t, i)
 	return rawget(t, i)
@@ -86,12 +87,17 @@ function WindowAPI.new(canvas)
 
 	local close = self:getChild("close")
 	---@cast close GNUI.Widget.Button
-	close.PRESSED:register(function()
-		self:setVisible(false)
-	end)
+	
+	
+	self.ON_CLOSE = Event.new()
 
 	setmetatable(self, Window)
 	---@cast self GNUI.Widget.Window
+	
+	close.PRESSED:register(function()
+		self:close()
+	end)
+	
 	return self
 end
 
@@ -100,6 +106,13 @@ end
 function Window:addContent(child)
 	self:getChild("content"):addChild(child)
 	return self
+end
+
+
+function Window:close()
+	self.ON_CLOSE:invoke()
+	self.ON_CLOSE:clear()
+	self:free()
 end
 
 function Window:setTitle(title)

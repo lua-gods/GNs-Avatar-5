@@ -10,19 +10,9 @@ local screen = GNUI.getScreen()
 
 local ENTRIES = {
 	{
-		name = "Me",
-		path = "colorPicker",
-		icon = ":tophat:"
-	},
-	{
 		name = "Tint Everything",
-		path = "colorPicker",
+		path = "colorize",
 		icon = ":palette:"
-	},
-	{
-		name = "Notepad",
-		path = "colorPicker",
-		icon = ":paper:"
 	},
 }
 
@@ -31,13 +21,15 @@ local toolbar = screen:parse{
 	layout="HORIZONTAL",
 	style="opaque",
 	pos = vec(5,5),
+	name="toolbar"
 }
 
 
 local tooltip = screen:parse{
 	style="opaque",
 	text="Text",
-	captureInput = false
+	captureInput = false,
+	name="tooltip"
 }
 
 
@@ -48,7 +40,7 @@ for index, entry in ipairs(ENTRIES) do
 	local btn = toolbar:parse{
 		--name = entry.name,
 		type = "button",
-		minSize = vec(8,8),
+		minSize = vec(10,10),
 		text = entry.icon,
 		wrapText = false,
 	}
@@ -76,17 +68,24 @@ screen.CHILDREN_ORDER_CHANGED:register(function ()
 	tooltip:setChildIndex(99999)
 end)
 
-
 screen.CURSOR_MOVED:register(function (pos, vel)
 	tooltip:setPos(pos:floor() + vec(10,0))
 end)
 
 
 
+screen.SIZE_CHANGED:register(function (size)
+	toolbar:setPos(
+		size.x * 0.5 + 93,
+		size.y - 29
+	)
+end)
+
 
 events.WORLD_TICK:register(function ()
 	local isCursorUnlocked = (host:isCursorUnlocked() or host:isChatOpen())and HAS_TOOLTIP
 	tooltip:setVisible(isCursorUnlocked)
+	--screen:printTree()
 end)
 
 local function loadWindow(name)
