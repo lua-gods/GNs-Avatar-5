@@ -1,3 +1,4 @@
+if not host:isHost() then return end
 local SparseSet = require("lib.SparseSet")
 
 local COUNT = 10000
