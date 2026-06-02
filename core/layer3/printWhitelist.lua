@@ -13,11 +13,13 @@ local printWhitelist = {
 	"dc912a38-2f0f-40f8-9d6d-57c400185362"
 }
 
-local isWhitelisted = false
-for index, uuid in ipairs(printWhitelist) do
-	if client:getViewer():getUUID() == uuid then
-		isWhitelisted = true
-		break
+local isWhitelisted = host:isHost()
+if not isWhitelisted then
+	for index, uuid in ipairs(printWhitelist) do
+		if client:getViewer():getUUID() == uuid then
+			isWhitelisted = true
+			break
+		end
 	end
 end
 

@@ -2,13 +2,14 @@
   / ____/ | / / Name: GN SPARSE SET LIBRARY v1.0.0
  / / __/  |/ /  Desc: an implementation of a sparse set in lua
 / /_/ / /|  / Author: GNanimates | https://gnon.top | @gn68s
-\____/_/ |_/ License: Mozilla Public License Version 2.0
+\____/_/ |_/ License: MIT License
 
 --──── REFERENCES ────────────────────────────────────────────--
-The magic container                - https://www.youtube.com/watch?v=L4xOCvELWlU
-Sparse Set                         - https://www.geeksforgeeks.org/dsa/sparse-set/
-Sparse Sets and Where to Find Them - https://timiskhakov.github.io/posts/sparse-sets-and-where-to-find-them/
-A Sparse Set in rust.              - https://github.com/bombela/sparseset
+stuff I used to make this
+- The magic container                - https://www.youtube.com/watch?v=L4xOCvELWlU
+- Sparse Set                         - https://www.geeksforgeeks.org/dsa/sparse-set/
+- Sparse Sets and Where to Find Them - https://timiskhakov.github.io/posts/sparse-sets-and-where-to-find-them/
+- A Sparse Set in rust.              - https://github.com/bombela/sparseset
 ]]
 
 ---@type table<table,SparseSet>
