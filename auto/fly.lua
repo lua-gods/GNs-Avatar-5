@@ -3,6 +3,11 @@ local Sync = require("lib.GNSync")
 local Macros = require("lib.GNMacros")
 local Spring = require("lib.GNSpring")
 
+
+local LEFT_ARM = models.player.Base.Torso.Waist.Chest.LeftArm
+local RIGHT_ARM = models.player.Base.Torso.Waist.Chest.RightArm
+
+
 if silly and host:isHost() then
 	silly:setFly(true)
 end
@@ -35,9 +40,6 @@ flyMacro = Macros.new(function(events, ...)
 		lsway = sway
 		sway = spring.pos
 
-		if player:getSwingArm() == "MAIN_HAND" and player:getSwingTime() == 0 then
-			animations.player.armSwingRight:stop():play()
-		end
 
 		if player:isOnGround() then
 			flyMacro:setActive(false)
@@ -48,6 +50,20 @@ flyMacro = Macros.new(function(events, ...)
 
 	events.RENDER:register(function(delta, ctx)
 		if ctx ~= "OTHER" then
+			-- arm fix
+			local isUsingItem = player:isUsingItem()
+			RIGHT_ARM:setRot(isUsingItem and vanilla_model.RIGHT_ARM:getOriginRot() or nil)
+			LEFT_ARM:setRot(isUsingItem and vanilla_model.LEFT_ARM:getOriginRot() or nil)
+
+			local swingArm = player:getSwingArm()
+			if swingArm then
+				if swingArm == "MAIN_HAND" then
+					RIGHT_ARM:setRot(vanilla_model.RIGHT_ARM:getOriginRot())
+				else
+					LEFT_ARM:setRot(vanilla_model.LEFT_ARM:getOriginRot())
+				end
+			end
+
 			local tvel = math.lerp(lsway, sway, delta)
 			animations.player.flyForward:time(tvel.z * 0.5 + 0.5)
 			animations.player.flySideways:time(tvel.x * -0.5 + 0.5)

@@ -61,7 +61,7 @@ end
 --────────-< Debug Options >-────────--
 
 -- shows the data that is being synced beside the player
-local DEBUG_SHOW_DATA = true
+local DEBUG_SHOW_DATA = false
 
 --────────────────────────-< END OF CONFIG >-────────────────────────--
 

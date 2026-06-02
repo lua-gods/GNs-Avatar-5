@@ -45,7 +45,7 @@ nameComponent = toJson(nameComponent)
 --────────────────────────-< Nameplate Status >-────────────────────────--
 
 local motdComponent = toJson{
-	text=MOTD.."\n",
+	text=MOTD.." ",
 	color="gray"
 }
 
@@ -154,11 +154,9 @@ local function updateStatus()
 			end
 			final = final .. component("]")
 			
-			final = final .. component("\n")
 		end
-	else
-
 	end
+	final = final .. component("\n")
 	
 	final = final .. ',{"text":"","extra":[' .. nameComponent .. "]}"
 

@@ -1,5 +1,3 @@
-local Spring = require("lib.GNSpring")
-
 local BLINK_RANGE = vec(1, 5) * 20
 local HEAD_ANIM_X = animations.player.headHorizontal
 local HEAD_ANIM_Y = animations.player.headVertical
@@ -24,7 +22,7 @@ EYES_ANIM_Y:pause()
 local blinkTime = 0
 local eyeMoveTime = 0
 
-local headSpring = Spring.newVec2(2, vec(0.35, 0.4), 0.2)
+local lastTargetRot = vec(0, 0)
 local targetRot = vec(0, 0)
 
 events.TICK:register(function()
@@ -41,23 +39,18 @@ events.TICK:register(function()
 		EYES_ANIM_Y:setTime(targetRot.x * 0.5 + 1)
 	end
 	
-	if math.abs(headSpring.pos.x) > 4 or math.abs(headSpring.pos.y) > 4 then
-		headSpring.pos = headSpring.target
-		headSpring.vel = headSpring.pos-headSpring.pos
-	end
+	lastTargetRot = targetRot
+	targetRot = player:getRot() - vec(0, player:getVehicle() and player:getVehicle():getRot().y or player:getBodyYaw())
+	targetRot.y = ((targetRot.y + 180) % 360 - 180) / -50
+	targetRot.x = targetRot.x / -90
 end)
 
 animations.player.breathing:speed(0.3):play()
 
 events.RENDER:register(function(delta, ctx)
 	MODEL_HEAD:setPos(0, player:isCrouching() and -4 or 0)
-	targetRot = player:getRot(delta) - vec(0, player:getVehicle() and player:getVehicle():getRot(delta).y or player:getBodyYaw(delta))
-	targetRot.y = ((targetRot.y + 180) % 360 - 180) / -50
-	targetRot.x = targetRot.x / -90
-	---@cast targetRot Vector2
-
-	headSpring.target = targetRot
-
-	HEAD_ANIM_X:setTime(headSpring.pos.y * 0.5 + 1)
-	HEAD_ANIM_Y:setTime(headSpring.pos.x * 0.5 + 1)
+	local rot = math.lerp(lastTargetRot, targetRot, delta)
+	
+	HEAD_ANIM_X:setTime(rot.y * 0.5 + 1)
+	HEAD_ANIM_Y:setTime(rot.x * 0.5 + 1)
 end)
