@@ -1,3 +1,5 @@
+# flags: host_only
+
 function genDocs(query)
 
 	local border = {
