@@ -10,7 +10,7 @@ local screen = GNUI.getScreen()
 
 local ENTRIES = {
 	{
-		name = "Tint Everything",
+		name = "Color Picker",
 		path = "colorize",
 		icon = ":palette:"
 	},

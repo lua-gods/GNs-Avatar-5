@@ -1,4 +1,5 @@
 # flags: host_only
+local GNcommon = require "lib.GNcommon"
 ---@diagnostic disable: return-type-mismatch
 ---@diagnostic disable: param-type-mismatch
 
@@ -26,10 +27,16 @@ ProceduralTexture:newTexture("colorWheel", RESOLUTION, RESOLUTION, function(x, y
 	return sampleColor(x / RESOLUTION, y / RESOLUTION)
 end)
 
-ProceduralTexture:newTexture("brightness", 80, RESOLUTION, function(x, y, w, h)
+ProceduralTexture:newTexture("brightness", 1, RESOLUTION, function(x, y, w, h)
 	local i = (1 - y / h) ^ 2.2
 	return vec(i, i, i, 1)
 end)
+
+
+ProceduralTexture:newTexture("Hue", RESOLUTION, 1, function(x, y, w, h)
+	return vectors.hsvToRGB(x / w, 1, 1):augmented(1)
+end)
+
 
 local saturationTexture = ProceduralTexture:newTexture("saturation", RESOLUTION, 80,
 	function(x, y, w, h)
@@ -61,12 +68,20 @@ return (function(screen, GNUI)
 		layout = "VERTICAL",
 		{
 			{
-				type = "box",
-				name = "colorPreview",
-				style = "white",
-				minSize = vec(11, 11),
+				layout="HORIZONTAL",
+				style="none",
 				sizing = { "FILL", "FIT" },
-				color = vec(1, 0, 0),
+				{
+					{
+						type = "box",
+						name = "colorPreview",
+						style = "white",
+						minSize = vec(11, 11),
+						sizing = { "FILL", "FIT" },
+						color = vec(1, 0, 0),
+					},
+					
+				}
 			},
 			{
 				style = "none",
@@ -102,6 +117,35 @@ return (function(screen, GNUI)
 								texturePath = "brightness",
 							},
 						},
+					},
+				},
+			},
+			{
+				layout = "HORIZONTAL",
+				style = "none",
+				sizing = { "FILL", "FIT" },
+				{
+					{
+						name = "hueSlider",
+						type = "slider",
+						min = 1,
+						max = 100,
+						step = 1,
+						{
+							sizing = { "FILL", "FILL" },
+							style = {
+								type = "quad",
+								texturePath = "Hue",
+							},
+						},
+					},
+					{
+						type = "button",
+						name = "eyeDropperButton",
+						text = ":mci_iron_sword:",
+						wrapText=false,
+						minSize = vec(9, 0),
+						sizing = { "FIT", "FILL" },
 					},
 				},
 			},
@@ -248,6 +292,7 @@ return (function(screen, GNUI)
 
 	local colorWheel = content:getChild("colorwheel")
 	local grabber = content:getChild("grabber") ---@cast grabber GNUI.Widget.Button
+	local hueSlider = content:getChild("hueSlider") ---@cast hueSlider GNUI.Widget.Slider
 
 	local brightnessSlider = content:getChild("brightnessSlider") ---@cast brightnessSlider GNUI.Widget.Slider
 	local saturationSlider = content:getChild("saturationSlider") ---@cast saturationSlider GNUI.Widget.Slider
@@ -269,6 +314,8 @@ return (function(screen, GNUI)
 	local gField = content:getChild("gField") ---@cast gField GNUI.Widget.TextField
 	local bField = content:getChild("bField") ---@cast bField GNUI.Widget.TextField
 
+	local eyeDropperButton = content:getChild("eyeDropperButton") ---@cast eyeDropperButton GNUI.Widget.Button
+	
 	local function applyColor(from)
 		--──── Extract values from controls ────────────────────────────────────────────--
 		if from == 1 then -- color wheel and sliders
@@ -325,6 +372,9 @@ return (function(screen, GNUI)
 				(tonumber(bField:getActiveField()) or 0) / 255
 			)
 			hsva = vectors.rgbToHSV(rgb.xyz):augmented(hsva.a)
+		elseif from == 9 then -- hue slider
+			local hue = hueSlider:getNormalizedValue()
+			hsva.x = hue
 		end
 
 		--──── Apply values to controls ────────────────────────────────────────────--
@@ -371,6 +421,9 @@ return (function(screen, GNUI)
 			gField:setField(tostring(math.floor(rgb.y * 255))):setColor(1 - rgb.g, 1, 1 - rgb.g)
 			bField:setField(tostring(math.floor(rgb.z * 255))):setColor(1 - rgb.b, 1 - rgb.b, 1)
 		end
+		if from ~= 9 then
+			hueSlider:setNormalizedValueSilent(hsva.x)
+		end
 		applySaturationHue(hsva.x, hsva.z)
 		local v = hsva.z
 		brightnessSlider.boxKnob:setColor(v, v, v)
@@ -383,37 +436,40 @@ return (function(screen, GNUI)
 
 		CPW.COLOR_CHANGED:invoke(color:augmented(hsva.w))
 	end
-
-
-	grabber.BUTTON_DOWN:register(function()
-		screen.CURSOR_MOVED:register(function(pos, vel)
-			local areaSize = colorWheel.finalSize
-			local grabberOffset = grabber.finalSize.xy * 0.5
-			local samplePos = (colorWheel:toLocal(pos)) / areaSize
-
-			local HALF = vec(0.5, 0.5)
-
-			local centerDir = samplePos - HALF
-			local centerLen = centerDir:length()
-			if centerLen > 0.5 then
-				samplePos = (samplePos - HALF):normalize() * 0.5 + HALF
+	
+	colorWheel.MOUSE_INPUT:register(function (button, state)
+		if button == 0 then
+			if state == 1 then
+				screen.CURSOR_MOVED:register(function(pos, vel)
+					local areaSize = colorWheel.finalSize
+					local grabberOffset = grabber.finalSize.xy * 0.5
+					local samplePos = (colorWheel:toLocal(pos)) / areaSize
+						
+					local HALF = vec(0.5, 0.5)
+						
+					local centerDir = samplePos - HALF
+					local centerLen = centerDir:length()
+					if centerLen > 0.5 then
+						samplePos = (samplePos - HALF):normalize() * 0.5 + HALF
+					end
+					grabber:setPos((samplePos) * areaSize - grabberOffset)
+					applyColor(1)
+				end, grabber.id)
+			else
+				applyColor(1)
+				screen.CURSOR_MOVED:remove(grabber.id)
 			end
-			grabber:setPos((samplePos) * areaSize - grabberOffset)
-			applyColor(1)
-		end, grabber.id)
+		end
 	end)
+	
 	alphaButton.STATE_CHANGED:register(function(down)
 		applyColor(0)
-	end)
-
-	grabber.BUTTON_UP:register(function()
-		applyColor(1)
-		screen.CURSOR_MOVED:remove(grabber.id)
 	end)
 
 	local brightnessSlider = content:getChild("brightnessSlider")
 	---@cast brightnessSlider GNUI.Widget.Slider
 
+	hueSlider.VALUE_CHANGED:register(function(value) applyColor(9) end)
 	brightnessSlider.VALUE_CHANGED:register(function(value) applyColor(2) end)
 	saturationSlider.VALUE_CHANGED:register(function(value) applyColor(3) end)
 	alphaSlider.VALUE_CHANGED:register(function(value) applyColor(4) end)
@@ -431,10 +487,36 @@ return (function(screen, GNUI)
 	rField.FIELD_CHANGED:register(function(text) applyColor(8) end)
 	gField.FIELD_CHANGED:register(function(text) applyColor(8) end)
 	bField.FIELD_CHANGED:register(function(text) applyColor(8) end)
+	
+	eyeDropperButton.PRESSED:register(function ()
+		local screenshot = host:screenshot("screenshot")
+		local freeze = screen:parse({
+			sizing = { "FILL", "FILL" },
+			style = {
+				type="quad",
+				texturePath="screenshot",
+			}
+		})
+		
+		freeze.MOUSE_INPUT:register(function (button, state)
+			if button == 0 then -- left mouse
+				if state == 0 then -- when button release
+					local pos = screen.cursorPos
+					local rgb = screenshot:getPixel(pos.x,pos.y)
+					CPW:setColor(rgb)
+					freeze:free()
+				end
+			end
+		end)
+	end)
+	
+	function CPW:setColor(r,g,b,a)
+		local color = GNcommon.color(r,g,b,a)
+		hsva = vectors.rgbToHSV(color.xyz):augmented(color.w)
+		applyColor(0)
+	end
 
-
-
-	CPW:setTitle("Color Wheel")
+	CPW:setTitle("Color Picker")
 	CPW:addContent(content)
 	CPW.COLOR_CHANGED = Event.new()
 	colorPreview:setColor(0, 0, 0)

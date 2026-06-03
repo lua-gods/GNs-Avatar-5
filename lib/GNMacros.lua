@@ -1,14 +1,19 @@
 ---@diagnostic disable: undefined-field
 --[[______   __
-  / ____/ | / / Name: GN MACROS LIBRARY v1.0.0
+  / ____/ | / / Name: GN MACROS LIBRARY v1.2.0
  / / __/  |/ /  Desc: encapsulates events and initialization into a togglable macro.
 / /_/ / /|  / Author: GNanimates | https://gnon.top | @gn68s
-\____/_/ |_/ License: Mozilla Public License Version 2.0 ]]
+\____/_/ |_/ License: Mozilla Public License Version 2.0
+--────────-< DEPENDENCIES >-────────--
+Place required dependencies in the same folder as this script.
+- GNEvent > https://discord.com/channels/1129805506354085959/1492967289312641095
+]]
+
 ---@class MacroAPI
 local MacrosAPI = {}
 
--- DEPENDENCIES
-local Event = require("lib.GNEvent")
+
+local Event = require("./GNEvent")
 
 
 local randomID = function()

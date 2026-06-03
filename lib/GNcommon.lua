@@ -22,8 +22,10 @@ function gnc.color(r,g,b,a)
 	local tr,tg,tb,ta=type(r),type(g),type(b),type(a)
 	if (tr == "string") then
 		return vectors.hexToRGB(r):augmented()
+	elseif (tr == "Vector4") then
+		return r:copy()
 	elseif (tr == "Vector3") then
-		return vec(r.x,r.y,r.z,1)
+		return vec(r.x,r.y,r.z,g or 1)
 	else
 		return vec(r,g,b,a or 1)
 	end
