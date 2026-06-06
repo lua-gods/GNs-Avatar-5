@@ -14,6 +14,11 @@ local ENTRIES = {
 		path = "colorize",
 		icon = ":palette:"
 	},
+	{
+		name = "Orthographic Projection",
+		path = "orthographic",
+		icon = ":camera:"
+	},
 }
 
 
@@ -43,14 +48,18 @@ for index, entry in ipairs(ENTRIES) do
 		minSize = vec(10,10),
 		text = entry.icon,
 		wrapText = false,
+		toggle=true
 	}
 	local macro = require("auto.windows."..entry.path)
 	entry.macro = macro
 	---@cast btn GNUI.Widget.Button
 	
-	btn.PRESSED:register(function ()
-		entry.macro:setActive(false,screen,GNUI)
+	btn.BUTTON_DOWN:register(function ()
 		entry.macro:setActive(true,screen,GNUI)
+	end)
+	
+	btn.BUTTON_UP:register(function ()
+		entry.macro:setActive(false,screen,GNUI)
 	end)
 	
 	btn.CURSOR_PRESENCE_CHANGED:register(function (inside)
@@ -76,8 +85,8 @@ end)
 
 screen.SIZE_CHANGED:register(function (size)
 	toolbar:setPos(
-		size.x * 0.5 + 93,
-		size.y - 29
+		size.x * 0.5 - 91.25,
+		size.y - 55.1
 	)
 end)
 
@@ -109,6 +118,7 @@ events.MOUSE_SCROLL:register(function(amount) screen:inputScroll(amount, 0) end)
 
 
 function events.WORLD_RENDER()
+	screen:setVisible(client:isHudEnabled())
 	local screenID = host:getScreen()
 	if (action_wheel:isEnabled())
 	or (screenID and not screenID == "net.minecraft.class_408") then -- move mouse away if theres already UI open

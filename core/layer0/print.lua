@@ -3,7 +3,7 @@ local function getPath()
 end
 
 
-function print(...)
+function printa(...)
 	local content = {
 		{text=""}
 	}

@@ -1,0 +1,8 @@
+local Macro = require("lib.GNMacros")
+
+local myApp
+
+myApp = Macro.new(function (events, screen, GNUI)
+end)
+
+return myApp

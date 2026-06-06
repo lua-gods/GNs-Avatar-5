@@ -15,11 +15,9 @@ end
 local flyMacro
 
 flyMacro = Macros.new(function(events, ...)
-	animations.player.armSwingRight:speed(1.7)
-	animations.player.armSwingLeft:speed(1.7)
 	events.ENTITY_INIT:register(function()
-		animations.player.flyForward:play():setSpeed(0)
-		animations.player.flySideways:play():setSpeed(0)
+		animations.player.flyForward:play():pause()
+		animations.player.flySideways:play():pause()
 	end)
 
 	local spring = Spring.newVec3(1, 0.2, 0)
@@ -43,8 +41,6 @@ flyMacro = Macros.new(function(events, ...)
 
 		if player:isOnGround() then
 			flyMacro:setActive(false)
-			animations.player.flyForward:stop()
-			animations.player.flySideways:stop()
 		end
 	end)
 

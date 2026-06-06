@@ -1,56 +1,45 @@
+---@diagnostic disable: param-type-mismatch
 --[[______   __
   / ____/ | / /  by: GNanimates / https://gnon.top / Discord: @gn68s
  / / __/  |/ / name: GN's Particle Library
 / /_/ / /|  /  desc: 
 \____/_/ |_/ source: link ]]
 
---[────────────────────────-< CONFIG >-────────────────────────]--
+local i = 0
 
---- ! BIG PERFORMANCE IMPACT !
-local DEEP_COPY_PARTICLES = false
-
-
-
---[────────────────────────-< Dust >-────────────────────────]--
----@type table<Dust.Identity,Dust.Instance[]>
-local instances = {}
-
----@type table<string,Dust.Identity>
-local IDENTITIES = {}
-
-local function deepCopy(part)
-	if DEEP_COPY_PARTICLES then
-		local copy = part:copy(part:getName())
-		--for key, value in pairs(part:getTask()) do
-		--	copy:addTask(value)
-		--end
-		for _, child in ipairs(part:getChildren()) do
-			copy:removeChild(child)
-			deepCopy(child):moveTo(copy)
-		end
-		return copy
-	else
-		return part:copy(math.random(10000000))
-	end
+local function id()
+	i = i + 1
+	return i
 end
 
 
----@class DustAPI
----@field identities table<string,Dust.Identity>
+---@type table<GN.Particles.Identity,GNDust.Instance[]>
+local instances = {}
+
+---@type table<string,GN.Particles.Identity>
+local IDENTITIES = {}
+
+local function copyModel(part)
+	return part:copy(id())
+end
+
+
+---@class GN.ParticlesAPI
+---@field identities table<string,GN.Particles.Identity>
 local DustAPI = {
 	identities = {}
 }
 
 ---an identity a particle can be when spawned
----@class Dust.Identity
+---@class GN.Particles.Identity
 ---@field id string
 ---@field model ModelPart
 ---@field duration number
----@field process fun(Sandstorm.ParticleInstance)
+---@field process fun(Dust.Instance)
 
 ---an physical representation of a particle
----@class Dust.Instance
----@field identity Dust.Identity
+---@class GNDust.Instance
+---@field identity GN.Particles.Identity
 ---@field model ModelPart
 ---@field lpos Vector3
 ---@field pos Vector3
@@ -61,7 +50,7 @@ local DustAPI = {
 ---Creates a new process with properties expected from a particle
 ---@param damping number|Vector3 # between 0 and 1, gets applied to velocity
 ---@param gravity Vector3 # in m/s
----@return fun(Sandstorm.ParticleInstance)
+---@return fun(Dust.Instance)
 function DustAPI.newProcessMaterial(damping, gravity)
 	gravity = gravity / 20
 	return function (p)
@@ -69,6 +58,49 @@ function DustAPI.newProcessMaterial(damping, gravity)
 		p.pos = p.pos + p.vel
 	end
 end
+
+
+---@class GNDust.Spawner
+---@field private __index table
+---@field identity GN.Particles.Identity
+local DustSpawner = {}
+DustSpawner.__index = DustSpawner
+
+local SPAWNER_LINK = {}
+
+---@param identity string
+---@return GNDust.Spawner
+function DustAPI.newSpawner(identity)
+	local self = setmetatable({identity = identity}, DustSpawner)
+	return self
+end
+
+function DustSpawner:spawn(pos,vel)
+	return DustAPI.spawn(self.identity,pos, vel)
+end
+
+
+---@param texture Texture
+---@param x number?
+---@param y number?
+---@param w number?
+---@param h number?
+function DustAPI.newBillboardTexture(texture,x,y,w,h)
+	local size = texture:getDimensions()
+	w,h = w or size.x, h or size.y
+	local root = models:newPart("gndust"..id())
+	root:setParentType("WORLD")
+	root:newPart("billboard","CAMERA")
+	:newSprite("sprite")
+	:texture(texture,size.x,size.y)
+	:setRegion(w,h)
+	:size(w,h)
+	:setUVPixels(x or 0,y or 0)
+	:pos(w * 0.5,h * 0.5)
+	:setRenderType("CUTOUT_EMISSIVE_SOLID")
+	return root
+end
+
 
 --- this gets used when no process is giveth.
 local DEFAULT_PROCESS = DustAPI.newProcessMaterial(0.95, vec(0,-1,0))
@@ -78,8 +110,9 @@ local DEFAULT_PROCESS = DustAPI.newProcessMaterial(0.95, vec(0,-1,0))
 ---@param id string
 ---@param model ModelPart # The ModelPart to be displayed when a particle is spawned
 ---@param duration number? # (in seconds) how long the particle should last, this defaults to 1
----@param process fun(Sandstorm.ParticleInstance)?
+---@param process fun(dust: GNDust.Instance)?
 function DustAPI.registerIdentity(id, model, duration, process)
+	model:remove()
 	assert(IDENTITIES[id] == nil, "Particle identity already exists: " .. id)
 	assert(model, "No model provided")
 	local identity = {
@@ -89,6 +122,7 @@ function DustAPI.registerIdentity(id, model, duration, process)
 		process = process or DEFAULT_PROCESS,
 	}
 	IDENTITIES[id] = identity
+	return DustAPI.newSpawner(id)
 end
 
 
@@ -97,13 +131,13 @@ end
 ---@param pos Vector3?
 ---@param vel Vector3?
 function DustAPI.spawn(id, pos, vel)
-	assert(IDENTITIES[id], "No such particle identity: " .. id)
+	assert(IDENTITIES[id], "No such particle identity: " .. tostring(id))
 	local identity = IDENTITIES[id]
 	instances[identity] = instances[identity] or {}
 	
 	local instance = {
 		identity = identity,
-		model = deepCopy(identity.model):setParentType("WORLD"):moveTo(models),
+		model = copyModel(identity.model):setParentType("WORLD"):moveTo(models),
 		pos = pos or vec(0,0,0),
 		vel = vel or vec(0,0,0),
 		age = 0,
@@ -127,7 +161,6 @@ events.TICK:register(function ()
 		end
 	end
 end)
-
 
 events.RENDER:register(function (delta, ctx, matrix)
 	if ctx == "RENDER" or ctx == "FIRST_PERSON" then

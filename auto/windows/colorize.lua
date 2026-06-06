@@ -11,6 +11,10 @@ colorMacro = Macro.new(function (events, screen, GNUI)
 	ColorPicker.ON_CLOSE:register(function ()
 		colorMacro:setActive(false)
 	end)
+	
+	events.ON_EXIT:register(function ()
+		ColorPicker:free()
+	end)
 end)
 
 return colorMacro

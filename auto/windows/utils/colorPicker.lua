@@ -502,6 +502,10 @@ return (function(screen, GNUI)
 			if button == 0 then -- left mouse
 				if state == 0 then -- when button release
 					local pos = screen.cursorPos
+					local res = screenshot:getDimensions()
+					local size = screen.finalSize
+					pos.x = pos.x/size.x*res.x
+					pos.y = pos.y/size.y*res.y
 					local rgb = screenshot:getPixel(pos.x,pos.y)
 					CPW:setColor(rgb)
 					freeze:free()
