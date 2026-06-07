@@ -2,7 +2,7 @@
   / ____/ | / / Name: GN MODEL UTILS LIBRARY v1.1.0
  / / __/  |/ /  Desc: a script with some useful functions for working with models
 / /_/ / /|  / Author: GNanimates | https://gnon.top | @gn68s
-\____/_/ |_/ License: Mozilla Public License Version 2.0 ]]
+\____/_/ |_/ License: Copyleft License ]]
 ---@class GN.ModelUtils
 local ModelUtils = {}
 

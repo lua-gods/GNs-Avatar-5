@@ -1,0 +1,120 @@
+local modelUtils = require("lib.modelUtils")
+
+
+local Macros = require("lib.GNMacros")
+
+
+local parts = {}
+
+local i = 0
+local function id()
+	i = i + 1
+	return i
+end
+
+local ogParents = {}
+
+local explodeMacro = Macros.new(function(events, ...)
+	local sound
+	
+	local model = models.player
+	modelUtils.apply(model, function(modelPart)
+		if modelPart:getVisible() and modelPart:getType() == "CUBE" then
+			local parent = models:newPart("explode" .. id(), "WORLD")
+			local pivot = modelPart:getPivot()
+			local mat = modelPart:partToWorldMatrix()
+			mat:translate(-mat:applyDir(pivot))
+			ogParents[modelPart] = modelPart:getParent()
+			modelPart:moveTo(parent)
+			local center = vec(0, 0, 0)
+			local c = 0
+			for index, material in pairs(modelPart:getAllVertices()) do
+				for index, value in ipairs(material) do
+					c = c + 1
+					center = center + mat:apply(value:getPos())
+				end
+			end
+			modelPart:setPivot(center)
+			center = center / math.max(c, 1)
+			modelPart:setMatrix(mat:copy():translate(-center):scale(16))
+
+			parts[#parts + 1] = {
+				modelPart = parent,
+				offset = center,
+				pos = center,
+				vel = vec(math.random() - 0.5, math.random(), math.random() - 0.5) * vec(0.5, 0.5, 0.5) *
+				0.5,
+			}
+		end
+	end)
+
+	local function isColliding(pos)
+		local block = world.getBlockState(pos)
+		if block.id == "minecraft:light" then
+			return false
+		end
+		return block:hasCollision()
+	end
+
+
+	local GRAVITY = vec(0, -0.015, 0)
+	local RESTITUTION = 0.3
+	local FRICTION = 0.9
+		
+	events.TICK:register(function()
+		for index, part in pairs(parts) do
+			if true then
+				part.lpos = part.pos
+				part.vel = part.vel + GRAVITY
+				if isColliding(part.pos + part.vel.x__) then
+					part.vel.x = part.vel.x * -RESTITUTION
+					part.vel.z = part.vel.z * FRICTION
+					part.vel.y = part.vel.y * FRICTION
+				else
+					part.pos = part.pos + part.vel.x__
+				end
+				if isColliding(part.pos + part.vel._y_) then
+					part.vel.y = part.vel.y * -RESTITUTION
+					part.vel.x = part.vel.x * FRICTION
+					part.vel.z = part.vel.z * FRICTION
+				else
+					part.pos = part.pos + part.vel._y_
+				end
+				if isColliding(part.pos + part.vel.__z) then
+					part.vel.z = part.vel.z * -RESTITUTION
+					part.vel.x = part.vel.x * FRICTION
+					part.vel.y = part.vel.y * FRICTION
+				else
+					part.pos = part.pos + part.vel.__z
+				end
+			end
+		end
+	end)
+
+	events.RENDER:register(function(delta, ctx, matrix)
+		if ctx == "RENDER" or ctx == "FIRST_PERSON" then
+			for index, part in pairs(parts) do
+				part.modelPart:setPos((math.lerp(part.lpos or part.pos, part.pos, delta)) * (16 * 1.0625) -
+				part.offset)
+			end
+		end
+	end)
+	
+	events.ON_EXIT:register(function ()
+		for key, value in pairs(ogParents) do
+			key:moveTo(value)
+			key:setPos():setRot():setPivot()
+		end
+		for key, value in pairs(parts) do
+			value.modelPart:remove()
+		end
+		ogParents = {}
+		parts = {}
+	end)
+end)
+
+
+
+events.TICK:register(function()
+	explodeMacro:setActive(player:isSneaking())
+end)

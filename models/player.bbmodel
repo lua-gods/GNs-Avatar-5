@@ -7310,9 +7310,59 @@
 			},
 			"type": "mesh",
 			"uuid": "b628e9a3-0bbf-8968-704a-6c90799c80fb"
+		},
+		{
+			"name": "cube",
+			"box_uv": false,
+			"rescale": false,
+			"locked": false,
+			"light_emission": 0,
+			"render_order": "default",
+			"allow_mirror_modeling": true,
+			"from": [-1, 35, -1],
+			"to": [1, 37, 1],
+			"autouv": 1,
+			"color": 1,
+			"origin": [0, 35, 0],
+			"faces": {
+				"north": {
+					"uv": [0, 0, 2, 2]
+				},
+				"east": {
+					"uv": [0, 0, 2, 2]
+				},
+				"south": {
+					"uv": [0, 0, 2, 2]
+				},
+				"west": {
+					"uv": [0, 0, 2, 2]
+				},
+				"up": {
+					"uv": [0, 0, 2, 2]
+				},
+				"down": {
+					"uv": [0, 0, 2, 2]
+				}
+			},
+			"type": "cube",
+			"uuid": "c7c9d4cd-ef86-2852-6f4a-0d1b0b527052"
 		}
 	],
 	"outliner": [
+		{
+			"name": "Nameplate",
+			"origin": [0, 35, 0],
+			"color": 0,
+			"uuid": "e6d023b9-8e87-c25c-aed8-b6db1b925aa7",
+			"export": true,
+			"mirror_uv": false,
+			"isOpen": true,
+			"locked": false,
+			"visibility": true,
+			"autouv": 0,
+			"selected": false,
+			"children": ["c7c9d4cd-ef86-2852-6f4a-0d1b0b527052"]
+		},
 		{
 			"name": "VFX",
 			"origin": [0, 0, 0],
@@ -8157,7 +8207,7 @@
 											"locked": false,
 											"visibility": false,
 											"autouv": 0,
-											"selected": true,
+											"selected": false,
 											"children": [
 												{
 													"name": "CSHandle",
@@ -8484,7 +8534,7 @@
 			"saved": true,
 			"uuid": "1626091b-c07d-5115-7ee9-642b63fbccd6",
 			"relative_path": "../textures/particles.png",
-			"source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAAXNSR0IArs4c6QAAAQxJREFUeF7tlyGOwmAQRqeCGywCg0chViA4AgmsRqGadWhOgMaRKhQaSDjCCgQChccgdm+A6KYC8jeBC/BeVVM3b743M80iedrTr/Ky2GTpt3d/rxX7uRyUx++9AN6962l9tW6Pf0blur9lJqAqftbrxvxwChKErBp8zc4t8uFH5K1VFNdJFLu/+D03gjAQH3HHJiAdCOgZUIFwDdLvAPwlSDqA7rWijp5nDRYAMfYv/wWIMFSA2HUVSAiogArACagAPABhAkwAnIAKwAPgEFQBFYATUAF4ANwCKqACcAIqAA+AW0AFVABOQAXgAXALqIAKwAmoADwAbgEVUAE4ARWAB8AtoAIqACeAV+Af/Y07QZoJHH8AAAAASUVORK5CYII="
+			"source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAAXNSR0IArs4c6QAAAY1JREFUeF7tlqFLA2EYxt8L/gcKyoHd5MANg8FiE5xpwbQ0bMsLW9BgtsmSyWBSwbZiMIw52NK6cGyg/8HCyTc4uHmcXnjK891zaSw8vO/v+d13X2CpZ7d9Hn/ePgXp/3z/vbbswd1pPL58zQAIwzDOAxFFETWwwgC2u5UMg8X1xLwCcPFejx+Onv814Pixam+NjxUQbwC45TuH+3YznNpfEHxa3hUYuINva29prbNNa+3cW3/etP7Lt33NNiw5EJMzoDc6savaYO1VKIUBDoBb/vfjYHgDwC1X9AxIg/AKQN5n0Oe7QKHPYGkAlP4m6HPTebtRX2MRhQkAgiJzhgxgbg8xuwxAUGTOkAHM7SFmlwEIiswZMoC5PcTsMgBBkTlDBjC3h5hdBiAoMmfIAOb2ELPLAARF5gwZwNweYnYZgKDInCEDmNtDzC4DEBSZM2QAc3uI2WUAgiJzhgxgbg8xuwxAUGTOkAHM7SFmlwEIiswZMoC5PcTsMgBBkTlDBjC3h5hdBiAoMmeU3oAfTRtmQcN5r0AAAAAASUVORK5CYII="
 		},
 		{
 			"path": "/home/gn/sott/Games/Minecraft/Figura/avatars/A Favorites/GNs-Avatar-5/textures/camera.png",
@@ -34984,6 +35034,121 @@
 							"interpolation": "linear"
 						}
 					]
+				},
+				"e6d023b9-8e87-c25c-aed8-b6db1b925aa7": {
+					"name": "Nameplate",
+					"type": "bone",
+					"keyframes": [
+						{
+							"channel": "position",
+							"data_points": [
+								{
+									"x": "0",
+									"y": "0",
+									"z": "0"
+								}
+							],
+							"uuid": "6dee96e8-39c2-1e9b-a4a4-cf90b206c469",
+							"time": 0,
+							"color": -1,
+							"interpolation": "bezier",
+							"bezier_linked": true,
+							"bezier_left_time": [-0.1, -0.36333, -0.1],
+							"bezier_left_value": [0, 0.57637, 0],
+							"bezier_right_time": [0.1, 0.36333, 0.1],
+							"bezier_right_value": [0, -0.57637, 0]
+						},
+						{
+							"channel": "position",
+							"data_points": [
+								{
+									"x": "0",
+									"y": "-35",
+									"z": "0"
+								}
+							],
+							"uuid": "961fc034-2ddf-96a0-b1da-c1ee65018b56",
+							"time": 0.58333,
+							"color": -1,
+							"interpolation": "bezier",
+							"bezier_linked": true,
+							"bezier_left_time": [-0.1, -0.09, -0.1],
+							"bezier_left_value": [0, 11.74613, 0],
+							"bezier_right_time": [0.1, 0.09, 0.1],
+							"bezier_right_value": [0, -11.74613, 0]
+						},
+						{
+							"channel": "position",
+							"data_points": [
+								{
+									"x": "0",
+									"y": "-31.6",
+									"z": "0"
+								}
+							],
+							"uuid": "ad7dee61-e55b-ce91-3879-93a2d7dd465f",
+							"time": 0.95833,
+							"color": -1,
+							"interpolation": "bezier",
+							"bezier_linked": true,
+							"bezier_left_time": [-0.1, -0.05297, -0.1],
+							"bezier_left_value": [0, 2.28724, 0],
+							"bezier_right_time": [0.1, 0.05297, 0.1],
+							"bezier_right_value": [0, -2.28724, 0]
+						},
+						{
+							"channel": "position",
+							"data_points": [
+								{
+									"x": "0",
+									"y": "-26.2",
+									"z": "0"
+								}
+							],
+							"uuid": "b61ad20c-8256-4b23-bcea-f5ec7690210d",
+							"time": 0.79167,
+							"color": -1,
+							"interpolation": "bezier",
+							"bezier_linked": true,
+							"bezier_left_time": [-0.1, -0.06909, -0.1],
+							"bezier_left_value": [0, 0, 0],
+							"bezier_right_time": [0.1, 0.06909, 0.1],
+							"bezier_right_value": [0, 0, 0]
+						},
+						{
+							"channel": "position",
+							"data_points": [
+								{
+									"x": "0",
+									"y": "-35",
+									"z": "0"
+								}
+							],
+							"uuid": "6cc74266-b7ed-41d3-d8a9-afb39ecdac94",
+							"time": 1.04167,
+							"color": -1,
+							"interpolation": "linear"
+						},
+						{
+							"channel": "position",
+							"data_points": [
+								{
+									"x": "0",
+									"y": "-35",
+									"z": "0"
+								}
+							],
+							"uuid": "0b003b37-e67c-0e1e-3951-3354c653223a",
+							"time": 0.625,
+							"color": -1,
+							"interpolation": "bezier",
+							"bezier_linked": true,
+							"bezier_left_time": [-0.1, -0.06987, -0.1],
+							"bezier_left_value": [0, -5.14629, 0],
+							"bezier_right_time": [0.1, 0.06987, 0.1],
+							"bezier_right_value": [0, 5.14629, 0]
+						}
+					]
 				}
 			}
 		},
@@ -39686,7 +39851,7 @@
 			"override": false,
 			"length": 1.75,
 			"snapping": 24,
-			"selected": true,
+			"selected": false,
 			"anim_time_update": "",
 			"blend_weight": "",
 			"start_delay": "",
