@@ -13,18 +13,18 @@ local ProceduralTexture = require("lib.GNProceduralTexture")
 local TAU = math.pi * 2
 
 local function sampleColor(x, y)
-	x = x - 0.5
-	y = y - 0.5
+	
+end
+
+local RESOLUTION = 64 * 3
+ProceduralTexture:newTexture("colorWheel", RESOLUTION, RESOLUTION, function(x, y, w, h)
+	x = x / w - 0.5
+	y = y / h - 0.5
 
 	local dist = math.sqrt(x * x + y * y) * 2
 	local angle = math.atan2(x, -y)
 
 	return vectors.hsvToRGB(angle / (TAU), dist, 1):augmented(math.clamp((1 - dist) * 98, 0, 1))
-end
-
-local RESOLUTION = 64 * 3
-ProceduralTexture:newTexture("colorWheel", RESOLUTION, RESOLUTION, function(x, y, w, h)
-	return sampleColor(x / RESOLUTION, y / RESOLUTION)
 end)
 
 ProceduralTexture:newTexture("brightness", 1, RESOLUTION, function(x, y, w, h)
