@@ -8,7 +8,7 @@ local Macro = require("lib.GNMacros")
 local Window = require("lib.GNUI-WindowManager.widgets.window")
 local Event = require("lib.GNEvent")
 
-local ProceduralTexture = require("lib.proceduralTexture")
+local ProceduralTexture = require("lib.GNProceduralTexture")
 
 local TAU = math.pi * 2
 

@@ -4,21 +4,22 @@
 / /_/ / /|  / Author: GNanimates | https://gnon.top | @gn68s
 \____/_/ |_/ License: Mozilla Public License Version 2.0
 ]]
-
+--──── CONFIG ────────────────────────────────────────────--
 -- replace 120 with the desired maximum frames per second before it stalls
-local MAX_FPS = 1000/240
+local MAX_FPS = 2000/120
 local MAX_REPETITION_COUNT = 10000
 
----@class ProceduralTextureAPI
+--──── END OF CONFIG ────────────────────────────────────────────--
+
+---@class GN.ProceduralTextureAPI
 local ProceduralTextureAPI = {}
 
 
----@class ProceduralTexture
+---@class GN.ProceduralTexture
 local ProceduralTexture = {}
 ProceduralTexture.__index = ProceduralTexture
 
 
---TODO: make this regional, not globally.
 ---@param texture Texture
 ---@param applyFunc fun(x:integer,y:integer,w:integer,h:integer):Vector4
 function ProceduralTextureAPI:apply(texture,applyFunc)
