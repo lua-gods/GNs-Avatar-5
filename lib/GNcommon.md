@@ -12,10 +12,17 @@
 |`table` |gnc.[appendArrays](#gncappendarrays)(. : table)|
 ||gnc.[vec2](#gncvec2x-y-default)(x : number?, y : number?, default : Vector2?)|
 ||gnc.[vec2](#gncvec2xy)(xy : Vector2)|
-|`Vector3` |gnc.[vec3](#gncvec3x-y-z-default)(x : number?, y : number?, z : number?, default : Vector3?)|
+|`Vector3` |gnc.[vec3](#gncvec3x-y-z)(x : number?, y : number?, z : number?)|
+||gnc.[vec3](#gncvec3x-y-z)(x : number, y : number, z : number)|
 ||gnc.[vec3](#gncvec3xyz)(xyz : Vector3)|
-|`Vector4` |gnc.[vec4](#gncvec4x-y-z-w-default)(x : number?, y : number?, z : number?, w : number?, default : Vector4?)|
+|`Vector4` |gnc.[vec4](#gncvec4x-y-z-w)(x : number?, y : number?, z : number?, w : number?)|
+||gnc.[vec4](#gncvec4x-y-z-w)(x : number, y : number, z : number, w : number)|
 ||gnc.[vec4](#gncvec4xy-zw)(xy : Vector2, zw : Vector2)|
+||gnc.[vec4](#gncvec4x-y-zw)(x : number, y : number, zw : Vector2)|
+||gnc.[vec4](#gncvec4x-yz-w)(x : number, yz : Vector2, w : number)|
+||gnc.[vec4](#gncvec4xy-z-z)(xy : Vector2, z : number, z : number)|
+||gnc.[vec4](#gncvec4x-yzw)(x : number, yzw : Vector3)|
+||gnc.[vec4](#gncvec4xyz-w)(xyz : Vector3, w : number)|
 ||gnc.[vec4](#gncvec4xyzw)(xyzw : Vector4)|
 ## `gnc.color(r, g, b, a)`
 Parses a color from different formats into a Vector4.  
@@ -110,7 +117,7 @@ uses an average of `20` instructions
 - `Vector2` `xy`
 
 
-## `gnc.vec3(x, y, z, default)`
+## `gnc.vec3(x, y, z)`
 Parses Vector3 variants into a single unified Vector3.  
 uses an average of `26` instructions  
 ### Arguments
@@ -120,9 +127,18 @@ uses an average of `26` instructions
 
 - `number?` `z`
 
-- `Vector3?` `default`
-
 ### Returns `Vector3`
+
+## `gnc.vec3(x, y, z)`
+Parses Vector3 variants into a single unified Vector3.  
+uses an average of `26` instructions  
+### Arguments
+- `number` `x`
+
+- `number` `y`
+
+- `number` `z`
+
 
 ## `gnc.vec3(xyz)`
 Parses Vector3 variants into a single unified Vector3.  
@@ -131,7 +147,7 @@ uses an average of `26` instructions
 - `Vector3` `xyz`
 
 
-## `gnc.vec4(x, y, z, w, default)`
+## `gnc.vec4(x, y, z, w)`
 Parses Vector4 variants into a single unified Vector4.  
 uses an average of `32` instructions  
 ### Arguments
@@ -143,9 +159,20 @@ uses an average of `32` instructions
 
 - `number?` `w`
 
-- `Vector4?` `default`
-
 ### Returns `Vector4`
+
+## `gnc.vec4(x, y, z, w)`
+Parses Vector4 variants into a single unified Vector4.  
+uses an average of `32` instructions  
+### Arguments
+- `number` `x`
+
+- `number` `y`
+
+- `number` `z`
+
+- `number` `w`
+
 
 ## `gnc.vec4(xy, zw)`
 Parses Vector4 variants into a single unified Vector4.  
@@ -154,6 +181,57 @@ uses an average of `32` instructions
 - `Vector2` `xy`
 
 - `Vector2` `zw`
+
+
+## `gnc.vec4(x, y, zw)`
+Parses Vector4 variants into a single unified Vector4.  
+uses an average of `32` instructions  
+### Arguments
+- `number` `x`
+
+- `number` `y`
+
+- `Vector2` `zw`
+
+
+## `gnc.vec4(x, yz, w)`
+Parses Vector4 variants into a single unified Vector4.  
+uses an average of `32` instructions  
+### Arguments
+- `number` `x`
+
+- `Vector2` `yz`
+
+- `number` `w`
+
+
+## `gnc.vec4(xy, z, z)`
+Parses Vector4 variants into a single unified Vector4.  
+uses an average of `32` instructions  
+### Arguments
+- `Vector2` `xy`
+
+- `number` `z`
+
+- `number` `z`
+
+
+## `gnc.vec4(x, yzw)`
+Parses Vector4 variants into a single unified Vector4.  
+uses an average of `32` instructions  
+### Arguments
+- `number` `x`
+
+- `Vector3` `yzw`
+
+
+## `gnc.vec4(xyz, w)`
+Parses Vector4 variants into a single unified Vector4.  
+uses an average of `32` instructions  
+### Arguments
+- `Vector3` `xyz`
+
+- `number` `w`
 
 
 ## `gnc.vec4(xyzw)`
