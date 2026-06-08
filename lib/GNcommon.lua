@@ -138,7 +138,9 @@ end
 ---Parses Vector3 variants into a single unified Vector3.
 ---uses an average of `26` instructions
 ---@overload fun(xyz: Vector3,default: Vector3?): Vector3
----@overload fun(x: number,y: number,z: number,default: Vector3?): Vector3
+---@overload fun(xy: Vector2,z: number): Vector3
+---@overload fun(x: number,yz: Vector2): Vector3
+---@overload fun(x: number,y: number,z: number): Vector3
 ---@param x number?
 ---@param y number?
 ---@param z number?
