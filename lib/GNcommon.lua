@@ -1,5 +1,5 @@
 --[[______   __
-  / ____/ | / / Name: GN COMMON LIBRARY v1.0.0
+  / ____/ | / / Name: GN COMMON LIBRARY v1.1.0
  / / __/  |/ /  Desc: contains all sorts of goodies that are generally useful
 / /_/ / /|  / Author: GNanimates | https://gnon.top | @gn68s
 \____/_/ |_/ License: MIT ]]
@@ -138,18 +138,19 @@ end
 ---Parses Vector3 variants into a single unified Vector3.
 ---uses an average of `26` instructions
 ---@overload fun(xyz: Vector3,default: Vector3?): Vector3
+---@overload fun(x: number,y: number,z: number,default: Vector3?): Vector3
 ---@param x number?
 ---@param y number?
 ---@param z number?
----@param default Vector3?
 ---@return Vector3
-function gnc.vec3(x,y,z,default)
+function gnc.vec3(x,y,z)
 	local tx,ty,tz=type(x), type(y), type(z)
 	if (tx == "Vector3" and ty == "nil" and tz == "nil") then
 		return x
-	elseif default and (tx == "number" or ty == "number" or tz == "number") then
-		---@cast tx Vector3
-		return vec(x or default.x,y or default.y,z or default.z)
+	elseif (tx == "Vector2" or ty == "number" or tz == "nil") then
+		return vec(x.x,x.y,y)
+	elseif (tx == "number" or ty == "Vector2" or tz == "number") then
+		return vec(x,y.y,y.z)
 	elseif (tx == "number" and ty == "number" and tz == "number") then
 		return vec(x,y,z)
 	else
@@ -161,21 +162,35 @@ end
 
 ---Parses Vector4 variants into a single unified Vector4.
 ---uses an average of `32` instructions
----@overload fun(xyzw: Vector4,default: Vector4?): Vector4
----@overload fun(xy: Vector2, zw: Vector2, default: Vector4?): Vector4
+---@overload fun(xyzw: Vector4): Vector4
+---@overload fun(xyz: Vector3, w: number): Vector4
+---@overload fun(x: number, yzw: Vector3): Vector4
+---@overload fun(xy: Vector2, z: number, z: number): Vector4
+---@overload fun(x: number,yz: Vector2, w: number): Vector4
+---@overload fun(x: number,y: number,zw: Vector2): Vector4
+---@overload fun(xy: Vector2, zw: Vector2,): Vector4
+---@overload fun(x: number,y: number,z: number,w: number): Vector4
 ---@param x number?
 ---@param y number?
 ---@param z number?
 ---@param w number?
----@param default Vector4?
 ---@return Vector4
 function gnc.vec4(x,y,z,w,default)
 	local tx,ty,tz,tw=type(x), type(y), type(z), type(w)
 	if (tx == "Vector4" and ty == "nil" and tz == "nil" and tw == "nil") then
-		return x
-	elseif default and (tx == "number" or ty == "number" or tz == "number" or tw == "number") then
-		---@cast tx Vector4
-		return vec(x or default.x,y or default.y,z or default.z,w or default.w)
+		return x:copy()
+	elseif (tx == "Vector3" and ty == "number" and tz == "nil" and tw == "nil") then
+		return vec(x.x,x.y,x.z,y)
+	elseif (tx == "number" and ty == "Vector3" and tz == "nil" and tw == "nil") then
+		return vec(x,y.x,y.y,y.z)
+	elseif (tx == "Vector2" and ty == "number" and tz == "number" and tw == "nil") then
+		return vec(x.x,x.y,y,z)
+	elseif (tx == "number" and ty == "Vector2" and tz == "number" and tw == "nil") then
+		return vec(x,y.x,y.y,z)
+	elseif (tx == "number" and ty == "number" and tz == "Vector2" and tw == "nil") then
+		return vec(x,y,z.x,z.y)
+	elseif (tx == "Vector2" and ty == "Vector2" and tz == "nil" and tw == "nil") then
+		return vec(x.x,x.y,y.x,y.y)
 	elseif (tx == "number" and ty == "number" and tz == "number" and tw == "number") then
 		return vec(x,y,z,w)
 	else

@@ -14,7 +14,7 @@ local TIME_OFFSET = 1780386870274
 
 --──── ZZZ ────────────────────────────────────────────--
 
-local GNParticles = require("lib.GNparticles")
+local GNParticles = require("lib.GNParticles")
 local Easings = require("lib.GNEasings")
 
 GNParticles.registerIdentity(
