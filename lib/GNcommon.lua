@@ -116,17 +116,13 @@ end
 
 ---Parses Vector2 variants into a single unified Vector2.
 ---uses an average of `20` instructions
----@overload fun(xy: Vector2,default: Vector2?): Vector2
+---@overload fun(xy: Vector2): Vector2
 ---@param x number?
 ---@param y number?
----@param default Vector2?
-function gnc.vec2(x,y,default)
+function gnc.vec2(x,y)
 	local tx,ty=type(x), type(y)
 	if (tx == "Vector2" and ty == "nil") then
 		return x
-	elseif default and (tx == "number" or ty == "number") then
-		---@cast tx Vector2
-		return vec(x or default.x,y or default.y)
 	elseif (tx == "number" and ty == "number") then
 		return vec(x,y)
 	else
