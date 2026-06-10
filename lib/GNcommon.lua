@@ -145,9 +145,9 @@ function gnc.vec3(x,y,z)
 	local tx,ty,tz=type(x), type(y), type(z)
 	if (tx == "Vector3" and ty == "nil" and tz == "nil") then
 		return x
-	elseif (tx == "Vector2" or ty == "number" or tz == "nil") then
+	elseif (tx == "Vector2" and ty == "number" and tz == "nil") then
 		return vec(x.x,x.y,y)
-	elseif (tx == "number" or ty == "Vector2" or tz == "number") then
+	elseif (tx == "number" and ty == "Vector2" and tz == "number") then
 		return vec(x,y.y,y.z)
 	elseif (tx == "number" and ty == "number" and tz == "number") then
 		return vec(x,y,z)
