@@ -2,7 +2,7 @@ local modelUtils = require("lib.modelUtils")
 
 
 local Macros = require("lib.GNMacros")
-
+local dontyoulecturemewithyour30dollarhaircut = require("lib.dontyoulecturemewithyour30dollarhaircut")
 
 local parts = {}
 
@@ -16,6 +16,10 @@ local ogParents = {}
 
 local explodeMacro = Macros.new(function(events, ...)
 	local sound
+	
+	if player:isLoaded() then
+		sound = sounds:playSound("sounds.bowling", player:getPos(), 1,1)
+	end
 	
 	local model = models.player
 	modelUtils.apply(model, function(modelPart)
@@ -38,12 +42,14 @@ local explodeMacro = Macros.new(function(events, ...)
 			center = center / math.max(c, 1)
 			modelPart:setMatrix(mat:copy():translate(-center):scale(16))
 
+			local vel = player:getVelocity()
+			
 			parts[#parts + 1] = {
 				modelPart = parent,
 				offset = center,
 				pos = center,
 				vel = vec(math.random() - 0.5, math.random(), math.random() - 0.5) * vec(0.5, 0.5, 0.5) *
-				0.5,
+				0.5 + vel,
 			}
 		end
 	end)
@@ -59,7 +65,7 @@ local explodeMacro = Macros.new(function(events, ...)
 
 	local GRAVITY = vec(0, -0.015, 0)
 	local RESTITUTION = 0.3
-	local FRICTION = 0.9
+	local FRICTION = 0.75
 		
 	events.TICK:register(function()
 		for index, part in pairs(parts) do
@@ -107,6 +113,9 @@ local explodeMacro = Macros.new(function(events, ...)
 		end
 		for key, value in pairs(parts) do
 			value.modelPart:remove()
+		end
+		if sound then
+			sound:stop()
 		end
 		ogParents = {}
 		parts = {}

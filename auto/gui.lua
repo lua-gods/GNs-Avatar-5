@@ -19,6 +19,11 @@ local ENTRIES = {
 		path = "orthographic",
 		icon = ":camera:"
 	},
+	{
+		name = "Face Expression",
+		path = "expression",
+		icon = ":smile:"
+	},
 }
 
 

@@ -8,9 +8,14 @@ if avatar:getMaxTickCount() <= 8192 then return end
 
 --────────────────────────-< CONFIG >-────────────────────────--
 
-local IDLE_EMOTE = animations["models.player"].eyeCloseSit
-local IDLE_EMOTE2 = animations["models.player"].FallOverSolid:setBlendDuration(0)
+local IDLE_EMOTE2 = animations["models.player"].sleepyFace
+local IDLE_EMOTE = animations["models.player"].sleepy
 local TIME_OFFSET = 1780386870274
+
+IDLE_EMOTE2:setSpeed(0.5):setPriority(1)
+IDLE_EMOTE:speed(0.5)
+IDLE_EMOTE2:setBlendDuration(0.5)
+IDLE_EMOTE:setBlendDuration(0.5)
 
 --──── ZZZ ────────────────────────────────────────────--
 
@@ -49,11 +54,6 @@ zzzSpawner:moveTo(models.player.Base.Torso.Waist.Chest.Head)
 zzzSpawner:setVisible(false)
 --────────────────────────-< END OF CONFIG >-────────────────────────--
 
-IDLE_EMOTE
-:setBlendDuration(0.2)
-:setOverride(true)
-:setPriority(1)
-
 local isLocal = false
 local lastStatus
 local function updateStatus()
@@ -65,8 +65,8 @@ local function updateStatus()
 	if status == 1 then -- idle
 		Nameplate.setStatus(":zzz:",time)
 		if lastStatus ~= 1 then
-			IDLE_EMOTE:stop():play()
-			IDLE_EMOTE2:stop():play()
+			IDLE_EMOTE:play()
+			IDLE_EMOTE2:play()
 			zzzSpawner:setVisible(true)
 		end
 	elseif status == 2 then -- typing
