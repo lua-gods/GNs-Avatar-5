@@ -19,11 +19,11 @@ local ENTRIES = {
 		path = "orthographic",
 		icon = ":camera:"
 	},
-	{
-		name = "Face Expression",
-		path = "expression",
-		icon = ":smile:"
-	},
+	--{
+	--	name = "Face Expression",
+	--	path = "expression",
+	--	icon = ":smile:"
+	--},
 }
 
 
@@ -78,6 +78,8 @@ for index, entry in ipairs(ENTRIES) do
 end
 
 
+--ENTRIES[3].macro:setActive(true,screen,GNUI)
+
 screen.CHILDREN_ORDER_CHANGED:register(function ()
 	tooltip:setChildIndex(99999)
 end)
@@ -102,10 +104,6 @@ events.WORLD_TICK:register(function ()
 	--screen:printTree()
 end)
 
-local function loadWindow(name)
-	local WindowFactory = require("auto.windows."..name)
-	return WindowFactory(screen,GNUI)
-end
 
 --────────────────────────────────────────-< GNUI Boilerplate >-────────────────────────────────────────--
 -- TODO: make all this boilerplate code a loadable preset instead

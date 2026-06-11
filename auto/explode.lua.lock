@@ -13,23 +13,28 @@ local function id()
 end
 
 local ogParents = {}
+local ogRots = {}
+local ogPivots = {}
 
 local explodeMacro = Macros.new(function(events, ...)
 	local sound
 	
 	if player:isLoaded() then
-		sound = sounds:playSound("sounds.bowling", player:getPos(), 1,1)
+		sound = dontyoulecturemewithyour30dollarhaircut.playRandom(player:getPos())
+		--sound = sounds:playSound("sounds.bowling", player:getPos(), 1,1)
 	end
 	
 	local model = models.player
 	modelUtils.apply(model, function(modelPart)
-		if modelPart:getVisible() and modelPart:getType() == "CUBE" then
+		if modelPart:getVisible() and modelPart:getType() ~= "GROUP" then
 			local parent = models:newPart("explode" .. id(), "WORLD")
 			local pivot = modelPart:getPivot()
 			local mat = modelPart:partToWorldMatrix()
 			mat:translate(-mat:applyDir(pivot))
 			ogParents[modelPart] = modelPart:getParent()
 			modelPart:moveTo(parent)
+			ogRots[modelPart] = modelPart:getRot()
+			ogPivots[modelPart] = pivot
 			local center = vec(0, 0, 0)
 			local c = 0
 			for index, material in pairs(modelPart:getAllVertices()) do
@@ -48,7 +53,7 @@ local explodeMacro = Macros.new(function(events, ...)
 				modelPart = parent,
 				offset = center,
 				pos = center,
-				vel = vec(math.random() - 0.5, math.random(), math.random() - 0.5) * vec(0.5, 0.5, 0.5) *
+				vel = vec(math.random() - 0.5, 0.65, math.random() - 0.5) * 0.5 *
 				0.5 + vel,
 			}
 		end
@@ -64,7 +69,7 @@ local explodeMacro = Macros.new(function(events, ...)
 
 
 	local GRAVITY = vec(0, -0.015, 0)
-	local RESTITUTION = 0.3
+	local RESTITUTION = 0.8
 	local FRICTION = 0.75
 		
 	events.TICK:register(function()
@@ -109,7 +114,7 @@ local explodeMacro = Macros.new(function(events, ...)
 	events.ON_EXIT:register(function ()
 		for key, value in pairs(ogParents) do
 			key:moveTo(value)
-			key:setPos():setRot():setPivot()
+			key:setPos():setRot(ogRots[key]):setPivot(ogPivots[key])
 		end
 		for key, value in pairs(parts) do
 			value.modelPart:remove()

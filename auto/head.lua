@@ -35,7 +35,7 @@ events.TICK:register(function()
 	eyeMoveTime = eyeMoveTime - 1
 	if eyeMoveTime <= 0 then
 		eyeMoveTime = math.lerp(MOVE_RANGE.x, MOVE_RANGE.y, math.random())
-		EYES_ANIM_X:setTime(targetRot.y * 0.25 + 1 + (math.random() - 0.5) * 2 * VARIANCE)
+		EYES_ANIM_X:setTime(targetRot.y * 1 + 1 + (math.random() - 0.5) * 2 * VARIANCE)
 		EYES_ANIM_Y:setTime(targetRot.x * 0.5 + 1)
 	end
 	
@@ -48,9 +48,11 @@ end)
 animations.player.breathing:speed(0.3):play()
 
 events.RENDER:register(function(delta, ctx)
-	MODEL_HEAD:setPos(0, player:isCrouching() and -4 or 0)
-	local rot = math.lerp(lastTargetRot, targetRot, delta)
-	
-	HEAD_ANIM_X:setTime(rot.y * 0.5 + 1)
-	HEAD_ANIM_Y:setTime(rot.x * 0.5 + 1)
+	if ctx ~= "PAPERDOLL" then
+		MODEL_HEAD:setPos(0, player:isCrouching() and -4 or 0)
+		local rot = math.lerp(lastTargetRot, targetRot, delta)
+		
+		HEAD_ANIM_X:setTime(rot.y * 0.25 + 1)
+		HEAD_ANIM_Y:setTime(rot.x * 0.5 + 1)
+	end
 end)
