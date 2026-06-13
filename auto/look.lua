@@ -35,6 +35,26 @@ homePage:newAction()
 	end
 end)
 
+
+---@param point Vector3
+---@param radius number
+---@return Entity|nil
+local function nearestEntity(point, radius)
+   local best = math.huge
+   local entity
+   for _, e in pairs(world.getEntities(point - radius, point + radius)) do
+      ---@cast e Entity
+		if e:getType() ~= "minecraft:player" and e:isLiving() and e:getHealth() > 0 then
+			local dist = (e:getPos() - point):lengthSquared()
+			if dist < best then
+				best = dist
+				entity = e
+			end
+		end
+   end
+   return entity
+end
+
 action_wheel:setPage(homePage)
 
 events.POST_WORLD_RENDER:register(function (delta)
@@ -42,31 +62,13 @@ events.POST_WORLD_RENDER:register(function (delta)
 	local ppos = player:getPos()
 	
 	local closestPos
-	for name, other in pairs(world.getPlayers()) do
-		if other:getUUID() ~= player:getUUID() and other:isLoaded() and player:isLoaded() then
-			local pos = other:getPos(delta):add(0,other:getBoundingBox().y*0.8)
-			if not closestPos then
-				closestPos = pos
-			else
-				if closestPos then
-					if (pos - ppos):length() < (closestPos - ppos):length() then
-						closestPos = pos
-					end
-				end
-			end
-			local from = player:getPos(delta):add(0,player:getEyeHeight())
-			
-			if activeLook then
-				
-				silly:setRot((dirToEular(closestPos-from).xy * vec(-1,-1) - vec(0,180)).xy)
-			end
-			
-			if activeZoom then
-				local dist = closestPos-from
-				renderer:setFOV(math.min(1.5/dist:length(),1))
-			end
-			
-			renderer.renderCrosshair = not (activeLook or activeZoom)
+	if activeLook then
+		local from = player:getPos(delta):add(0,player:getEyeHeight())
+		local nearest = nearestEntity(from, 32)
+		if nearest then
+			silly:setRot((dirToEular(nearest:getPos(delta):add(0,nearest:getEyeHeight())-from).xy * vec(-1,-1) - vec(0,180)).xy)
 		end
 	end
+	
+	renderer.renderCrosshair = not (activeLook or activeZoom)
 end,"look")

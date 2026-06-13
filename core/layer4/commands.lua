@@ -205,23 +205,28 @@ end
 
 function giveItem(item,count)
 	count = count or 1
-	local newItem = world.newItem(item,count)
-	local itemString = newItem:toStackString()
-	for i = 0, 35, 1 do -- all player slots
-		local slotItem = host:getSlot(i)
-		if slotItem:toStackString() == itemString
-		or slotItem.id == "minecraft:air" then
-			local currentCount = slotItem:getCount()
-			local amountToAdd = math.min(count,slotItem:getMaxCount() - slotItem:getCount())
-			host:setSlot(i, world.newItem(item, currentCount + amountToAdd))
-			count = count - amountToAdd
+	local ok,newItem = pcall(world.newItem,item,count)
+	if ok then
+		local itemString = newItem:toStackString()
+		for i = 0, 35, 1 do -- all player slots
+			local slotItem = host:getSlot(i)
+			if slotItem:toStackString() == itemString
+			or slotItem.id == "minecraft:air" then
+				local currentCount = slotItem:getCount()
+				local amountToAdd = math.min(count,slotItem:getMaxCount() - slotItem:getCount())
+				host:setSlot(i, world.newItem(item, currentCount + amountToAdd))
+				count = count - amountToAdd
+			end
+			if count <= 0 then
+				sounds:playSound("minecraft:entity.item.pickup",client:getCameraPos():add(client:getCameraDir()),1,2)
+				return
+			end
 		end
-		if count <= 0 then
-			sounds:playSound("minecraft:entity.item.pickup",client:getCameraPos():add(client:getCameraDir()),1,2)
-			return
-		end
+		warn("Unable to give item, inventory full")
+	else
+		warn("Unable to give item, invalid item")
+		print(newItem)
 	end
-	warn("Unable to give item, inventory full")
 end
 
 

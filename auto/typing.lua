@@ -13,7 +13,7 @@
 --────────────────────────-< DEPENDENCEIS >-────────────────────────--
 
 local tweens = require("lib.GNtween")
-
+local stringStyle = require("lib.stringStyles")
 
 --────────────────────────-< CONFIG >-────────────────────────--
 
@@ -74,10 +74,11 @@ local LINE_SEPARATORS = ",;.?!"
 local SHRINK_RATIO = 100
 local TEST_MODE = false
 local VOICE_INTERVAL = 0.09
-local COLOR = vectors.hexToRGB("#4DB52A")
-local COLOR_OUTLINE = vectors.hexToRGB("#ffffff")
+local COLOR          = "#5ac54f"
+local COLOR2         = "#99e65f"
+local COLOR_OUTLINE  = "#272727"
 local OUTLINE_COUNT = 24
-local OUTLINE_THICKNESS = 0.2
+local OUTLINE_THICKNESS = 0.5
 
 --────────────────────────-< END OF CONFIG >-────────────────────────--
 
@@ -99,7 +100,7 @@ local function splitWithColons(text)
 	local i = 0
 	while i < #text do
 		local part = text:sub(i+1,-1)
-		local char = part:match("^:[%w_]+:") or part:match("^[\x00-\x7F\xC2-\xF4][\x80-\xBF]*") or part:sub(1, 1)
+		local char = part:match("^:[^:]+:") or part:match("^[\x00-\x7F\xC2-\xF4][\x80-\xBF]*") or part:sub(1, 1)
 		result[#result+1] = char
 		i = i + #char
 	end
@@ -128,13 +129,13 @@ local function speak(message, pos, rot, scale, screaming)
 	
 	local letters = splitWithColons(text)
 	
-	local color1 = '#'..vectors.rgbToHex(COLOR)
-	local color2 = '#'..vectors.rgbToHex(COLOR * 0.85)
-	local color3 = '#'..vectors.rgbToHex(COLOR_OUTLINE)
+	local color1 = COLOR
+	local color2 = COLOR2
+	local color3 = COLOR_OUTLINE
 
 	
 	local fscale = (SHRINK_RATIO/(getWidth(text)+SHRINK_RATIO)) * scale
-	local outline = OUTLINE_THICKNESS / fscale
+	local outline = OUTLINE_THICKNESS
 	
 	local offset = -getWidth(text) / 2 * fscale
 	for i = 1, #letters, 1 do
@@ -163,14 +164,6 @@ local function speak(message, pos, rot, scale, screaming)
 				local o = vec(math.sin(c * math.pi * 2), math.cos(c * math.pi * 2), 0) * outline
 				t:setPos(width * 0.5 + o.x, 4 + o.y, 0.01)
 			end
-		end
-		
-		for i = 0, OUTLINE_COUNT+2, 1 do
-			local t = part:newText("lettere" .. c .. i)
-			t:setText('{"text":' .. j .. ',"color":"#000000"}')
-			local c = i / OUTLINE_COUNT
-			local o = vec(math.sin(c * math.pi * 2), math.cos(c * math.pi * 2), 0) * outline * 2
-			t:setPos(width * 0.5 + o.x, 4 + o.y, 0.1)
 		end
 		offset = offset + width * fscale
 		tasks[i] = part
@@ -220,7 +213,7 @@ local function speak(message, pos, rot, scale, screaming)
 				from = 1,
 				to = -3,
 				duration = duration,
-				easing = "outQuad",
+				easing = "outCubic",
 				tick = function(v, t)
 					if v > 0 then
 						local e = (1 + math.max(v, 0) * 0.5) * fscale
@@ -310,7 +303,7 @@ function pings.mitext(text, scale, screaming)
 			rot = math.deg(math.atan2(diff.x, diff.z))-180
 		end
 		speak(
-			DECRYPT(text),
+			stringStyle.smallcaps(DECRYPT(text)),
 			pos,
 			rot, scale,
 			screaming

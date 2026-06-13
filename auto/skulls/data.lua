@@ -6,20 +6,24 @@ local SKullAPI = require("lib.GNskull")
 local MODEL = models.plushie
 MODEL:setVisible(false)
 
+local DATA = {}
+
+function SKullAPI:onDataLoad()
+	
+end
 
 
 SKullAPI.newIdentity({
-	id = "default",
+	id = "data",
 	init = function (skull, cfg)
-		local plushie = ModelUtils.deepCopy(MODEL):setVisible(true)
-		local scale = cfg.scale or 1
-		plushie:setScale(scale)
-		skull.model:addChild(plushie)
+		if cfg.ctx == "BLOCK" then
+			DATA[cfg.name] = DATA[cfg.name] or {name = cfg.name,count = cfg.count}
+			DATA[cfg.name][cfg.id] = skull.binary
+		end
 	end,
 	frame = function (skull, dt, df)
 	end,
 	tick = function (skull)
-		
 	end,
 	exit = function (skull)
 		print("exit")
