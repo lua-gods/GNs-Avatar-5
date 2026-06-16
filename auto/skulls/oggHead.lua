@@ -20,6 +20,7 @@ local function isInside(pos,from,to)
 	   and pos.z <= to.z
 end
 
+local DOWN = vec(0,1,0)
 
 SKullAPI.newIdentity({
 	id = "ogg",
@@ -56,6 +57,9 @@ SKullAPI.newIdentity({
 		cfg.volume = cfg.volume or 1
 		cfg.fadeTime = 0
 		cfg.fade = cfg.fade or 0.001
+		if skull.ctx == "BLOCK" then
+			cfg.pos = skull.block:getPos()
+		end
 	end,
 	world_frame = function(skull, cfg, dt, df)
 		if skull.block then
@@ -87,8 +91,7 @@ SKullAPI.newIdentity({
 	end,
 	tick = function(skull, cfg)
 		if skull.ctx == "BLOCK" then
-			local activate = false
-			activate = (skull.block.properties.powered == "false")
+			local activate = world.getRedstonePower(cfg.pos - DOWN) == 0
 			if cfg.hasRegion then
 				activate = activate and isInside(client:getCameraPos(),cfg.from,cfg.to)
 			end
@@ -96,7 +99,7 @@ SKullAPI.newIdentity({
 			if activate then
 				if cfg.fadeTime < cfg.fade then
 					cfg.fadeTime = math.min(cfg.fadeTime + 0.05, cfg.fade)
-					if cfg.audio then
+					if cfg.audio and cfg.audio:isPlaying() then
 						cfg.audio:volume(cfg.fadeTime / cfg.fade * cfg.volume)
 					end
 				end
@@ -108,16 +111,15 @@ SKullAPI.newIdentity({
 					end
 				end
 			end
-			cfg.active = cfg.fadeTime >= 0
-			
+			cfg.active = cfg.fadeTime > 0
 			if cfg.wasPowered ~= cfg.active then
 				if cfg.active then
 					cfg.audio = sounds[skull.hash]
 						 :pos(skull.block:getPos() + HALF)
 						 :loop(cfg.loop)
-						 :volume(0)
+						 :volume(cfg.fadeTime > 0.01 and 0 or cfg.volume)
 						 :pitch(cfg.pitch or 1)
-						 :attenuation(cfg.attenuation or 0)
+						 :attenuation(cfg.attenuation or 1)
 						 :play()
 				else
 					cfg.c = 0
@@ -147,7 +149,8 @@ function oggHead(path, flags)
 		buffer:close()
 
 		flags = flags or {}
-		makeSkull({ ogg = flags }, binary)
+		local item = SKullAPI.makeHead({ ogg = flags }, binary)
+		giveItem(item)
 	else
 		print("File " .. path .. "dosent exists")
 	end

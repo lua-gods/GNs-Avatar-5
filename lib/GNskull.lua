@@ -11,7 +11,7 @@ Place required dependencies in the same folder as this script.
 --──── CONFIG ────────────────────────────────────────────--
 
 local SKULL_PARTS = models:newPart("Skulls", "SKULL")
-local BINARY_CHUNK_SIZE = 32000-1
+local BINARY_CHUNK_SIZE = 32000-2
 local DISCARD_THRESHOLD = 5
 --──── AUTO CONFIG ────────────────────────────────────────────--
 -- leave these alone unless you know what youre doing
@@ -87,7 +87,8 @@ SKULL_PARTS:newBlock("dirt"):block("dirt"):scale(0, 0, 0)
 ---@return string
 local function parseBase64(string)
 	local buffer = data:createBuffer(#string)
-	buffer:writeBase64(string)
+	local ok, result = pcall(buffer.writeBase64,buffer,string)
+	if not ok then return "" end
 	buffer:setPosition(0)
 	local out = buffer:readByteArray(buffer:available())
 	buffer:close()
@@ -99,7 +100,8 @@ end
 ---@return string
 local function toBase64(string)
 	local buffer = data:createBuffer(#string)
-	buffer:writeByteArray(string)
+	local ok, result = pcall(buffer.writeByteArray,buffer,string)
+	if not ok then return "" end
 	buffer:setPosition(0)
 	local out = buffer:readBase64(buffer:available())
 	buffer:close()
@@ -155,9 +157,9 @@ local function parseName(name)
 	end
 
 	output = output
-		 :gsub("([%a_][%w_]*)%s*,", "%1={},")
-		 :gsub("^([%a_][%w_]*)%s*,", "%1={},")
-		 :gsub(",%s*([%a_][%w_]*)%s*=", ",%1=")
+		 :gsub("([%a_][%w_]*)%s*,", "%1:{},")
+		 :gsub("^([%a_][%w_]*)%s*,", "%1:{},")
+		 :gsub(",%s*([%a_][%w_]*)%s*:", ",%1:")
 
 	output = output:sub(1, -2)
 
@@ -176,77 +178,88 @@ local function parseHeader(base64)
 	if ok then
 		return result
 	end
-	return {}
+end
+
+local function parseTextures(texture,stringName)
+	local data = parseBase64(texture)
+	local headerLength = data:match("^([0-9]+)")
+
+	local header 
+	local binary 
+	
+	if headerLength then
+		local headerLengthLength = #headerLength
+		headerLength = tonumber(headerLength)
+		
+		header = data:sub(headerLengthLength+1,headerLengthLength+headerLength)
+		binary = data:sub(headerLength + headerLengthLength + 1,-1)
+	end
+	local ok, nameHeader = pcall(parseJson, stringName)
+	if ok then
+		if header and stringName and #stringName > 0 then
+			header = (
+				   header:sub(1, -2) 
+				.. ","
+				.. (stringName:sub(2, -1))
+			)
+		elseif nameHeader then
+			header = stringName
+		end
+	end
+	return header,binary
 end
 
 
 ---@param item ItemStack
----@return string,string
-local function getItemData(item)
-	local header = ""
+---@return string?,string?
+function SkullAPI.getItemData(item)
+	local stringName = ""
 	local binary = ""
 	local nbt = item.tag
 	if IS_NEW then
 		if nbt
 			 and nbt["minecraft:custom_name"] then
-			header = parseName(nbt["minecraft:custom_name"])
+			stringName = parseName(nbt["minecraft:custom_name"])
 		end
-
 		if nbt
 			 and nbt["minecraft:profile"]
 			 and nbt["minecraft:profile"].properties
 			 and nbt["minecraft:profile"].properties then
 			for index, property in ipairs(nbt["minecraft:profile"].properties) do
-				if index == 2 then
-					-- header reader, not related
-				elseif index > 2 then
-					binary = binary .. parseBase64(property.value)
+				if index > 1 then
+					binary = binary .. property.value
 				end
 			end
 		end
 	else
-		if nbt --TODO: Check if this works
-			 and nbt.CustomName then
-			header = parseName(nbt.CustomName)
-		end
-
+		local i = 0
 		if nbt
-			 and nbt.SkullOwner
-			 and nbt.SkullOwner.Properties
-			 and nbt.SkullOwner.Properties.textures
-			 and nbt.SkullOwner.Properties.textures then
-			local i = 0
-			for index, value in pairs(nbt.SkullOwner.Properties) do
-				i = i + 1
-				if i == 2 then
-					if #header > 0 then
-						header = (header:sub(1, -2) ..
-							"," .. (toJson(parseHeader(value[1].Value)):sub(2, -1)))
-					else
-						header = parseHeader(value[1].Value)
+		and nbt.SkullOwner
+		and nbt.SkullOwner.Properties then
+			for name, entry in pairs(nbt.SkullOwner.Properties) do
+				if name ~= "textures" then
+					if entry[1].Value then
+						binary = binary .. entry[1].Value
 					end
-				elseif i > 2 then
-					binary = binary .. parseBase64(value[1].Value)
 				end
 			end
-			return header, binary
 		end
 	end
-	return header, binary
+	return parseTextures(binary,stringName)
 end
 
 
 ---@param block BlockState
----@return string,string
-local function getDataBlock(block)
+---@return string?,string?
+function SkullAPI.getDataBlock(block)
 	local nbt = block:getEntityData()
-	local header = ""
+	local stringName = ""
 	local binary = ""
 
 	if IS_NEW then
 		if nbt
 			 and nbt.custom_name then
-			header = parseName(nbt.custom_name)
+			stringName = parseName(nbt.custom_name)
 		end
 
 		if nbt
@@ -254,83 +267,73 @@ local function getDataBlock(block)
 			 and nbt.profile.properties
 			 and nbt.profile.properties then
 			for index, property in ipairs(nbt.profile.properties) do
-				if index == 2 then
-					if #header > 0 then
-						-- badly stitch together two json tables
-						header = (header:sub(1, -2) ..
-							"," .. (toJson(parseHeader(property.value)):sub(2, -1)))
-					else
-						header = parseHeader(property.value)
-					end
-				elseif index > 2 then
-					binary = binary .. parseBase64(property.value)
+				if index > 1 then
+					binary = binary .. property.value
 				end
 			end
 		end
-	else
-		if nbt --TODO: Check if this works
-			 and nbt.CustomName then
-			header = parseName(nbt.CustomName)
-		end
-
+	else -- 1.20.1
+		local i = 0
 		if nbt
-			 and nbt.SkullOwner
-			 and nbt.SkullOwner.Properties
-			 and nbt.SkullOwner.Properties.textures
-			 and nbt.SkullOwner.Properties.textures then
-			local i = 0
-
-			for index, property in pairs(nbt.SkullOwner.Properties) do
-				i = i + 1
-				if i == 2 then
-					if #header > 0 then
-						header = (header:sub(1, -2) ..
-							"," .. (toJson(parseHeader(property[1].Value)):sub(2, -1)))
-					else
-						header = parseHeader(property[1].Value)
+		and nbt.SkullOwner
+		and nbt.SkullOwner.Properties then
+			local entries = {}
+			for name, entry in pairs(nbt.SkullOwner.Properties) do
+				if name ~= "textures" then
+					if entry[1].Value then
+						entries[tonumber(name:match("%d+$"))-1] = entry[1].Value
 					end
-				elseif i > 2 then
-					binary = binary .. parseBase64(property[1].Value)
 				end
+			end
+			for index, entry in ipairs(entries) do
+				binary = binary .. entry
 			end
 		end
 	end
-	--printTable(header,5)
-	return header, binary
+	return parseTextures(binary,stringName)
 end
 
-function SkullAPI.makeSkull(header, binary)
+function SkullAPI.makeHead(header, binary)
 	local item =
 	[=[minecraft:player_head[profile={id:[I;-457632696,995642399,-2093362161,1978444996],properties:%s}]]=]
 	local properties = ""
-
+	---457632696,995642399,-2093362161,1978444996
+	--Id:[I;-594466248,789528824,-1653778492,1594210]
 	local function addEntry(name, value)
 		properties = properties .. "{name:'" .. name .. "',value:'" .. value .. "'},"
 	end
 
-	addEntry("textures",
-		"e3RleHR1cmVzOntTS0lOOnt1cmw6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOGYzMjNiYzk4Nzk2MGExNjQxYmY3MGIzNDIxNDY2NGRlOWEyM2NjNGIxNDRjMzNhZWYxZjlmYzYyMDg2NTA1NyJ9fX0=")
+	--addEntry("textures","e3RleHR1cmVzOntTS0lOOnt1cmw6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOGYzMjNiYzk4Nzk2MGExNjQxYmY3MGIzNDIxNDY2NGRlOWEyM2NjNGIxNDRjMzNhZWYxZjlmYzYyMDg2NTA1NyJ9fX0=")
 
 
 	if header then
-		addEntry("textures1", toBase64(toJson(header)))
+		local jsonHeader = toJson(header)
+		binary = #jsonHeader .. jsonHeader .. (binary or "")
+	else
+		binary = "0" .. binary
 	end
-	local c = 0
+	local c = 1
+		addEntry("textures","e3RleHR1cmVzOntTS0lOOnt1cmw6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOGYzMjNiYzk4Nzk2MGExNjQxYmY3MGIzNDIxNDY2NGRlOWEyM2NjNGIxNDRjMzNhZWYxZjlmYzYyMDg2NTA1NyJ9fX0=")
 	if binary then
-		for i = 1, #binary, BINARY_CHUNK_SIZE do
+		local base64 = toBase64(binary)
+		for i = 1, #base64, BINARY_CHUNK_SIZE do
 			c = c + 1
-			addEntry("textures" .. c, toBase64(binary:sub(i, i + BINARY_CHUNK_SIZE - 1)))
-			if c > 16-2 then
-				print("ERROR: Reached max binary texture size")
-				return
-			end
+			addEntry("textures" .. c, (base64:sub(i, i + BINARY_CHUNK_SIZE - 1)))
 		end
 	end
-	print(c,"textures")
 	properties = "[" .. properties:sub(1, -2):gsub("'", '"') .. "]"
 	host:setClipboard("count: " .. c)
-	item = item:format(properties)
+	print(c,"textures")
 	print(#item,"size")
+	if c > 16 then
+		print("ERROR: Reached max texture count",c)
+		return
+	end
+	if c > 16 then
+		print("ERROR: Reached max binary texture size",#item)
+		return
+	end
+	item = item:format(properties)
 	if #item > 512000 then
 		print("ERROR: Head size too big")
 		return
@@ -460,11 +463,13 @@ events.SKULL_RENDER:register(function(delta, block, item, entity, ctx)
 				instance.model:remove()
 				skulls[instance.hash] = nil
 				for name, cfg in pairs(instance.header) do
-					if IDENTITIES[name].exit then
+					if IDENTITIES[name] and IDENTITIES[name].exit then
 						IDENTITIES[name].exit(instance, cfg)
 					end
-					identityInstances[name][instance.hash] = nil
-					etcInstances[instance.hash] = nil
+					if identityInstances[name] then
+						identityInstances[name][instance.hash] = nil
+						etcInstances[instance.hash] = nil
+					end
 				end
 			end
 		end
@@ -484,13 +489,13 @@ events.SKULL_RENDER:register(function(delta, block, item, entity, ctx)
 			
 			for name, cfg in pairs(instance.header) do
 				local identity = IDENTITIES[name]
-				if identity.frame then
+				if identity and identity.frame then
 					identity.frame(instance, cfg or {}, delta, deltaFrame)
 				end
 			end
 			
 		else
-			local header, binary = getDataBlock(block)
+			local header, binary = SkullAPI.getDataBlock(block)
 			local ok, result = pcall(parseJson, header)
 			if ok then
 				header = result
@@ -498,7 +503,8 @@ events.SKULL_RENDER:register(function(delta, block, item, entity, ctx)
 				header = nil
 			end
 			header = header or { default = {} }
-
+			binary = binary or ""
+			
 			local instance = {
 				header = header,
 				hash = hash,
@@ -530,8 +536,17 @@ events.SKULL_RENDER:register(function(delta, block, item, entity, ctx)
 			instance.model:setVisible(true)
 			lastModel = instance.model
 			instance.lastSeen = time
+			
+			if instance.ready then
+				for name, cfg in pairs(instance.header) do
+					local identity = IDENTITIES[name]
+					if identity and identity.frame then
+						identity.frame(instance, cfg or {}, delta, deltaFrame)
+					end
+				end
+			end
 		else
-			local header, binary = getItemData(item)
+			local header, binary = SkullAPI.getItemData(item)
 			local ok, result = pcall(parseJson, header)
 			if ok then
 				header = result
@@ -553,11 +568,12 @@ events.SKULL_RENDER:register(function(delta, block, item, entity, ctx)
 			etcInstances[hash] = instance
 			skulls[hash] = instance
 
-			for name, value in pairs(header) do
+			for name, cfg in pairs(header) do
 				local identity = IDENTITIES[name]
 				if identity then
 					if identity.init then
-						identity.init(instance, instance.header[name] or {})
+						identity.init(instance, cfg or {})
+						instance.ready = true
 					end
 					identityInstances[identity.id][hash] = instance
 				end
@@ -576,5 +592,6 @@ function SkullAPI.newIdentity(entry)
 	IDENTITIES[identity.id] = identity
 	identityInstances[identity.id] = {}
 end
+
 
 return SkullAPI

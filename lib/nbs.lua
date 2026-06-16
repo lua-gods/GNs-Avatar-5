@@ -98,7 +98,7 @@ end
 ---@param volume integer
 ---@param attenuation integer
 local function defaultPlay(musicPlayer, instrument, pos, key, volume, attenuation)
-	local pitch = 2 ^ (((key - 9) / 12 + musicPlayer.transposition) - 3)
+	local pitch = (2 ^ (((key - 9) / 12 + musicPlayer.transposition) - 3)) * musicPlayer.masterPitch
 	sounds[instrument]
 		 :pos(pos)
 		 :pitch(pitch)
@@ -206,6 +206,7 @@ end
 ---@field TRACK_FINISHED Event
 ---@field currentTrack NBS.Track
 ---@field tick integer
+---@field masterPitch number
 ---@field currentNoteTick integer
 ---@field location Vector3
 ---@field currentNote integer
@@ -225,6 +226,7 @@ function Nbs.newMusicPlayer(track)
 		currentNoteTick = 0,
 		playbackSpeed = 1,
 		masterVolume = 1,
+		masterPitch = 1,
 		attenuation = 1,
 		location = vec(0, -10000, 0),
 		transposition = 0,
@@ -394,6 +396,17 @@ function MusicPlayer:setVolume(volume)
 end
 
 MusicPlayer.volume = MusicPlayer.setVolume
+
+---Sets the volume of the music player.
+---@param pitch number
+---@return NBS.MusicPlayer
+function MusicPlayer:setPitch(pitch)
+	self.masterPitch = pitch
+	return self
+end
+
+MusicPlayer.pitch = MusicPlayer.setPitch
+
 
 function MusicPlayer:getVolume()
 	return self.masterVolume

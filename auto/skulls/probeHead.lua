@@ -18,6 +18,6 @@ SKullAPI.newIdentity({
 			:pos(-4,0,-4)
 			:scale(0.5,0.5,0.5)
 		end
-	end
+	end,
 })
 

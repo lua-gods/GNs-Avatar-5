@@ -5309,12 +5309,12 @@
 			"light_emission": 0,
 			"render_order": "default",
 			"allow_mirror_modeling": true,
-			"from": [-1.75, 24.125, -4.025],
-			"to": [1.75, 25.625, -4.025],
+			"from": [-1.75, 24.25, -4.025],
+			"to": [1.75, 25.75, -4.025],
 			"autouv": 0,
 			"color": 0,
 			"visibility": false,
-			"origin": [-0.25, 23.35, -3.025],
+			"origin": [-0.25, 23.475, -3.025],
 			"faces": {
 				"north": {
 					"uv": [0, 13, 9, 17],
@@ -5436,11 +5436,11 @@
 			"light_emission": 0,
 			"render_order": "default",
 			"allow_mirror_modeling": true,
-			"from": [-3, 25.5, -3.965],
-			"to": [-1, 27.5, -3.965],
+			"from": [-2.5, 25.575, -3.965],
+			"to": [-1, 27.575, -3.965],
 			"autouv": 0,
 			"color": 3,
-			"origin": [-1.625, 26.25, -3.965],
+			"origin": [-1.625, 26.325, -3.965],
 			"faces": {
 				"north": {
 					"uv": [7, 8, 11, 12],
@@ -5646,11 +5646,11 @@
 			"light_emission": 0,
 			"render_order": "default",
 			"allow_mirror_modeling": true,
-			"from": [1, 25.5, -3.965],
-			"to": [3, 27.5, -3.965],
+			"from": [1, 25.575, -3.965],
+			"to": [2.5, 27.575, -3.965],
 			"autouv": 0,
 			"color": 5,
-			"origin": [1.625, 26.25, -3.965],
+			"origin": [1.625, 26.325, -3.965],
 			"faces": {
 				"north": {
 					"uv": [7, 8, 11, 12],
@@ -7749,7 +7749,7 @@
 													"children": [
 														{
 															"name": "Mouth2",
-															"origin": [0, 24.7, -4.025],
+															"origin": [0, 25.075, -4.025],
 															"color": 0,
 															"uuid": "3bc904b0-c8b2-b520-68a4-138fb5857e48",
 															"export": true,
@@ -8592,7 +8592,7 @@
 			"saved": true,
 			"uuid": "584f910a-c0c3-a794-9d7c-e9c0cffe18c0",
 			"relative_path": "../textures/face2.png",
-			"source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAAXNSR0IArs4c6QAAAgJJREFUeF7tmT9LA0EQxWcDGtHGRiUJCBJB0EJMKlHxA1iYSkQ/QBIbW0VtbLS10QSsBTsV7GzEf1UiCgqCQVAxoI2FKbRw5DZELpq7mytvdrZLMoS833s7O9lTYPhSdv3RSAKt1y/lYt37nBlpoTXhoTYF3xU0E4BJrtsTrROAiDh7noKDbAU+ro+Mib+l/Z/Yi8sSDg/FjYGgnndXMTa1ArFoUu99Kw1KKXMAPG0vYVNrC6hQVXPX9LIv8bUG+vekCEpPUW4AuudT+lisrceNPV9wgnB8ugpK5ibwbvNT6+ibC0MhcygAguCqn9/o6ujM2SSO97Tr7zt+eIedkX2zEuCHZFBr2Tnq1wgBYBG7WcvUHXd2igOLOdaQWIujbAcB4EbJ2hrGbAGnPmAMgEZJMCIBr4lR7CicOO6Et+QYdBZP2fYKz///3O8HNIDb9axjAvoXtoDzBYmC3D1iOu4IQOVLAJlevluAMixwrtHOpgerD0QarfwV74ckyi4+0hz+ZVD+qt4EWYszBN0EvSLOugnKHODxHEDmAJkDZA7w6pGB/pzthEd1RQBQSXGtkwRwdZaqSxJAJcW1ThLA1VmqLkkAlRTXOkkAV2epuiQBVFJc6yQBXJ2l6pIEUElxrZMEcHWWqksSQCXFtU4SwNVZqi5JAJUU1zpJAFdnqbqMT8APniSkQaK7wSEAAAAASUVORK5CYII="
+			"source": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAAXNSR0IArs4c6QAAAgZJREFUeF7tmT1LA0EQhncDGjGNjUoSECSCoIWYVKLiDxA0lYj+gFxsbBW1sdHWxiRgLdipYGcjflWJKCgIBkHFgDYWptDCkd0QuWguN4fVzc52l5vi3mfemZ3sSmH4knb9kXAc1PNzqVDzO2VGWmhVeCAkxVcZzARgUtbtjtYOAACYPUuK/XRZvF8dGmN/pf2P2POLIgwNxoyBIJ92ViE6tSKikYSufeUGKaU5AB63lqCptUXIQEVz5/SyJ/HVBvp7p/BLT5GNAHTNJ/W2WF0PG7ue4Phh+2woKJEdh9vND62jdy4o8taBWQBmTidB7QxqTWRCYnt4zzwAY91tGsDR/Zt5APxQw//9RnKW9gqEAShi12tWzXZnp9i/mCUNibQ4TDkwgEaUVGkYUwJOfcAYAPWcYIQDXuIj0J4/dqyE18So6CickO0Vrv//qZ8PaAA362lHB/QtZATlAxIpsncAqZgjAJkrCmH10C0BzLBAOUZnNjVQuRCpt3KXtC9JpF18uDn4w6D0WTkJUosyBN0E3SxOugnyHOByD8BzAM8BPAe49Uhfvyc74WGzwgCwpKjGsQOoZharix2AJUU1jh1ANbNYXewALCmqcewAqpnF6mIHYElRjWMHUM0sVhc7AEuKahw7gGpmsbrYAVhSVOPYAVQzi9XFDsCSohrHDqCaWawu4x3wDaDkpEGoukfQAAAAAElFTkSuQmCC"
 		}
 	],
 	"animations": [
@@ -38325,7 +38325,7 @@
 			"override": false,
 			"length": 2,
 			"snapping": 24,
-			"selected": true,
+			"selected": false,
 			"anim_time_update": "",
 			"blend_weight": "",
 			"start_delay": "",

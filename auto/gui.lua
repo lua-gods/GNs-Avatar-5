@@ -105,6 +105,57 @@ events.WORLD_TICK:register(function ()
 end)
 
 
+
+
+if true then
+	--- parent box to hold all the columns
+	local classColumns = screen:parse({
+		style = "none",
+		layout = "HORIZONTAL",
+		sizing = { "FIT", "FIT" },
+		gap = 5,
+	})
+
+	-- loop for each class with a given style
+	for _, className in ipairs(GNUI.Theme.getClassNames()) do
+		-- create a column container for each widget
+		local variantColumn = classColumns:parse({
+			layout = "VERTICAL",
+			sizing = { "FIT", "FIT" },
+			minSize = vec(80, 0),
+			style = "none",
+		})
+
+		-- create the class header
+		local classHeader = variantColumn:parse({
+			sizing = { "FILL", "FIT" },
+			minSize = vec(0, 15),
+			style = "none",
+			text = className,
+		})
+
+		-- loop for each class variant
+		for _, variantName in ipairs(GNUI.Theme.getVariantNames(className)) do
+			-- create that given widget with the given variant
+			local widget = variantColumn:parse({
+				type = className,
+				sizing = { "FILL", "FIT" },
+				style = variantName,
+				text = variantName,
+			})
+
+			--if className == "button" then
+			--	widget.PRESSED:register(function ()
+			--		widget:free()
+			--	end)
+			--end
+		end
+	end
+	classColumns:setPos(5, 5)
+	screen:addChild(classColumns)
+end
+
+
 --────────────────────────────────────────-< GNUI Boilerplate >-────────────────────────────────────────--
 -- TODO: make all this boilerplate code a loadable preset instead
 events.KEY_PRESS:register(function(key, state)

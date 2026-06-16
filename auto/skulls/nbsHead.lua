@@ -111,6 +111,10 @@ end
 SKullAPI.newIdentity({
 	id = "nbs",
 	init = function (skull, cfg)
+		local plushie = ModelUtils.deepCopy(MODEL):setVisible(true)
+		local scale = cfg.scale or 1
+		plushie:setScale(scale)
+		skull.model:addChild(plushie)
 		
 		local packedBinary = skull.binary
 		packedBinary = zlib.Deflate.Decompress(packedBinary)
@@ -118,18 +122,9 @@ SKullAPI.newIdentity({
 		buffer:writeByteArray(packedBinary)
 		buffer:setPosition(0)
 		
-		
-		
-		
-		local plushie = ModelUtils.deepCopy(MODEL):setVisible(true)
-		local scale = cfg.scale or 1
-		plushie:setScale(scale)
-		skull.model:addChild(plushie)
 		cfg.squish = 0
 		cfg.steer = 0
 		if skull.block then
-			
-			
 			if packedBinary then
 				cfg.musicPlayer = NBS.newMusicPlayer(NBS.parseBuffer(buffer))
 				buffer:close()
@@ -189,7 +184,8 @@ function nbsHead(path)
 		local binary = buffer:readByteArray(buffer:available())
 		buffer:close()
 		binary = zlib.Deflate.Compress(binary)
-		makeSkull({nbs={}},binary)
+		local item = SKullAPI.makeHead({nbs={}},binary)
+		giveItem(item)
 	else
 		print("File ".. path .. "dosent exists")
 	end

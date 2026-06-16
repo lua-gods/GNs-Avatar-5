@@ -22,7 +22,6 @@ SKullAPI.newIdentity({
 		
 	end,
 	exit = function (skull)
-		print("exit")
 	end
 })
 

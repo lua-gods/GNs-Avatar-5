@@ -2,5 +2,6 @@
 	"author":"GNanimates",
 	"name": "GN's Avatar v5",
 	"color":"#5ac54f",
-	"autoScripts": ["main"]
+	"autoScripts": ["main"],
+	"resources": ["*.nbs"]
 }
