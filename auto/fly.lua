@@ -2,11 +2,11 @@
 local Sync = require("lib.GNSync")
 local Macros = require("lib.GNMacros")
 local Spring = require("lib.GNSpring")
+local Parts = require("auto.parts")
 
 
-local LEFT_ARM = models.player.Base.Torso.Waist.Chest.LeftArm
-local RIGHT_ARM = models.player.Base.Torso.Waist.Chest.RightArm
-
+local VELOCITY_INTENSITY = 1
+local ACCELERATION_INTENSITY = 10
 
 if silly and host:isHost() then
 	silly:setFly(true)
@@ -33,7 +33,8 @@ flyMacro = Macros.new(function(events, ...)
 		vel = player:getVelocity()
 		vel = vectors.rotateAroundAxis(player:getBodyYaw(), vel, vec(0, 1, 0))
 
-		spring.vel = spring.vel + (vel - lvel) * 10 + vel * 2
+		
+		spring.vel = spring.vel + (vel - lvel) * ACCELERATION_INTENSITY + vel * VELOCITY_INTENSITY
 
 		lsway = sway
 		sway = spring.pos
@@ -45,18 +46,19 @@ flyMacro = Macros.new(function(events, ...)
 	end)
 
 	events.RENDER:register(function(delta, ctx)
+		delta = client:getFrameTime()
 		if ctx ~= "OTHER" then
 			-- arm fix
 			local isUsingItem = player:isUsingItem()
-			RIGHT_ARM:setRot(isUsingItem and vanilla_model.RIGHT_ARM:getOriginRot() or nil)
-			LEFT_ARM:setRot(isUsingItem and vanilla_model.LEFT_ARM:getOriginRot() or nil)
+			Parts.RIGHT_ARM:setRot(isUsingItem and vanilla_model.RIGHT_ARM:getOriginRot() or nil)
+			Parts.LEFT_ARM:setRot(isUsingItem and vanilla_model.LEFT_ARM:getOriginRot() or nil)
 
 			local swingArm = player:getSwingArm()
 			if swingArm then
 				if swingArm == "MAIN_HAND" then
-					RIGHT_ARM:setRot(vanilla_model.RIGHT_ARM:getOriginRot())
+					Parts.RIGHT_ARM:setRot(vanilla_model.RIGHT_ARM:getOriginRot())
 				else
-					LEFT_ARM:setRot(vanilla_model.LEFT_ARM:getOriginRot())
+					Parts.LEFT_ARM:setRot(vanilla_model.LEFT_ARM:getOriginRot())
 				end
 			end
 

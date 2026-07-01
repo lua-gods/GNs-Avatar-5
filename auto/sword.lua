@@ -13,7 +13,7 @@ models.player.VFX:setVisible(true)
 models.player.Roll.Sword.glow:setPrimaryRenderType("EMISSIVE_SOLID")
 models.player.VFX.Smear1.Smear1Spin:setPrimaryRenderType("EMISSIVE"):setColor(0.8,0.8,0.8)
 
-models.player.Roll:setVisible(true)
+models.player.Roll:setVisible(false)
 
 local current
 local function setAnimation(anim)

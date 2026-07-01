@@ -52,6 +52,20 @@ function Animation:stop()
 end
 
 
+function Animation:setPlaying(state)
+	if state then
+		if not self:isPlaying() then
+			self:play()
+		end
+	else
+		if self:isPlaying() then
+			self:stop()
+		end
+	end
+	return self
+end
+
+
 ---Sets how fast the duration of the transition when the animation is played or stopped.
 ---@param duration number
 ---@return Animation
@@ -61,13 +75,16 @@ function Animation:setBlendDuration(duration)
 end
 
 
-function Animation:blend(blend)
-	if active[self] then
-		trueBlend[self] = blend
-	else
-		ogIndex(self,"blend")(self,blend)
+function Animation:blend(weight)
+	trueBlend[self] = weight
+	if not active[self] then
+		ogIndex(self,"blend")(self,weight)
 	end
 	return self
+end
+
+function Animation:setBlend(weight)
+	return self:blend(weight)
 end
 
 local allowProcess = true

@@ -17,7 +17,7 @@ SKullAPI.newIdentity({
 		model:scale(0.5)
 		cfg.squish = 0
 		skull.model:addChild(model)
-		if skull.ctx:find("HAND") or skull.ctx == "BLOCK" then
+		if skull.ctx:find("HAND") then
 			cfg.musicPlayer = NBS.newMusicPlayer(track)
 			cfg.musicPlayer:play():setAttenuation(0.5):setVolume(0.5)
 			cfg.musicPlayer.NOTE_PLAYED:register(function (cnote) 
@@ -31,9 +31,6 @@ SKullAPI.newIdentity({
 		else
 			model:pos(0,1,0)
 		end
-		if skull.block then
-			cfg.musicPlayer:setPos(skull.block:getPos():add(0.5,0.5,0.5))
-		end
 	end,
 	frame = function (skull,cfg, dt, df)
 		cfg.squish = cfg.squish * 0.9
@@ -44,7 +41,14 @@ SKullAPI.newIdentity({
 	tick = function (skull,cfg)
 		if cfg.musicPlayer then
 			if skull.entity then
-				local speed = 1 + skull.entity:getVelocity().xz:length()
+				local speed = skull.entity:getVelocity().xz:length() * 2.5
+				if speed > 0.6 then
+					speed = 1 + (math.floor((speed ^ 0.5) * 12) / 12) ^ 2
+				elseif speed > 0.4 then
+					speed = 1
+				elseif speed > 0.1 then
+					speed = 0.5
+				end
 				cfg.musicPlayer:speed(speed):pitch(speed)
 				cfg.musicPlayer:setPos(skull.entity:getPos())
 			end

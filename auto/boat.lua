@@ -1,6 +1,8 @@
 local Macros = require("lib.GNMacros")
 local Spring = require("lib.GNSpring")
 
+local parts = require("auto.parts")
+
 local recoilSpring = Spring.new(
 	0.2,
 	0.5,
@@ -31,12 +33,12 @@ local Motorcycle = Macros.new(function (events, vehicle)
 	model:setVisible(true)
 	models.player:setPos(0,12,-2):setRot(0,0,0)
 	
-	models.player.Base.Torso:setRot(-25,0,0)
-	models.player.Base.Torso.Waist.Chest.LeftArm:setRot(60,0,0)
-	models.player.Base.Torso.Waist.Chest.RightArm:setRot(60,0,0)
-	models.player.Base.LeftLeg:setRot(-20,0,0)
-	models.player.Base.RightLeg:setRot(-20,0,0)
-	models.player.Base.Torso.Waist.Chest.Head:setRot(25,0,0)
+	parts.TORSO:setRot(-25,0,0)
+	parts.LEFT_ARM:setRot(60,0,0)
+	parts.RIGHT_ARM:setRot(60,0,0)
+	parts.LEFT_LEG:setRot(-20,0,0)
+	parts.RIGHT_LEG:setRot(-20,0,0)
+	parts.HEAD:setRot(25,0,0)
 	model:setRot(0,0,0)
 	
 	renderer:offsetCameraPivot(0,0.7,0)
@@ -121,15 +123,15 @@ local Motorcycle = Macros.new(function (events, vehicle)
 		renderer:offsetCameraRot()
 		
 		models.player:setRot()
-		models.player.Base:setRot()
-		models.player.Base.Torso:setRot()
-		models.player.Base.Torso.Waist:setRot()
-		models.player.Base.Torso.Waist.Chest:setRot()
-		models.player.Base.Torso.Waist.Chest.LeftArm:setRot()
-		models.player.Base.Torso.Waist.Chest.RightArm:setRot()
-		models.player.Base.LeftLeg:setRot()
-		models.player.Base.RightLeg:setRot()
-		models.player.Base.Torso.Waist.Chest.Head:setRot()
+		parts.BASE:setRot()
+		parts.TORSO:setRot()
+		parts.WAIST:setRot()
+		parts.CHEST:setRot()
+		parts.LEFT_ARM:setRot()
+		parts.RIGHT_ARM:setRot()
+		parts.LEFT_LEG:setRot()
+		parts.RIGHT_LEG:setRot()
+		parts.HEAD:setRot()
 	end)
 	
 	events.ON_ENTITY_UNLOAD:register(function ()

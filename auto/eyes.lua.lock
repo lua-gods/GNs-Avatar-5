@@ -1,0 +1,43 @@
+
+
+local Line = require("lib.GNLine")
+
+local function display(text)
+	host:setActionbar(tostring(text))
+end
+
+local dirUP = vec(0,1,0)
+
+local lines = {}
+local function clear()
+	for key, value in pairs(lines) do
+		value:free()
+	end
+end
+
+local function line(dir,r,g,b)
+	local pos = player:getPos():add(0,player:getEyeHeight(),0)
+	local line = Line.new():setAB(pos,pos+dir):setColor(r,g,b)
+	lines[#lines+1] = line
+end
+
+-- target entity
+local target = world.getEntity("dc912a38-2f0f-40f8-9d6d-57c400185362")
+events.TICK:register(function ()
+	if target and not target:isLoaded() then return end
+	
+	local posA = player:getPos():add(0,player:getEyeHeight(),0)
+	local posB = target:getPos():add(0,target:getEyeHeight(),0)
+	
+	-- calculate trig stuff
+	local dirDiff = (posA-posB):normalize()
+	local dirLeft = dirDiff:copy():cross(dirUP):normalize()
+	local dirUp = dirLeft:copy():cross(dirDiff:copy())
+	local dirLook = player:getLookDir()
+	
+	-- normalized diff for eye normal
+	local lookDif = vec(
+		dirLook:dot(dirLeft),
+		dirLook:dot(dirUp)
+	)
+end)
