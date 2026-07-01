@@ -74,6 +74,9 @@ function Animation:setBlendDuration(duration)
 	return self
 end
 
+function Animation:getBlendDuration()
+	return durationTime[self] == 0 and 0 or 1/durationTime[self]
+end
 
 function Animation:blend(weight)
 	trueBlend[self] = weight
@@ -86,6 +89,7 @@ end
 function Animation:setBlend(weight)
 	return self:blend(weight)
 end
+
 
 local allowProcess = true
 events.WORLD_RENDER:register(function (delta)
@@ -106,13 +110,13 @@ events.RENDER:register(function (delta, ctx, matrix)
 			activeTime[self] = activeTime[self] + deltaFrame * (mode and 1 or -1) * (durationTime[self] or invDuration)
 			if mode then
 				if activeTime[self] > 1 then
-					activeTime[self] = nil
+					activeTime[self] = 1
 					ogIndex(self,"blend")(self, trueBlend[self])
 					active[self] = nil
 				end
 			else
 				if activeTime[self] < 0 then
-					activeTime[self] = nil
+					activeTime[self] = 0
 					ogIndex(self,"blend")(self,1)
 					ogIndex(self,"stop")(self)
 					active[self] = nil

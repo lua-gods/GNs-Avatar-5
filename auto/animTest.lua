@@ -1,3 +1,5 @@
+local GNanim = require("lib.GNanim")
+
 local UP = vec(0, 1, 0)
 
 local WALK = animations.player.walk
@@ -7,10 +9,17 @@ local IDLE = animations.player.idle
 local SNEAK = animations.player.sneak
 
 local SLIDE = animations.player.slide
+local JUMP1 = animations.player.jump1
+local JUMP2 = animations.player.jump2
 
-
+JUMP1:speed(0)
+:setBlendDuration(0.15)
+JUMP2:speed(0)
+:setBlendDuration(0.15)
 SLIDE:setSpeed(0)
 :setBlendDuration(0.5)
+
+local JUMP = GNanim.newGroup("ROUND_ROBIN",JUMP1,JUMP2)
 
 local animLayers = {}
 local function set(anim,layer)
@@ -47,7 +56,7 @@ events.TICK:register(function()
 	
 	if onGround ~= nowOnGround then
 		if nowOnGround then
-			DROP:stop():play():blend(math.min(-lvel.y*5,1))
+			DROP:stop():play():blend(math.clamp(-lvel.y*5,0,1))
 		end
 		onGround = nowOnGround
 	end
@@ -62,7 +71,7 @@ events.RENDER:register(function(delta, ctx, matrix)
 	local vel = math.lerp(llvel, lvel, delta)
 	local walkSpeed = math.abs(vel.z)
 	if player:isOnGround() then
-		if accel > -0.01 then
+		if accel > -0.015 then
 			if walkSpeed > 0.02 then
 				if player:isSprinting() or walkSpeed > 0.3 then
 					set(SPRINT)
@@ -78,11 +87,14 @@ events.RENDER:register(function(delta, ctx, matrix)
 			end
 		else
 			set(SLIDE)
-			SLIDE:setBlend(math.min(vel.xz:length()*7,1))
-			SLIDE:setTime(((math.deg(math.atan2(vel.x, vel.z)))/360) % 1)
+			SLIDE:blend(math.clamp(vel.xz:length()*7,0,1))
+			SLIDE:setTime(((math.deg(math.atan2(-vel.x, vel.z)))/360) % 1)
 		end
 	else
-		set(IDLE)
+		set(JUMP)
+		JUMP
+		:setTime(0.5 + -vel.y)
+		--:blend(0.5 + math.min(math.abs(vel.z* 2),1))
 	end
 	
 	if player:isSneaking() then
