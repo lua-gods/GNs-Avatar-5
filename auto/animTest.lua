@@ -35,13 +35,13 @@ end
 
 local llvel = vec(0, 0, 0)
 local lvel = vec(0, 0, 0)
-local accel = vec(0, 0, 0)
+local accel = 0
 local onGround = false
 events.TICK:register(function()
 	local byaw = player:getBodyYaw()
 	llvel = lvel
 	lvel = vectors.rotateAroundAxis(byaw, player:getVelocity(), UP)
-	accel = lvel - llvel
+	accel = lvel.xz:length() - llvel.xz:length()
 	local nowOnGround = player:isOnGround()
 	
 	
@@ -62,12 +62,12 @@ events.RENDER:register(function(delta, ctx, matrix)
 	local vel = math.lerp(llvel, lvel, delta)
 	local walkSpeed = math.abs(vel.z)
 	if player:isOnGround() then
-		if accel.z > -0.01 then
+		if accel > -0.01 then
 			if walkSpeed > 0.02 then
 				if player:isSprinting() or walkSpeed > 0.3 then
 					set(SPRINT)
 					SPRINT:blend(math.min(math.abs(vel.z * 7), 1))
-					SPRINT:speed(vel.z * 7)
+					SPRINT:speed(vel.xz:length() * 7)
 				else
 					set(WALK)
 					WALK:blend(math.min(math.abs(vel.z * 7), 1))
@@ -78,8 +78,8 @@ events.RENDER:register(function(delta, ctx, matrix)
 			end
 		else
 			set(SLIDE)
-			SLIDE:setBlend(math.min(vel.z*7,1))
-			--SLIDE:setTime((player:getBodyYaw(delta)/360) % 1)
+			SLIDE:setBlend(math.min(vel.xz:length()*7,1))
+			SLIDE:setTime(((math.deg(math.atan2(vel.x, vel.z)))/360) % 1)
 		end
 	else
 		set(IDLE)
