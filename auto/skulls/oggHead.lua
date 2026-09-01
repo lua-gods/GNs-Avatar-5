@@ -5,11 +5,11 @@ local Tween = require("lib.GNtween")
 local SKullAPI = require("lib.GNskull")
 
 
-local MODEL = models.plushie
+local MODEL = models.skull.boombox
 MODEL:setVisible(false)
 
 local HALF = vec(0.5, 0.5, 0.5)
-
+local PI = math.pi
 
 local function isInside(pos,from,to)
 	return pos.x >= from.x 
@@ -25,6 +25,15 @@ local DOWN = vec(0,1,0)
 SKullAPI.newIdentity({
 	id = "ogg",
 	init = function(skull, cfg)
+		if skull.ctx:find("FIRST_PERSON") then
+			skull.model
+			:scale(0.75)
+			:rot(0,-70,0)
+			:pos(0,4,0)
+		elseif skull.ctx == "OTHER" then
+			skull.model
+			:scale(0.75)
+		end
 		local packedBinary = skull.binary
 		local buffer = data:createBuffer(#packedBinary)
 		buffer:writeByteArray(packedBinary)
@@ -55,6 +64,7 @@ SKullAPI.newIdentity({
 			cfg.hasRegion = false
 		end
 		cfg.volume = cfg.volume or 1
+		cfg.bpm = ((cfg.bpm or 120) / 120)
 		cfg.fadeTime = 0
 		cfg.fade = cfg.fade or 0.001
 		if skull.ctx == "BLOCK" then
@@ -75,9 +85,10 @@ SKullAPI.newIdentity({
 	end,
 	frame = function(skull, cfg, dt, df)
 		if cfg.active then
-			cfg.c = cfg.c + df
-
-			local s = math.sin(cfg.c * 3.14159 * 4) * 0.1 * (cfg.fadeTime / cfg.fade) + 1
+			cfg.c = cfg.c + df * cfg.bpm
+			local fade = (cfg.fadeTime / cfg.fade)
+			local s = math.abs(math.sin(cfg.c * PI * 2)) * 0.1
+			s = s + 1
 			skull.model
 				 :scale(1 / s, s, 1 / s)
 
@@ -148,7 +159,7 @@ function oggHead(path, flags)
 		local binary = buffer:readByteArray(buffer:available())
 		buffer:close()
 
-		flags = flags or {}
+		flags = flags or {loop=true}
 		local item = SKullAPI.makeHead({ ogg = flags }, binary)
 		giveItem(item)
 	else

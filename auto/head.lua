@@ -46,7 +46,7 @@ animations.player.breathing:speed(0.3):play()
 
 events.RENDER:register(function(delta, ctx)
 	if ctx ~= "PAPERDOLL" then
-		--MODEL_HEAD:setPos(0, player:isCrouching() and -4 or 0)
+		MODEL_HEAD:setPos(0, player:isCrouching() and -4 or 0)
 		
 		local headRot = springHead.pos
 		Parts.HEAD:setRot(springHead.pos:unpack())

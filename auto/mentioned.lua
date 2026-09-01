@@ -1,3 +1,4 @@
+#host
 local patterns = {
 	" gn ",
 	" gnui ",

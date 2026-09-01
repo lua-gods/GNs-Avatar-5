@@ -1,4 +1,4 @@
-# flags: host_only
+#host
 
 local Sequencer = require('lib.sequencer')
 

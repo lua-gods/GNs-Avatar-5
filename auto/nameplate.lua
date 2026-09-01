@@ -183,7 +183,10 @@ end)
 
 --────────────────────────-< Bootstrap >-────────────────────────--
 
-nameplate.ENTITY:setOutline(true):setBackgroundColor(0, 0, 0, 0)
+nameplate.ENTITY
+:setOutline(true)
+:setBackgroundColor(0, 0, 0, 0)
+:setPivot(0,2.2,0)
 updateStatus()
 
 return NameplateAPI

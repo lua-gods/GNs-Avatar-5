@@ -1,4 +1,4 @@
-# flags: host_only
+#host
 local Sync = require "lib.GNSync"
 
 
@@ -107,7 +107,7 @@ end)
 
 
 
-if true then
+if false then
 	--- parent box to hold all the columns
 	local classColumns = screen:parse({
 		style = "none",

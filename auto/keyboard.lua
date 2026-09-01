@@ -1,4 +1,4 @@
-# flags: host_only
+#host
 
 
 local STEER_SPEED = 90

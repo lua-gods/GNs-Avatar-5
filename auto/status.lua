@@ -10,12 +10,25 @@ if avatar:getMaxTickCount() <= 8192 then return end
 
 local IDLE_EMOTE2 = animations["models.player"].sleepyFace
 local IDLE_EMOTE = animations["models.player"].sleepy
+local CHAT_EMOTE = animations["models.player"].phone
 local TIME_OFFSET = 1780386870274
+
+
+animations["models.player"].default:speed(0):play()
 
 IDLE_EMOTE2:setSpeed(0.5):setPriority(1)
 IDLE_EMOTE:speed(0.5)
 IDLE_EMOTE2:setBlendDuration(0.5)
 IDLE_EMOTE:setBlendDuration(0.5)
+
+
+if host:isHost() then
+	events.TICK:register(function () -- this makes the phone not appear in first person
+		CHAT_EMOTE:setPriority(renderer:isFirstPerson() and 0 or 10)
+	end)
+else
+	CHAT_EMOTE:setPriority(10)
+end
 
 --──── ZZZ ────────────────────────────────────────────--
 
@@ -45,13 +58,13 @@ GNParticles.registerIdentity(
 --TODO: add scale property
 --TODO: add init callback to identity
 
-local zzzSpawner = GNParticles.newSpawner("zzz")
+local sleepParticles = GNParticles.newSpawner("zzz")
 :setInterval(0.75)
 
 
-zzzSpawner:moveTo(models.player.Base.Torso.Waist.Chest.Head)
+sleepParticles:moveTo(models.player.Base.Torso.Waist.Chest.Head)
 :pos(0,32,0)
-zzzSpawner:setVisible(false)
+sleepParticles:setVisible(false)
 --────────────────────────-< END OF CONFIG >-────────────────────────--
 
 local isLocal = false
@@ -67,10 +80,11 @@ local function updateStatus()
 		if lastStatus ~= 1 then
 			IDLE_EMOTE:play()
 			IDLE_EMOTE2:play()
-			zzzSpawner:setVisible(true)
+			sleepParticles:setVisible(true)
 		end
 	elseif status == 2 then -- typing
-		Nameplate.setStatus(":typing_animated:",time)
+		--Nameplate.setStatus(":typing_animated:",time)
+		CHAT_EMOTE:play()
 	elseif status == 3 then -- local
 		Nameplate.setStatus(":cloud::back::no_entry:",time)
 	elseif status == 4 then -- typing command
@@ -79,15 +93,18 @@ local function updateStatus()
 		Nameplate.setStatus(":mcb_chest:",time)
 	else
 		Nameplate.setStatus()
+	end
+	if lastStatus ~= status then
+		
 		if lastStatus == 1 then
 			if IDLE_EMOTE then
 				IDLE_EMOTE:stop()
 				IDLE_EMOTE2:stop()
-				zzzSpawner:setVisible(false)
+				sleepParticles:setVisible(false)
 			end
+		elseif lastStatus == 2 then
+			CHAT_EMOTE:stop()
 		end
-	end
-	if lastStatus ~= status then
 		lastStatus = status
 	end
 end

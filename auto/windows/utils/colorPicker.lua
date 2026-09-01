@@ -1,4 +1,4 @@
-# flags: host_only
+#host
 local GNcommon = require "lib.GNcommon"
 ---@diagnostic disable: return-type-mismatch
 ---@diagnostic disable: param-type-mismatch

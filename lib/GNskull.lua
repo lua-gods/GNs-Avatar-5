@@ -248,6 +248,79 @@ function SkullAPI.getItemData(item)
 	return parseTextures(binary, stringName)
 end
 
+-- Base64 decoding lookup table
+local b64_chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+local b64_lookup = {}
+for i = 1, #b64_chars do
+    b64_lookup[b64_chars:sub(i, i)] = i - 1
+end
+
+---@param bas64 string
+---@return string
+local function partialDecodeBase64(bas64)
+	local validLen = #bas64 - (#bas64 % 4)
+	if validLen == 0 then return "" end
+
+	local output = {}
+
+	for i = 1, validLen, 4 do
+		local n = 0
+		for j = 0, 3 do
+			local char = bas64:sub(i + j, i + j)
+			n = n * 64 + (b64_lookup[char] or 0)
+		end
+
+		local b1 = math.floor(n / 65536) % 256
+		local b2 = math.floor(n / 256) % 256
+		local b3 = n % 256
+		table.insert(output, string.char(b1, b2, b3))
+	end
+
+	return table.concat(output)
+end
+
+---@param item ItemStack
+---@return string
+local function hashItem(item)
+	local texture = ""
+	local nbt = item.tag
+	if IS_NEW then
+		if nbt
+			 and nbt["minecraft:custom_name"] then
+			texture = parseName(nbt["minecraft:custom_name"])
+		end
+		if nbt
+			 and nbt["minecraft:profile"]
+			 and nbt["minecraft:profile"].properties
+			 and nbt["minecraft:profile"].properties
+			 and nbt["minecraft:profile"].properties[2] then
+			texture = nbt["minecraft:profile"].properties[2].value
+		end
+	else
+		if nbt
+			 and nbt.SkullOwner
+			 and nbt.SkullOwner.Properties 
+			 and nbt.SkullOwner.Properties[2]
+			 and nbt.SkullOwner.Properties[2].Value then
+				texture = nbt.SkullOwner.Properties[2].Value
+		end
+	end
+	
+	local data = partialDecodeBase64(texture:sub(1,32))
+	local headerLength = data:match("^([0-9]+)")
+
+	local header
+
+	if headerLength then
+		local headerLengthLength = #headerLength
+		headerLength = tonumber(headerLength)
+
+		header = data:sub(headerLengthLength + 1, headerLengthLength + headerLength)
+		return header
+	end
+	return "balls"
+end
+
 ---@param block BlockState
 ---@return string?,string?
 function SkullAPI.getDataBlock(block)
@@ -538,7 +611,7 @@ events.SKULL_RENDER:register(function(delta, block, item, entity, ctx)
 			end
 		end
 	elseif item then
-		hash = hash .. item:toStackString() .. (entity and entity:getUUID() or "") .. ctx
+		hash = hash .. hashItem(item) .. (entity and entity:getUUID() or "") .. ctx
 		if skulls[hash] then
 			local instance = skulls[hash]
 			instance.model:setVisible(true)

@@ -2,9 +2,8 @@ if not host:isHost() then return end
 
 if not addScript or not getScript or not getScripts then
 	warn("Missing script methods. Disabling feature", "Avoid uploading avatar")
+	return
 end
-
-
 local IGNORE_HOST_SCRIPTS = false
 
 local fileIdentifier = avatar:getName() .. ".lcl"
@@ -22,7 +21,7 @@ end
 
 ---@type table<string,fun(path:string,content:string)>
 local FLAGS = {
-	host_only = function(path, content)
+	host = function(path, content)
 		addScript(path)
 		if not IGNORE_HOST_SCRIPTS then
 			addScript(path, content, "RUNTIME")
@@ -35,13 +34,17 @@ local FLAGS = {
 	end,
 }
 
+
+
+
+
 for _, path in ipairs(listFiles("", true)) do
 	local content = getScript(path)
 	if content:find("^#") then
 		local header = content:sub(1, (content:find("\n") or (#content + 1)) - 1)
 
 		-- parse flags
-		for flag in header:match("flags:([^\n]*)$"):gmatch("[^, ]+") do
+		for flag in header:match("([^\n]*)$"):gmatch("[^, ]+") do
 			if FLAGS[flag] then
 				FLAGS[flag](path, content)
 			end
