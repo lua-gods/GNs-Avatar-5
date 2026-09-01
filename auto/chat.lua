@@ -63,7 +63,7 @@ local function fade(bubble)
 end
 
 local function newBubble(text)
-	text = text:gsub("\\","\n")
+	text = text:gsub("\\", "\n")
 	local model = modelUtils.deepCopy(MODEL)
 	model:setVisible(true)
 	model:setLight(15, 15)
@@ -81,7 +81,7 @@ local function newBubble(text)
 		 :setVisible(true)
 
 	local size = client.getTextDimensions(text:gsub(":[^:]+:", "W"), MAX_WIDTH, true):ceil():add(1, 0)
-	:add(PADDING, PADDING)
+		 :add(PADDING, PADDING)
 	size.x = math.max(size.x, 8)
 	size.x = math.ceil(size.x / 2) * 2
 
@@ -146,13 +146,13 @@ local function newBubble(text)
 			label:setVisible(true)
 		end,
 	}
-	
+
 	local bubble = {
 		model = model,
 		label = label,
 		setSize = setSize,
 	}
-	
+
 	Tween.new {
 		from = 0,
 		to = 0,
@@ -185,7 +185,49 @@ end)
 --]]
 
 
+local function getKey(alt)
+	return math.floor(world.getTimeOfDay() / 12000 + (alt and 1 or 0))
+end
+
+local HEADER = "BALLS"
+
+
+local function xorCipher(text, key)
+    local out = {}
+    local prngState = bit32.bxor(key, 0xA5A5A5A5)
+
+    for i = 1, #text do
+        local byte = string.byte(text, i)
+        prngState = (prngState * 1664525 + 1013904223) % 4294967296
+
+        local k1 = bit32.rshift(prngState, 16)
+        local k2 = (key * i) % 256
+        local derivedKey = bit32.bxor(k1, k2, i) % 256
+
+        out[i] = string.char(bit32.bxor(byte, derivedKey))
+    end
+
+    return table.concat(out)
+end
+
+local function encrypt(text)
+	return xorCipher(HEADER .. text, math.floor(world.getTimeOfDay() / 12000))
+end
+
+local function decrypt(text)
+	local result = xorCipher(text, getKey())
+	if not result:find("^" .. HEADER) then
+		result = xorCipher(text, getKey(true))
+	end
+	return result:sub(#HEADER + 1, -1)
+end
+
+
+function pings.chat(msg)
+	newBubble(decrypt(msg))
+end
+
 events.CHAT_SEND_MESSAGE:register(function(message)
-	newBubble(message)
+	pings.chat(encrypt(message))
 	return message
 end)
