@@ -13,7 +13,8 @@ local modelUtils = require("lib.modelUtils")
 local Tween = require("lib.GNtween")
 
 local MODEL = models.bubble.bubble
-local MAX_WIDTH = 128
+local MODEL_ALT = models.bubble_alt.bubble
+local MAX_WIDTH = 128+32
 local PADDING = 1
 local CHILD_GAP = 4
 local MASTER_VOLUME = 0.5
@@ -22,6 +23,7 @@ local MASTER_SCALE = 0.3
 local scroll = 0
 
 MODEL:setVisible(false)
+MODEL_ALT:setVisible(false)
 
 local modelOrigin = models:newPart("bubbleOrigin")
 local modelCamera = modelOrigin:newPart("bubbleCamera", "CAMERA")
@@ -33,7 +35,7 @@ local modelScroll = modelCamera:newPart("scroll")
 ---@param volume any
 local function sound(id, pitch, volume)
 	if player:isLoaded() then
-		sounds:playSound(id, player:getPos(), volume * MASTER_VOLUME, pitch)
+		return sounds:playSound(id, player:getPos(), volume * MASTER_VOLUME, pitch)
 	end
 end
 
@@ -62,9 +64,8 @@ local function fade(bubble)
 	}
 end
 
-local function newBubble(text)
-	text = text:gsub("\\", "\n")
-	local model = modelUtils.deepCopy(MODEL)
+local function newBubble(text,alt)
+	local model = modelUtils.deepCopy(alt and MODEL_ALT or MODEL)
 	model:setVisible(true)
 	model:setLight(15, 15)
 		 :setPrimaryRenderType("CUTOUT_EMISSIVE_SOLID")
@@ -75,12 +76,13 @@ local function newBubble(text)
 	local label = model.LBL:newText("label")
 
 	label:setAlignment("LEFT")
-		 :setText('{"text":"' .. text .. '","color":"#000000"}')
+		 :setText(text)
 		 :width(MAX_WIDTH)
 		 :light(15, 15)
 		 :setVisible(true)
 
-	local size = client.getTextDimensions(text:gsub(":[^:]+:", "W"), MAX_WIDTH, true):ceil():add(1, 0)
+	local size = client.getTextDimensions(text:gsub(":[^a-zA-Z_]+:", "W"), MAX_WIDTH, true):ceil()
+		 :add(1, 0)
 		 :add(PADDING, PADDING)
 	size.x = math.max(size.x, 8)
 	size.x = math.ceil(size.x / 2) * 2
@@ -122,15 +124,6 @@ local function newBubble(text)
 		end,
 	}
 	model:setVisible(true)
-	sound("minecraft:entity.item.pickup", 0.35, 0.5)
-	Tween.new {
-		from = 0,
-		to = 0,
-		duration = 0.15,
-		onFinish = function()
-			sound("minecraft:entity.item.pickup", 0.7, 0.5)
-		end,
-	}
 	Tween.new {
 		from = vec(8, 0),
 		to = size,
@@ -193,21 +186,21 @@ local HEADER = "BALLS"
 
 
 local function xorCipher(text, key)
-    local out = {}
-    local prngState = bit32.bxor(key, 0xA5A5A5A5)
+	local out = {}
+	local prngState = bit32.bxor(key, 0xA5A5A5A5)
 
-    for i = 1, #text do
-        local byte = string.byte(text, i)
-        prngState = (prngState * 1664525 + 1013904223) % 4294967296
+	for i = 1, #text do
+		local byte = string.byte(text, i)
+		prngState = (prngState * 1664525 + 1013904223) % 4294967296
 
-        local k1 = bit32.rshift(prngState, 16)
-        local k2 = (key * i) % 256
-        local derivedKey = bit32.bxor(k1, k2, i) % 256
+		local k1 = bit32.rshift(prngState, 16)
+		local k2 = (key * i) % 256
+		local derivedKey = bit32.bxor(k1, k2, i) % 256
 
-        out[i] = string.char(bit32.bxor(byte, derivedKey))
-    end
+		out[i] = string.char(bit32.bxor(byte, derivedKey))
+	end
 
-    return table.concat(out)
+	return table.concat(out)
 end
 
 local function encrypt(text)
@@ -223,11 +216,73 @@ local function decrypt(text)
 end
 
 
-function pings.chat(msg)
-	newBubble(decrypt(msg))
+function pings.chat(msg, alt)
+	if alt then
+		local total = math.max(#msg,1)
+		newBubble('{"text":"'..(("g"):rep(total*2))..'","font":"minecraft:alt","obfuscated":true,"color":"#00ff00"}',alt)
+		--[ [
+		local count = 0
+		local timer = 0
+		local lastSound
+		local lastSound2
+		
+		local function process()
+			timer = timer + 1
+			if timer > 2 then
+				timer = 0
+				if lastSound then
+					lastSound:stop()
+					lastSound2:stop()
+				end
+				lastSound = sound("minecraft:block.note_block.bit", math.lerp(0.02,0.2,math.random()), 1)
+				lastSound2 = sound("minecraft:block.note_block.bit", math.lerp(0.02,0.2,math.random()), 1)
+				count = count + 1
+				if count > total then
+					lastSound:stop()
+					lastSound2:stop()
+					sound("minecraft:block.note_block.bit", 0.1, 1)
+					events.TICK:remove(process)
+				end
+			end
+		end
+		events.TICK:register(process)
+		--]]
+		
+		
+		--[[
+		local s = sound("minecraft:block.note_block.bit",1,1)
+		Tween.new {
+			from = 1,
+			to = 0.5,
+			duration = 1,
+			tick = function (v, t)
+				local r = math.lerp(0.2,v,math.random())
+				s:pitch(r)
+			end,
+		}
+		--]]
+	else
+		msg = msg:gsub("\\", "\n")
+		newBubble('{"text":"' .. decrypt(msg) .. '","color":"white"}')
+		sound("minecraft:entity.item.pickup", 0.35, 0.5)
+		Tween.new {
+			from = 0,
+			to = 0,
+			duration = 0.15,
+			onFinish = function()
+				sound("minecraft:entity.item.pickup", 0.7, 0.5)
+			end,
+		}
+	end
 end
 
 events.CHAT_SEND_MESSAGE:register(function(message)
-	pings.chat(encrypt(message))
-	return message
+	if message then
+		if message:find("^/") then
+			pings.chat(("a"):rep(#message*0.25),true)
+		else
+			pings.chat(encrypt(message))
+		end
+		return message
+	end
 end)

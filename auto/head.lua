@@ -38,8 +38,8 @@ events.TICK:register(function()
 	targetRot.y = ((-targetRot.y + 180) % 360 - 180)
 	targetRot.x = -targetRot.x
 	
-	springHead.target = targetRot * vec(0.8, 0.5)
-	springBody.target = targetRot * vec(0.2, 0.5)
+	springHead:setTarget(targetRot * vec(0.8, 0.5))
+	springBody:setTarget(targetRot * vec(0.2, 0.5))
 end)
 
 animations.player.breathing:speed(0.3):play()
@@ -49,7 +49,7 @@ events.RENDER:register(function(delta, ctx)
 		MODEL_HEAD:setPos(0, player:isCrouching() and -4 or 0)
 		
 		local headRot = springHead.pos
-		Parts.HEAD:setRot(springHead.pos:unpack())
-		Parts.TORSO:setRot(springBody.pos:unpack())
+		Parts.HEAD:setRot(springHead:samplePos(delta):unpack())
+		Parts.TORSO:setRot(springBody:samplePos(delta):unpack())
 	end
 end)

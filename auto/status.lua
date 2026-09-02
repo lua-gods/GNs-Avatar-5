@@ -23,7 +23,7 @@ IDLE_EMOTE:setBlendDuration(0.5)
 
 
 if host:isHost() then
-	events.TICK:register(function () -- this makes the phone not appear in first person
+	events.RENDER:register(function (ctx) -- this makes the phone not appear in first person
 		CHAT_EMOTE:setPriority(renderer:isFirstPerson() and 0 or 10)
 	end)
 else
