@@ -87,9 +87,7 @@ local function updateStatus()
 		CHAT_EMOTE:play()
 	elseif status == 3 then -- local
 		Nameplate.setStatus(":cloud::back::no_entry:",time)
-	elseif status == 4 then -- typing command
-		Nameplate.setStatus(":typing_command:",time)
-	elseif status == 5 then -- inventory
+	elseif status == 4 then -- inventory
 		Nameplate.setStatus(":mcb_chest:",time)
 	else
 		Nameplate.setStatus()
@@ -140,11 +138,11 @@ events.TICK:register(function ()
 		if Sync.status ~= 1 then 
 			local screen = host:getScreen()
 			if host:isChatOpen() then
-				if host:getChatText():find("^/") then
-					Sync.status = 4 -- typing command
-				else
-					Sync.status = 2 -- typing
-				end
+				--if host:getChatText():find("^/") then
+				--	Sync.status = 4 -- typing command
+				--else
+				--end
+				Sync.status = 2 -- typing
 			elseif screen == "net.minecraft.class_490" then
 				Sync.status = 5 -- inventory
 			elseif screen == "net.minecraft.class_433" then
