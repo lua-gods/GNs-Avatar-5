@@ -14,6 +14,7 @@ local Tween = require("lib.GNtween")
 
 --──── CONFIG ────────────────────────────────────────────--
 
+
 local MODEL = models.bubble.bubble
 local MAX_WIDTH = 128+32
 local PADDING = 3

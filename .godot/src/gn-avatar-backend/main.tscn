@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://v5fcedu8uvon"]
+
+[ext_resource type="Script" uid="uid://c8806og8xn6l1" path="res://scripts/router.gd" id="1_ig7tw"]
+
+[node name="Node" type="Node" unique_id=1093734703]
+
+[node name="HTTPRequest" type="HTTPRequest" parent="." unique_id=2027733558]
+
+[node name="Node" type="Node" parent="." unique_id=432900466]
+script = ExtResource("1_ig7tw")
+
+[node name="FileDialog" type="FileDialog" parent="." unique_id=1309964154]
+oversampling_override = 1.0
+title = "Open a File"
+position = Vector2i(0, 36)
+file_mode = 0
+access = 2
+root_subfolder = "/home/gn/sott/Games/Minecraft/Figura/data/"
+use_native_dialog = true
