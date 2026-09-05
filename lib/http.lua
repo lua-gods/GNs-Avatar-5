@@ -33,7 +33,7 @@ function httpRequestBuilder:sendAsync(callback, reader,timeout)
       return
    end
    table.insert(requests, {
-		age = -timeout,
+		age = -(timeout or 0),
       future = future,
       code = 0,
       stack = {},
