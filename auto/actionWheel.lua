@@ -19,7 +19,7 @@ local fileDialogAction = awUtil.action(":file_folder: File Dialog","open native 
 		else
 			print("File Dialog Failed")
 		end
-	end)
+	end,nil,9999999)
 end):item("stripped_oak_wood")
 awUtil.append(page,fileDialogAction)
 

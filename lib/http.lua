@@ -12,7 +12,7 @@ local requests = {}
 ---sends http request and calls callback at the end
 ---@param callback fun(result: string, status: number)
 ---@param reader auria.http.reader?
-function httpRequestBuilder:sendAsync(callback, reader)
+function httpRequestBuilder:sendAsync(callback, reader,timeout)
    if not net:isNetworkingAllowed() then
       callback('networkingNotAllowed', -1)
       return
@@ -33,7 +33,7 @@ function httpRequestBuilder:sendAsync(callback, reader)
       return
    end
    table.insert(requests, {
-		age = 0,
+		age = -timeout,
       future = future,
       code = 0,
       stack = {},
