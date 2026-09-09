@@ -5,7 +5,6 @@ local Sync = require('lib.GNSync')
 local LocalChecker = require("lib.localChecker")
 
 if avatar:getMaxTickCount() <= 8192 then return end
-
 --────────────────────────-< CONFIG >-────────────────────────--
 
 local IDLE_EMOTE2 = animations["models.player"].sleepyFace
