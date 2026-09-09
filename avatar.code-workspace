@@ -1,19 +1,30 @@
 {
-   "folders": [
-      {
-         "path": "."
-      },
-      {
-         "name": "Data",
-         "path": "../../data"
-      }
-   ],
-   "settings": {
-      "json.schemas": [
-         {
-            "fileMatch": ["**/avatar.json"],
-            "url": ".vscode/avatar.schema.json"
-         }
-      ]
-   }
+	"folders": [
+		{
+			"path": ".",
+		},
+		{
+			"name": "Data",
+			"path": "../../data",
+		},
+	],
+	"settings": {
+		"json.schemas": [
+			{
+				"fileMatch": ["**/avatar.json"],
+				"url": ".vscode/avatar.schema.json",
+			},
+		],
+		"explorer.sortOrder": "type",
+
+		"material-icon-theme.folders.associations": {
+			"boot": "core",
+			"scripts": "repository",
+			"scripthost": "repository",
+			"lib": "resource",
+			"libhost": "resource",
+			"host": "constant",
+		},
+		"markdown-mermaid.darkModeTheme":"dark"
+	},
 }

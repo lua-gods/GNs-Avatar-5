@@ -1,4 +1,4 @@
----@diagnostic disable: undefined-global
+---@diagnostic disable: undefined-global, redundant-parameter
 
 if not addScript then
 	if silly_backports then
