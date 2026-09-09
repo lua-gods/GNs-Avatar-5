@@ -1,0 +1,1 @@
+execute as @a[gamemode=creative] at @s as @e[distance=..10, tag=apple_wormhole] at @s run function wormholes:visibility/show_wormhole

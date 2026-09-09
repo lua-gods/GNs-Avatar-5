@@ -1,0 +1,9 @@
+scoreboard objectives add scratchboard dummy
+
+scoreboard objectives add apple_wormholes_construction_origin_x dummy
+scoreboard objectives add apple_wormholes_construction_origin_y dummy
+scoreboard objectives add apple_wormholes_construction_origin_z dummy
+
+scoreboard objectives add apple_wormholes_construction_has_origin dummy
+
+function wormholes:editing/look_for_wormholes

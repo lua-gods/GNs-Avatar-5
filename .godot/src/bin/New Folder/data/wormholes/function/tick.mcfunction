@@ -1,0 +1,3 @@
+function wormholes:visibility/visibility
+function wormholes:functioning/test_players
+function wormholes:editing/show_editable_wormholes

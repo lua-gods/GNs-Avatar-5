@@ -1,24 +1,13 @@
 
 --[ [ <- separate to enable
 
-local core = listFiles("core",true)
-table.sort(core)
+local boot = listFiles("boot",true)
+table.sort(boot)
 local stop = false
-local addScript = addScript
-for _, path in ipairs(core) do
+
+for _, path in ipairs(boot) do
 	if require(path) then stop = true break end
 end
 
 if stop then addScript("main","") return end
-
-for _, path in ipairs(listFiles("class")) do
-	require(path)
-end
-
-
-for _, path in ipairs(listFiles("auto")) do
-	require(path)
-end
-
-
 --]]

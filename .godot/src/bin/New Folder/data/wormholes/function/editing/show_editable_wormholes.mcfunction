@@ -1,0 +1,1 @@
+execute as @e[tag=apple_wormhole, nbt={data:{editable:1}}] at @s run function wormholes:editing/show_editable_wormhole

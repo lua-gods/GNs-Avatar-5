@@ -7804,7 +7804,7 @@
 				"properties": {},
 				"temp_data": {}
 			},
-			"origin": [-2, 13, 0],
+			"origin": [-2, 12, 0],
 			"rotation": [0, 0, 0],
 			"color": 3,
 			"children": [],
@@ -7814,7 +7814,7 @@
 			"visibility": true,
 			"autouv": 0,
 			"isOpen": true,
-			"primary_selected": false
+			"primary_selected": true
 		},
 		{
 			"name": "LeftKnee",
@@ -7988,7 +7988,7 @@
 				"properties": {},
 				"temp_data": {}
 			},
-			"origin": [2.125, 12.575, -5],
+			"origin": [2.125, 12.5625, -5.5],
 			"rotation": [0, 0, 0],
 			"color": 0,
 			"children": [],

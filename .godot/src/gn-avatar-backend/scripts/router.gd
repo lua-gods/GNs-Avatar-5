@@ -7,11 +7,6 @@ class_name MyExampleRouter
 const FILE_DIALOG_SIZE := Vector2i(500,400)
 var fileDialogRouter := HttpRouter.new("/fileDialog/",{
 	"get": func(request: HttpRequest, response: HttpResponse):
-		var monitor_size: Vector2i = DisplayServer.screen_get_size(DisplayServer.window_get_current_screen())
-		var center = monitor_size / 2
-		var size_half = FILE_DIALOG_SIZE / 2
-		#file_dialog.popup(Rect2i(monitor_size - size_half,monitor_size + size_half))
-		
 		var semaphore = Semaphore.new()
 		var selected_path = ""
 		var result_container: Array[String] = [""]

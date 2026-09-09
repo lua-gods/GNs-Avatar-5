@@ -9,4 +9,13 @@
 		"editor.suggest.showDeprecated": false
 	},
 	"explorer.sortOrder": "type",
+	
+	"material-icon-theme.folders.associations": {
+    "boot": "core",
+    "scripts": "repository",
+    "scripthost": "repository",
+    "lib": "resource",
+    "libhost": "resource",
+	 "host": "constant",
+}
 }

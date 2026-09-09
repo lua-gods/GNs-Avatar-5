@@ -1,0 +1,19 @@
+if not host:isHost() or silly == nil then return end
+
+---@type Texture
+screen = host:screenshot("frame")
+function events.tick()
+    screen = host:screenshot("frame")
+end
+function events.GUI_RENDER(g)
+    if screen == nil then return end
+    local mat = matrices.mat4(
+    vec(1,0,0,0),
+    vec(0,1,0,0),
+    vec(0,0,1,0),
+    vec(0,0,0,1)
+)
+    local size = client:getWindowSize()
+    g:pushPoseMatrix(mat:translate(size.x/6,size.y/6,0):scale(1/4,1/4,1/2))
+    g:blit(screen, vec(0,0))
+end
