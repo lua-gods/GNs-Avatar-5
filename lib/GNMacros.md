@@ -1,16 +1,12 @@
 ### Class Name: `GN.Macro`
+v2.0.0 public beta
 
-
-
-This library allows you to make a chunk of your code togglable!
-
+This library allows you to make a chunk of your code togglable!  
 examples being togglable accessories that do stuff when active, but completely turn off when turned off
 
 ## Added / Modified Events
 - **ENTITY_INIT**: instead of being triggered once, it gets triggered once the player is loaded; everytime the macro is enabled, if the player isnt loaded, it will wait until the player is loaded.
 - **ON_EXIT**: gets triggered when the macro is disabled
-- **ON_ENTITY_LOAD**: similar to the original ENTITY_INIT, but this triggers everytime the player is loaded
-- **ON_ENTITY_UNLOAD**: the opposite of ON_ENTITY_LOAD, triggers everytime the player unloads
 
 > NOTE
 > registering with ON_ENTITY_LOAD and ON_ENTITY_UNLOAD will make the macro use WORLD_TICK instructions
