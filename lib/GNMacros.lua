@@ -1,6 +1,6 @@
 ---@diagnostic disable: undefined-field
 --[[______   __
-  / ____/ | / / Name: GN MACROS LIBRARY v2.0.0 public beta
+  / ____/ | / / Name: GN MACROS LIBRARY v2.1.0 public beta
  / / __/  |/ /  Desc: encapsulates events and initialization into a togglable macro.
 / /_/ / /|  / Author: GNanimates | https://gnon.top | @gn68s
 \____/_/ |_/ License: Mozilla Public License Version 2.0
