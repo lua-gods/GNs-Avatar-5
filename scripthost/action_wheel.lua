@@ -1,5 +1,5 @@
 local awUtil = require("lib.GNAWUtil")
-local http = require("lib.http")
+require("lib.http")
 
 local page = action_wheel:newPage()
 
@@ -11,7 +11,7 @@ local fileDialogAction = awUtil.action(":file_folder: File Dialog","open native 
 			local _,pos = result:find("/data/")
 			local path = result:sub(pos+1,-1)
 			if path:find("%.nbs$") then
-				nbsHead(path)
+				--nbsHead(path)
 			end
 			if path:find("%.ogg$") then
 				oggHead(path,{loop=true})

@@ -1,8 +1,4 @@
-if avatar:getMaxRenderCount() <= 8192 then
-	models.skull:setVisible(false)
-	models.plushie:setVisible(false)
-	return
-end
+
 
 local SkullAPI = require("lib.GNskull")
 

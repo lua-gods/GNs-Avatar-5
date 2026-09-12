@@ -1,5 +1,5 @@
 
-local TIMEOUT_TIME = 20 * 1 -- 10 seconds
+local TIMEOUT_TIME = 20 * 5 -- 5 seconds
 
 ---@class HttpRequestBuilder
 local httpRequestBuilder = figuraMetatables.HttpRequestBuilder.__index
