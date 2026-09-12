@@ -1,5 +1,5 @@
 if host:isHost() then
-	require("scripthost.gui")
+	local ok, result = pcall(require,"scripthost.gui")
 else
 	function notify()
 		

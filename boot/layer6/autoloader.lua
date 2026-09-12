@@ -1,9 +1,12 @@
 
 local coreCommons = require("boot.lib.coreCommons")
-local notif = notify("Loading Scripts...","Avatar Loader",":loading:",true)
+local notif 
+if host:isHost() and notify then
+	notif = notify("Loading Scripts...","Avatar Loader",":loading:",true)
+end
 coreCommons.asyncLoadDir(listFiles("scripts",true),
 function (path,ok)
-	if host:isHost() then
+	if notif then
 		notif:setMessage("loading "..path)
 	end
 end
@@ -13,14 +16,14 @@ end
 	for key, value in pairs(dump) do
 		if value.errored then
 			errorCount = errorCount + 1
-			if host:isHost() then
-				notify(value.msg:match("[^\n]+"),value.path)
+			if notif then
+				notify(value.msg:match("[^\n]+"),value.path,nil,true):timeout(20)
 			end
 		else
 			correctCount = correctCount + 1
 		end
 	end
-	if host:isHost() then
+	if notif then
 		notif:setMessage(correctCount.." loaded, "..errorCount.." failed")
 		notif:setIcon(":@gn_portrait:")
 		notif:timeout(1)

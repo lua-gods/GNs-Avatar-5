@@ -20,14 +20,16 @@ end
 	for key, value in pairs(dump) do
 		if value.errored then
 			errorCount = errorCount + 1
-			notify(value.msg:match("[^\n]+"),value.path)
+			notify(value.msg:match("[^\n]+"),value.path,nil,true):timeout(20)
 		else
 			correctCount = correctCount + 1
 		end
+	end
+	if silly then
+		silly:updateAvatarSize()
 	end
 	notif:setMessage(correctCount.." loaded, "..errorCount.." failed")
 	notif:setIcon(":@gn_portrait:")
 	notif:timeout(1)
 end)
 addScript(table.concat({...},"/"),nil)
-

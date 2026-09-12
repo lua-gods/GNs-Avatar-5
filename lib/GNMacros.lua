@@ -1,134 +1,97 @@
----@diagnostic disable: undefined-field
---[[______   __
-  / ____/ | / / Name: GN MACROS LIBRARY v1.2.0
- / / __/  |/ /  Desc: encapsulates events and initialization into a togglable macro.
-/ /_/ / /|  / Author: GNanimates | https://gnon.top | @gn68s
-\____/_/ |_/ License: Mozilla Public License Version 2.0
---────────-< DEPENDENCIES >-────────--
-Place required dependencies in the same folder as this script.
-- GNEvent > https://discord.com/channels/1129805506354085959/1492967289312641095
-]]
+local Event = require("./GNEvent") ---@type GN.Event
 
----@class MacroAPI
+---@class GN.MacrosRewriteAPI
 local MacrosAPI = {}
 
+---@alias GN.MacrosRewrite.init fun(events: GN.MacrosRewrite.EventsAPI)
 
-local Event = require("./GNEvent")
+---@class GN.MacrosRewrite
+---@field active boolean
+---@field init GN.MacrosRewrite.init
+---@field events GN.MacrosRewrite.EventsAPI?
+---@field hooks table<string,function[]>
+local Macros = {}
+Macros.__index = Macros
 
 
-local randomID = function()
-	return client.intUUIDToString(client.generateUUID())
+---@class GN.MacrosRewrite.EventsAPI : EventsAPI
+---@field ON_EXIT GN.Event
+---@field ON_ENTITY_LOAD GN.Event
+---@field ON_ENTITY_UNLOAD GN.Event
+
+local eventsMetatable = {}
+
+eventsMetatable.__index = function(self, index)
+	index = tostring(index):lower()
+	local out = rawget(self, tostring(index):lower())
+	if not out then
+		local owner = rawget(self, "owner")
+		
+		local event = Event.new()
+		local hook = function(...)
+			if owner.active then -- avoids events like tick from triggering after ON_EXIT
+				local out = event:invoke(...)
+				return out[next(out)] ---TODO: find a better way to handle this
+			end
+		end
+		
+		if events[index] then
+			owner.hooks[index] = owner.hooks[index] or {}
+			local hooks = owner.hooks[index]
+			hooks[#hooks + 1] = hook
+			
+			events[index]:register(hook)
+		end
+		
+		rawset(self, index, event)
+		return event
+	end
+	return out
 end
 
----@class GN.Macro
----@field isActive boolean
----@field events MacroEventsAPI
----@field id string
----@field package init fun(events: MacroEventsAPI,...):any?
-local Macro = {}
-Macro.__index = Macro
+---@param init GN.MacrosRewrite.init
+---@return GN.MacrosRewrite
+function MacrosAPI.new(init)
+	local self = {
+		active = false,
+		init = init,
+		isActive = false,
+		hooks = {},
+	}
 
+	setmetatable(self, Macros)
+	return self
+end
 
----@class MacroEventsAPI : EventsAPI
----@field ON_EXIT Event
----@field ON_ENTITY_UNLOAD Event
----@field ON_ENTITY_LOAD Event
-local MacroEventsAPI = {}
-
----Enables / Disables the macro
----@param active boolean
----@param ... any
----@return ...
-function Macro:setActive(active, ...)
-	if self.isActive ~= active then
-		self.isActive = active
+function Macros:setActive(active)
+	if self.active ~= active then
+		self.active = active
 		if active then
-			self.events = setmetatable({
-				ENTITY_INIT = Event.new(),
-				ON_EXIT = Event.new(),
-				ON_ENTITY_UNLOAD = Event.new(),
-				ON_ENTITY_LOAD = Event.new(),
-			}, MacroEventsAPI)
-			local out = self.init(self.events, ...)
-
-			local hasInit = false
-			local hasLoadEvent = false
-			for name, value in pairs(self.events) do
-				if events[name] then
-					events[name]:register(function(...)
-						value:invoke(...)
-					end, self.id)
+			local fakeEvents = setmetatable({ owner = self }, eventsMetatable)
+			self.events = fakeEvents
+			self.init(fakeEvents)
+			local function entityInitHandler()
+				if self.events.ENTITY_INIT then
+					self.events.ENTITY_INIT:invoke()
 				end
-				if name == "ENTITY_INIT" then
-					hasInit = true
-				end
-				if name == "ON_ENTITY_LOAD" or name == "ON_ENTITY_UNLOAD" then
-					hasLoadEvent = true
-				end
+				events.TICK:remove(entityInitHandler)
 			end
-
-			if player:isLoaded() then
-				self.events.ENTITY_INIT:invoke()
-			else
-				if hasInit then
-					local initName = self.id .. "init"
-					self.initName = initName
-					events.TICK:register(function()
-						self.events.ENTITY_INIT:invoke()
-						events.TICK:remove(initName)
-					end, initName)
-				end
-			end
-			local wasLoaded = 5
-			if hasLoadEvent then
-				events.WORLD_TICK:register(function()
-					local isLoaded = player:isLoaded()
-					if isLoaded ~= wasLoaded then
-						wasLoaded = isLoaded
-						if isLoaded then
-							self.events.ON_ENTITY_LOAD:invoke()
-						else
-							self.events.ON_ENTITY_UNLOAD:invoke()
-						end
-					end
-				end)
-			end
-			return out
+			events.TICK:register(entityInitHandler)
 		else
-			for name in pairs(self.events) do
-				if events[name] then
-					events[name]:remove(self.id)
-				end
-				if self.initName then
-					events.TICK:remove(self.initName)
+			for name, funs in pairs(self.hooks) do
+				for _, fun in pairs(funs) do
+					events[name]:remove(fun)
 				end
 			end
-			self.events.ON_EXIT:invoke(...)
+			
+			if self.events.ON_EXIT then
+				self.events.ON_EXIT:invoke()
+			end
+			
+			self.events = nil
+			self.hooks = {}
 		end
 	end
 end
-
----@param init fun(events: MacroEventsAPI,...):any?
----@return GN.Macro
-function MacrosAPI.new(init)
-	assert(type(init) == "function", "Macro.init must be a function")
-	local new = {
-		init = init,
-		isActive = false,
-		id = randomID(),
-		events = {},
-	}
-	return setmetatable(new, Macro)
-end
-
-MacroEventsAPI.__index = function(t, k)
-	if not rawget(t, k) then
-		local signal = Event.new()
-		rawset(t, k, signal)
-		--if v and type(v) == "function" then signal:register(v) end
-	end
-	return rawget(t, k)
-end
-
 
 return MacrosAPI
