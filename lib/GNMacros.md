@@ -14,7 +14,7 @@ examples being togglable accessories that do stuff when active, but completely t
 ```lua
 local Macros = require("lib.GNMacros")
 
-local macro = Macros.new(function (events, ...)
+local macro = Macros.new(function (macro,events, ...)
     -- triggers when the player is loaded and the macro is enabled
     events.ENTITY_INIT:register(function ()
         print("INIT")

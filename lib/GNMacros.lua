@@ -10,12 +10,12 @@ Place required dependencies in the same folder as this script.
 ]]
 local Event = require("./GNEvent") ---@type GN.Event
 
----@class GN.MacrosRewriteAPI
+---@class GN.MacrosAPI
 local MacrosAPI = {}
 
----@alias GN.MacrosRewrite.init fun(events: GN.MacrosRewrite.EventsAPI,...:any)
+---@alias GN.MacrosRewrite.init fun(macro: GN.Macros,events: GN.MacrosRewrite.EventsAPI,...:any)
 
----@class GN.MacrosRewrite
+---@class GN.Macros
 ---@field active boolean
 ---@field init GN.MacrosRewrite.init
 ---@field events GN.MacrosRewrite.EventsAPI?
@@ -58,7 +58,7 @@ eventsMetatable.__index = function(self, index)
 end
 
 ---@param init GN.MacrosRewrite.init
----@return GN.MacrosRewrite
+---@return GN.Macros
 function MacrosAPI.new(init)
 	local self = {
 		active = false,
@@ -77,7 +77,7 @@ function Macros:setActive(active,...)
 		if active then
 			local fakeEvents = setmetatable({ owner = self }, eventsMetatable)
 			self.events = fakeEvents
-			self.init(fakeEvents,...)
+			self.init(self,fakeEvents,...)
 			local function entityInitHandler()
 				if self.events.ENTITY_INIT then
 					self.events.ENTITY_INIT:invoke()

@@ -26,7 +26,7 @@ end
 	if notif then
 		notif:setMessage(correctCount.." loaded, "..errorCount.." failed")
 		notif:setIcon(":@gn_portrait:")
-		notif:timeout(1)
+		notif:timeout(3)
 	end
 end)
 

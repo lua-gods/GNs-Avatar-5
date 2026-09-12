@@ -11,7 +11,9 @@ local ANIM_ATTACK_TWO = animations.player.swordAttack2:setBlendDuration(0.1)
 local alternate = false
 models.player.VFX:setVisible(true)
 models.player.Roll.Sword.glow:setPrimaryRenderType("EMISSIVE_SOLID")
-models.player.VFX.Smear1.Smear1Spin:setPrimaryRenderType("EMISSIVE"):setColor(0.8,0.8,0.8)
+models.player.Roll.Sword.glow:setPrimaryRenderType("EMISSIVE_SOLID")
+models.player.VFX.Smear1.Smear1Spin
+:setPrimaryRenderType("EMISSIVE")
 
 models.player.Roll:setVisible(true)
 

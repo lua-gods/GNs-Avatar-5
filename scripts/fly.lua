@@ -14,7 +14,7 @@ end
 
 local flyMacro
 
-flyMacro = Macros.new(function(events)
+flyMacro = Macros.new(function(macro,events)
 	events.ENTITY_INIT:register(function()
 		animations.player.flyForward:play():pause()
 		animations.player.flySideways:play():pause()
