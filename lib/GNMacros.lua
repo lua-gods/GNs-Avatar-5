@@ -1,9 +1,19 @@
+---@diagnostic disable: undefined-field
+--[[______   __
+  / ____/ | / / Name: GN MACROS LIBRARY v2.0.0 public beta
+ / / __/  |/ /  Desc: encapsulates events and initialization into a togglable macro.
+/ /_/ / /|  / Author: GNanimates | https://gnon.top | @gn68s
+\____/_/ |_/ License: Mozilla Public License Version 2.0
+--────────-< DEPENDENCIES >-────────--
+Place required dependencies in the same folder as this script.
+- GN Event > https://discord.com/channels/1129805506354085959/1492967289312641095
+]]
 local Event = require("./GNEvent") ---@type GN.Event
 
 ---@class GN.MacrosRewriteAPI
 local MacrosAPI = {}
 
----@alias GN.MacrosRewrite.init fun(events: GN.MacrosRewrite.EventsAPI)
+---@alias GN.MacrosRewrite.init fun(events: GN.MacrosRewrite.EventsAPI,...:any)
 
 ---@class GN.MacrosRewrite
 ---@field active boolean
@@ -16,8 +26,6 @@ Macros.__index = Macros
 
 ---@class GN.MacrosRewrite.EventsAPI : EventsAPI
 ---@field ON_EXIT GN.Event
----@field ON_ENTITY_LOAD GN.Event
----@field ON_ENTITY_UNLOAD GN.Event
 
 local eventsMetatable = {}
 
@@ -63,13 +71,13 @@ function MacrosAPI.new(init)
 	return self
 end
 
-function Macros:setActive(active)
+function Macros:setActive(active,...)
 	if self.active ~= active then
 		self.active = active
 		if active then
 			local fakeEvents = setmetatable({ owner = self }, eventsMetatable)
 			self.events = fakeEvents
-			self.init(fakeEvents)
+			self.init(fakeEvents,...)
 			local function entityInitHandler()
 				if self.events.ENTITY_INIT then
 					self.events.ENTITY_INIT:invoke()
