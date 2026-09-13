@@ -42,7 +42,7 @@ local profiler = Macro.new(function (macro, events, ...)
 	local lastDiff
 	local targetZoom = 1
 	
-	events.WORLD_RENDER:register(function ()
+	screen.PRE_RENDER:register(function ()
 		if isSearching then
 			local from = player:getPos():add(0,player:getEyeHeight())
 			local to = from + player:getLookDir() * 100

@@ -79,7 +79,7 @@ function Macros:setActive(active,...)
 			self.events = fakeEvents
 			self.init(self,fakeEvents,...)
 			local function entityInitHandler()
-				if self.events.ENTITY_INIT then
+				if self and self.events and self.events.ENTITY_INIT then
 					self.events.ENTITY_INIT:invoke()
 				end
 				events.TICK:remove(entityInitHandler)

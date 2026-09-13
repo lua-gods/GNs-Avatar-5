@@ -1,6 +1,6 @@
 local GNUI = require("libhost.GNUI.init")
 local screen = GNUI.getScreen()
-
+local Event = require("lib.GNEvent")
 
 
 for key, value in pairs(listFiles("scripthost.ui")) do
@@ -23,7 +23,8 @@ events.MOUSE_SCROLL:register(function(amount) screen:inputScroll(amount, 0) end)
 
 
 screen.display:setParentType("HUD")
-events.WORLD_RENDER:register(function ()
+screen.PRE_RENDER = Event.new()
+events.WORLD_RENDER:register(function (delta)
 	screen:setVisible(client:isHudEnabled())
 	local screenID = host:getScreen()
 	if (action_wheel:isEnabled())
@@ -33,6 +34,7 @@ events.WORLD_RENDER:register(function ()
 		screen:setCursorPos(client:getMousePos() *
 			(client:getScaledWindowSize() / client:getWindowSize()))
 	end
+	screen.PRE_RENDER:invoke(delta)
 	screen:flushUpdates()
 	
 		--screen:draw(graphics)
