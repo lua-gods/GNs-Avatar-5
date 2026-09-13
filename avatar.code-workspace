@@ -7,6 +7,10 @@
 			"name": "Data",
 			"path": "../../data",
 		},
+		{
+			"name": "Config",
+			"path": "../../config",
+		},
 	],
 	"settings": {
 		"json.schemas": [

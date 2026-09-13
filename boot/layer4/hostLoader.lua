@@ -1,15 +1,18 @@
 if not host:isHost() then return end
 local coreCommons = require("boot.lib.coreCommons")
-
 local addScript = addScript
 
+
+local files = listFiles("scripthost")
 if not addScript then
 	notify("fallback to classic loader, All host scripts will be included if uploaded","SillyPlugin not found",":cancel:",true):timeout(10)
-	addScript = function ()
-	end
+	coreCommons.asyncLoadDir(files)
+	return
 end
+
+
 local notif = notify("Loading Host Scripts...","Host Loader",":loading:",true)
-coreCommons.asyncLoadDir(listFiles("scripthost"),
+coreCommons.asyncLoadDir(files,
 function (path,ok)
 	notif:setMessage("loading "..path)
 	addScript(path,nil,"NBT")
@@ -32,4 +35,4 @@ end
 	notif:setIcon(":@gn_portrait:")
 	notif:timeout(3)
 end)
-addScript(table.concat({...},"/"),nil)
+

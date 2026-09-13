@@ -8,7 +8,7 @@ local player = models.player
 player.Base.Torso.Waist.Chest.Cape:setPrimaryTexture("CAPE")
 player.Base.Torso.Waist.Chest.RightElytra:setPrimaryTexture("CAPE"):scale(1.1,1.1,2.4)
 player.Base.Torso.Waist.Chest.LeftElytra:setPrimaryTexture("CAPE"):scale(1.1,1.1,2.4)
-player:setPrimaryRenderType("CUTOUT_CULL")
+player:setPrimaryRenderType("CUTOUT")
 
 --models.player:setPrimaryTexture("SKIN")
 --animations.player.california:play()
