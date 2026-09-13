@@ -7,10 +7,11 @@ local id = 0
 ---@param finish fun(errors:{errored:boolean,path:string,msg:string}[])?
 function api.asyncLoadDir(paths,tick,finish)
 	id = id + 1
-	local model = models:newPart("loader"..id, "WORLD")
+	local model = models:newPart("loader"..id, "SKULL")
 	local i = 1
 	local errors = {}
-	model.postRender = function(delta, context, part)
+	
+	local function process()
 		local path = paths[i]
 		if path then
 			local ok, result = pcall(require,path)
@@ -26,10 +27,13 @@ function api.asyncLoadDir(paths,tick,finish)
 		else
 			if finish then
 				finish(errors)
+				BOOT_CLOCK:remove(process)
 			end
 			model:remove()
 		end
+		
 	end
+	BOOT_CLOCK:register(process)
 end
 
 return api

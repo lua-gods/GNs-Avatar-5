@@ -4,7 +4,7 @@ local notif
 if host:isHost() and notify then
 	notif = notify("Loading Scripts...","Avatar Loader",":loading:",true)
 end
-coreCommons.asyncLoadDir(listFiles("scripts",true),
+coreCommons.asyncLoadDir(listFiles("scripts"),
 function (path,ok)
 	if notif then
 		notif:setMessage("loading "..path)

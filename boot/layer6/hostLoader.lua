@@ -9,7 +9,7 @@ if not addScript then
 	end
 end
 local notif = notify("Loading Host Scripts...","Host Loader",":loading:",true)
-coreCommons.asyncLoadDir(listFiles("scripthost",true),
+coreCommons.asyncLoadDir(listFiles("scripthost"),
 function (path,ok)
 	notif:setMessage("loading "..path)
 	addScript(path,nil,"NBT")

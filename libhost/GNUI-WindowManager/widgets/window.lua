@@ -72,7 +72,6 @@ function WindowAPI.new(canvas)
 			},
 		},
 	})
-
 	local titlebar = self:getChild("titlebar")
 	---@cast titlebar GNUI.Widget.Button
 	titlebar.BUTTON_DOWN:register(function()

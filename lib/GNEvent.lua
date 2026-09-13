@@ -50,8 +50,8 @@ function Events:remove(name) for id, value in pairs(self) do if value[1] == name
 ---@param name any
 ---@return integer
 function Events:getRegisteredCount(name)
-	local c = 0
 	if not name then return #self end
+	local c = 0
 	for id, value in pairs(self) do if value[1] == name then c = c + 1 end end
 	return c
 end

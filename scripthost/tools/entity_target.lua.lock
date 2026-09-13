@@ -1,0 +1,48 @@
+local Macros = require("lib.GNMacros")
+
+local DIST = 64
+
+---@param min Vector3
+---@param max Vector3
+---@return Entity[]
+local function getEntities(min, max)
+	local e = {}
+
+	raycast:entity(min, max, function(hit)
+		if hit ~= player and hit:isLiving() and hit:getHealth() > 0 then
+			e[#e + 1] = hit
+		end
+		return false
+	end)
+
+	return e
+end
+
+return {
+	name = "Entity Target",
+	macro = Macros.new(function(macro, events, ...)
+		events.TICK:register(function()
+			local pos = player:getPos()
+			local entities = getEntities(pos-DIST,pos+DIST)
+			local closestCenter
+			local closestDist = math.huge
+			for key, entity in pairs(entities) do
+				local bounds = entity:getBoundingBox()
+				local pos = entity:getPos()
+				local center = pos + vec(0,bounds.y * 0.5,0)
+				local spos = vectors.worldToScreenSpace(center)
+				local dist = spos.xy:length()
+				if dist < closestDist and vectors.toCameraSpace(center).y < 0 then
+					closestDist = dist
+					closestCenter = center
+				end
+			end
+			if closestCenter and player:getHeldItem().id:find("sword") then
+				renderer
+				:eyeOffset(closestCenter-pos:add(0,player:getEyeHeight()))
+			else
+				renderer:eyeOffset()
+			end
+		end)
+	end),
+}

@@ -1,7 +1,3 @@
-local GNanim = require("lib.GNanimClassic")
-
-local animState = GNanim.new():setBlendTime(0.0)
-
 local RANDOM_PITCH = 0.15
 
 local ANIM_IDLE = animations.player.sword

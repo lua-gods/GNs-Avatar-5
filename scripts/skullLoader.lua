@@ -1,4 +1,8 @@
-
+if avatar:getPermissionLevel() ~= "MAX" then
+	models.skull:setVisible(false)
+	models.plushie:setVisible(false)
+	return
+end
 
 local SkullAPI = require("lib.GNskull")
 
