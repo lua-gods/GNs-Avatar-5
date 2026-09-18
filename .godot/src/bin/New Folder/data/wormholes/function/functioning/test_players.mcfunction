@@ -1,1 +1,0 @@
-execute as @a[gamemode=!spectator] at @s run function wormholes:functioning/test_player
