@@ -1,0 +1,1 @@
+avatar:store("NSv9", {name="Niko Bellic"})
