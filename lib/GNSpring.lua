@@ -1,6 +1,6 @@
 ---@diagnostic disable: param-type-mismatch, assign-type-mismatch
 --[[______   __
-  / ____/ | / / Name: GN SPRING LIBRARY v1.0.0
+  / ____/ | / / Name: GN SPRING LIBRARY v1.0.1
  / / __/  |/ /  Desc: an implementation of a 2nd-order spring system
 / /_/ / /|  / Author: GNanimates | https://gnon.top | @gn68s
 \____/_/ |_/ License: Mozilla Public License Version 2.0 ]]
@@ -40,6 +40,7 @@ local springs = {}
 local TAU = math.pi * 2
 local PI = math.pi
 
+local nID = 0
 
 ---@generic T
 ---@param responseSpeed T?
@@ -66,9 +67,9 @@ function SpringAPI.new(responseSpeed, dampingCoeficient, initialResponseStrength
 	s.k3 = s.initialResponseStrength * s.dampingCoeficient / (TAU * s.responseSpeed)
 
 	setmetatable(s, Spring)
-	local id = #springs + 1
-	s.id = id
-	springs[id] = s
+	s.id = nID
+	springs[nID] = s
+	nID = nID + 1
 	return s
 end
 
@@ -163,26 +164,28 @@ end
 local DELTA = 0.05
 events.TICK:register(function ()
 	for i, s in pairs(springs) do
-		local taccel = 0
-		if not s.ltarget then
-			taccel = (s.target - s.ltarget) / DELTA
-		end
-		s.ltarget = s.target
-		s.lpos = s.pos
-		s.pos = s.pos + DELTA * s.vel
-		local accel = (s.target + s.k3 * taccel - s.pos - 2 * s.k1 * s.vel) / s.k2 + s.gravity
-		s.vel = s.vel + DELTA * accel
+		local pos, vel, target, gravity = s.pos, s.vel, s.target, s.gravity
+		local k1, k2, k3, ltarget = s.k1, s.k2, s.k3, s.ltarget
+		local gr = s.guardrailRadius
 		
-		if s.guardrailRadius then
-			local dir = s.pos-s.target
+		local taccel = (target - ltarget) / DELTA
+		s.ltarget = target
+		s.lpos = pos
+
+		pos = pos + DELTA * vel
+		local accel = (target + k3 * taccel - pos - 2 * k1 * vel) / k2 + gravity
+		vel = vel + DELTA * accel
+
+		if gr then
+			local dir = pos - target
 			if type(dir) == "number" then
-				s.pos = math.clamp(s.pos,s.target-s.guardrailRadius,s.target+s.guardrailRadius)
+				pos = math.clamp(pos, target - gr, target + gr)
 			else
----@diagnostic disable-next-line: undefined-field
-				s.pos = s.target + dir:clamped(0,s.guardrailRadius)
+				pos = target + dir:clamped(0, gr)
 			end
 		end
-		
+
+		s.pos, s.vel = pos, vel
 	end
 end)
 
