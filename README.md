@@ -4,7 +4,7 @@
 - then run:
 
 ```bash
-git clone https://github.com/lua-gods/GNs-Avatar-4 --recurse-submodules
+git clone https://github.com/lua-gods/GNs-Avatar-5 --recurse-submodules
 ```
 
 but if you already git cloned and and came back crawling here for not reading this lmao, run these:
