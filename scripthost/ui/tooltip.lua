@@ -1,7 +1,7 @@
 -- Any GNUI Box with `tooltipText` property set will display a tooltip
 -- a tooltip is just a text box thats beside the cursor
 
-if true then return end
+if false then return end
 
 local GNUI = require("libhost.GNUI.init")
 local screen = GNUI.getScreen()
