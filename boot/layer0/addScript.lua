@@ -7,7 +7,7 @@ if not addScript then
 		getScripts = function(...) return silly_backports.getScripts(silly_backports, ...) end
 	else
 		if host:isHost() then
-			warn("addScript method not found, disabling feature", "all scripts will be uploaded")
+			--warn("addScript method not found, disabling feature", "all scripts will be uploaded")
 		end
 		--addScript = function() end
 		--getScript = function() end

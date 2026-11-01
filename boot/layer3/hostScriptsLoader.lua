@@ -31,7 +31,7 @@ if host:isAvatarUploaded() then
 	local contents = config:load("content")
 	local foundKey = config:load("session")
 	local thisKey = require("session")
-	
+	print(thisKey,foundKey)
 	if thisKey ~= foundKey then
 		warn("Tampered cache scripts detected, canceled loading")
 		return

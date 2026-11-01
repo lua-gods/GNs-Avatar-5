@@ -151,6 +151,8 @@ function gnc.vec3(x,y,z)
 		return vec(x,y.y,y.z)
 	elseif (tx == "number" and ty == "number" and tz == "number") then
 		return vec(x,y,z)
+	elseif tx == "string" then -- figura exclusive, remove if not used in figura
+		return vectors.hexToRGB(x)
 	else
 		error(("Invalid Vector3 parameter, expected (number, number, number), instead got (%s, %s, %s)"):format(tx,ty,tz),3)
 	end

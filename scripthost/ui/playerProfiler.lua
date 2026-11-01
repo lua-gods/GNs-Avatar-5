@@ -1,5 +1,9 @@
 local GNUI = require("libhost.GNUI.init")
 local screen = GNUI.getScreen()
+
+
+if true then return end
+
 local Macro = require("lib.GNMacros")
 
 local ZOOM_SPEED = 0.05

@@ -14,7 +14,7 @@ local e = 0
 function api.playRandom(pos)
 	--e = (e + 1) % (i - 1)
 	e = 0
-	e = e + math.floor(world.getTime()/10)
+	--e = e + math.floor(world.getTime()/10)
 	--pos = pos:floor()
 	e = (e + pos.x * 12.135 )% 1024
 	e = (e + pos.y * 321.25 )% 1024
