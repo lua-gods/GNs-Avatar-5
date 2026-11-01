@@ -39,13 +39,16 @@ ProceduralTexture:newTexture("Hue", RESOLUTION, 1, function(x, y, w, h)
 end)
 
 
-local saturationTexture = ProceduralTexture:newTexture("saturation", RESOLUTION, 80,
+local saturationTexture = ProceduralTexture:newTexture("saturation", RESOLUTION, 1,
 	function(x, y, w, h)
 		local i = x / w
 		return vec(1, i, i, 1)
 	end)
 
+local lastHue, lastVal
 local function applySaturationHue(hue, value)
+	if lastHue == hue and lastVal == value then return end
+	lastHue, lastVal = hue, value
 	ProceduralTexture:apply(saturationTexture, function(x, y, w, h)
 		return vectors.hsvToRGB(hue, (1 - (x / w)), value):augmented(1)
 	end)
@@ -199,7 +202,8 @@ return (function(screen, GNUI)
 						placeholder = "A",
 						prefix = "a",
 						minSize = vec(26, 0),
-						sizing = { "FIT", "FILL" },
+						size = vec(-1, 13),
+						sizing = { "FIT", "FIXED" },
 					},
 				},
 			},
@@ -211,7 +215,8 @@ return (function(screen, GNUI)
 					{
 						type = "textField",
 						name = "hexField",
-						sizing = { "FILL", "FIT" },
+						size = vec(-1, 13),
+						sizing = { "FILL", "FIXED" },
 						placeholder = "#RRGGBB",
 						validator = "hex",
 					},
@@ -220,7 +225,8 @@ return (function(screen, GNUI)
 						name = "copyButton",
 						text = "Copy",
 						minSize = vec(26, 0),
-						sizing = { "FIT", "FILL" },
+						size = vec(-1, 13),
+						sizing = { "FIT", "FIXED" },
 					},
 				},
 			},
@@ -232,7 +238,8 @@ return (function(screen, GNUI)
 					{
 						type = "textField",
 						name = "hueField",
-						sizing = { "FILL", "FIT" },
+						size = vec(-1, 13),
+						sizing = { "FILL", "FIXED" },
 						placeholder = "Hue",
 						prefix = "h",
 						validator = "integer",
@@ -240,7 +247,8 @@ return (function(screen, GNUI)
 					{
 						type = "textField",
 						name = "satField",
-						sizing = { "FILL", "FIT" },
+						size = vec(-1, 13),
+						sizing = { "FILL", "FIXED" },
 						placeholder = "Sat",
 						prefix = "s",
 						validator = "integer",
@@ -248,7 +256,8 @@ return (function(screen, GNUI)
 					{
 						type = "textField",
 						name = "valField",
-						sizing = { "FILL", "FIT" },
+						size = vec(-1, 13),
+						sizing = { "FILL", "FIXED" },
 						placeholder = "Val",
 						prefix = "v",
 						validator = "integer",
@@ -263,7 +272,8 @@ return (function(screen, GNUI)
 					{
 						type = "textField",
 						name = "rField",
-						sizing = { "FILL", "FIT" },
+						size = vec(-1, 13),
+						sizing = { "FILL", "FIXED" },
 						placeholder = "R",
 						prefix = "r",
 						validator = "integer",
@@ -271,7 +281,8 @@ return (function(screen, GNUI)
 					{
 						type = "textField",
 						name = "gField",
-						sizing = { "FILL", "FIT" },
+						size = vec(-1, 13),
+						sizing = { "FILL", "FIXED" },
 						placeholder = "G",
 						prefix = "g",
 						validator = "integer",
@@ -279,7 +290,8 @@ return (function(screen, GNUI)
 					{
 						type = "textField",
 						name = "bField",
-						sizing = { "FILL", "FIT" },
+						size = vec(-1, 13),
+						sizing = { "FILL", "FIXED" },
 						placeholder = "B",
 						prefix = "b",
 						validator = "integer",
