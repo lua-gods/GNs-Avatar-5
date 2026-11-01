@@ -2,7 +2,7 @@ local GNUI = require("libhost.GNUI.init")
 local screen = GNUI.getScreen()
 
 
-if true then return end
+if false then return end
 
 local ENTRIES = {
 	{

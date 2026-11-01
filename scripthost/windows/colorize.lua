@@ -4,7 +4,7 @@ local ColorPickerWindow = require("scripthost.windows.utils.colorPicker")
 
 local colorMacro
 
-colorMacro = Macro.new(function (events, screen, GNUI)
+colorMacro = Macro.new(function (self, events, screen, GNUI)
 	local ColorPicker = ColorPickerWindow(screen, GNUI)
 	ColorPicker.COLOR_CHANGED:register(function (color)
 	end)

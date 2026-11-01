@@ -33,7 +33,7 @@ local function applyMat(t)
 	end
 end
 
-myApp = Macro.new(function(events, screen, GNUI)
+myApp = Macro.new(function(self, events, screen, GNUI)
 	Tween.new{
 		from = transition,
 		to = 1,

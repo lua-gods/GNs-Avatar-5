@@ -1,0 +1,36 @@
+---@meta _
+
+---@alias Minecraft.effectID string
+---| "minecraft:absorption"          # Absorption
+---| "minecraft:bad_omen"            # Bad Omen
+---| "minecraft:blindness"           # Blindness
+---| "minecraft:conduit_power"       # Conduit Power
+---| "minecraft:darkness"            # Darkness
+---| "minecraft:dolphins_grace"      # Dolphin's Grace
+---| "minecraft:fire_resistance"     # Fire Resistance
+---| "minecraft:glowing"             # Glowing
+---| "minecraft:haste"               # Haste
+---| "minecraft:health_boost"        # Health Boost
+---| "minecraft:hero_of_the_village" # Hero of the Village
+---| "minecraft:hunger"              # Hunger
+---| "minecraft:instant_damage"      # Instant Damage
+---| "minecraft:instant_health"      # Instant Health
+---| "minecraft:invisibility"        # Invisibility
+---| "minecraft:jump_boost"          # Jump Boost
+---| "minecraft:levitation"          # Levitation
+---| "minecraft:luck"                # Luck
+---| "minecraft:mining_fatigue"      # Mining Fatigue
+---| "minecraft:nausea"              # Nausea
+---| "minecraft:night_vision"        # Night Vision
+---| "minecraft:poison"              # Poison
+---| "minecraft:regeneration"        # Regeneration
+---| "minecraft:resistance"          # Resistance
+---| "minecraft:saturation"          # Saturation
+---| "minecraft:slow_falling"        # Slow Falling
+---| "minecraft:slowness"            # Slowness
+---| "minecraft:speed"               # Speed
+---| "minecraft:strength"            # Strength
+---| "minecraft:unluck"              # Bad Luck
+---| "minecraft:water_breathing"     # Water Breathing
+---| "minecraft:weakness"            # Weakness
+---| "minecraft:wither"              # Wither

@@ -28,7 +28,7 @@ events.WORLD_RENDER:register(function (delta)
 	screen:setVisible(client:isHudEnabled())
 	local screenID = host:getScreen()
 	if (action_wheel:isEnabled())
-	or (screenID and not screenID == "net.minecraft.class_408") then -- move mouse away if theres already UI open
+	or (screenID and screenID ~= "net.minecraft.class_408") then -- move mouse away if theres already UI open
 		screen:setCursorPos(-1000, -1000)
 	else
 		screen:setCursorPos(client:getMousePos() *
