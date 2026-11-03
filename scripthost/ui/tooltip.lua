@@ -22,6 +22,7 @@ screen.CHILDREN_ORDER_CHANGED:register(function ()
 end)
 
 screen.CURSOR_MOVED:register(function (pos, vel)
+	tooltip:forceUpdate()
 	local size = tooltip:getFinalSize()
 	local screenSize = screen:getFinalSize()
 	tooltip:setPos(
