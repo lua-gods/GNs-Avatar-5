@@ -1,5 +1,5 @@
 ### Class Name: `GN.Macro`
-v2.0.0 public beta
+v2.2.0
 
 This library allows you to make a chunk of your code togglable!  
 examples being togglable accessories that do stuff when active, but completely turn off when turned off
@@ -140,3 +140,20 @@ Enables / Disables the macro
 
 ### Returns `GN.Macro`
 
+## `Macros:duplicate()`
+Duplicates the macro into its own unique object  
+### Returns `GN.Macros`
+
+## `Macros:activate(.)`
+Activates the given macro  
+### Arguments
+- `any` `.`
+
+### Returns `GN.Macros`
+
+## `Macros:deactivate(.)`
+Deactivates the given macro  
+### Arguments
+- `any` `.`
+
+### Returns `GN.Macros`

@@ -1,6 +1,6 @@
 ---@diagnostic disable: undefined-field
 --[[______   __
-  / ____/ | / / Name: GN MACROS LIBRARY v2.1.0 public beta
+  / ____/ | / / Name: GN MACROS LIBRARY v2.2.0 public beta
  / / __/  |/ /  Desc: encapsulates events and initialization into a togglable macro.
 / /_/ / /|  / Author: GNanimates | https://gnon.top | @gn68s
 \____/_/ |_/ License: Mozilla Public License Version 2.0
@@ -9,6 +9,7 @@ Place required dependencies in the same folder as this script.
 - GN Event > https://discord.com/channels/1129805506354085959/1492967289312641095
 ]]
 local Event = require("./GNEvent") ---@type GN.Event
+
 
 ---@class GN.MacrosAPI
 local MacrosAPI = {}
@@ -57,6 +58,7 @@ eventsMetatable.__index = function(self, index)
 	return out
 end
 
+
 ---@param init GN.MacrosRewrite.init
 ---@return GN.Macros
 function MacrosAPI.new(init)
@@ -71,6 +73,9 @@ function MacrosAPI.new(init)
 	return self
 end
 
+---Sets whenever the macro is activated or not
+---@param active boolean
+---@param ... any
 function Macros:setActive(active,...)
 	if self.active ~= active then
 		self.active = active
@@ -101,5 +106,26 @@ function Macros:setActive(active,...)
 		end
 	end
 end
+
+---Duplicates the macro into its own unique object
+---@return GN.Macros
+function Macros:duplicate()
+	return MacrosAPI.new(self.init)
+end
+
+---Activates the given macro
+---@param ... any
+---@return GN.Macros
+function Macros:activate(...)
+	return self:setActive(true,...)
+end
+
+---Deactivates the given macro
+---@param ... any
+---@return GN.Macros
+function Macros:deactivate(...)
+	return self:setActive(false,...)
+end
+
 
 return MacrosAPI

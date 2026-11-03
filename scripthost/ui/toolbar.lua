@@ -92,7 +92,6 @@ for index, entry in ipairs(ENTRIES) do
 			textAlign = vec(0, 0),
 			textScale = ICON_SCALE,
 			wrapText = false,
-			toggle = true,
 		})
 	
 		if false then
@@ -108,12 +107,8 @@ for index, entry in ipairs(ENTRIES) do
 		entry.macro = macro
 		---@cast btn GNUI.Widget.Button
 	
-		btn.BUTTON_DOWN:register(function()
+		btn.PRESSED:register(function()
 			entry.macro:setActive(true, screen, GNUI)
-		end)
-	
-		btn.BUTTON_UP:register(function()
-			entry.macro:setActive(false, screen, GNUI)
 		end)
 	
 		btn.tooltipText = entry.name
