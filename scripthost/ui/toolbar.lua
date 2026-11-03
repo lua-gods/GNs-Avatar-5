@@ -1,72 +1,139 @@
 local GNUI = require("libhost.GNUI.init")
 local screen = GNUI.getScreen()
 
+if false then
+	return
+end
+local SIZE = 12
+local ICON_SCALE = 1
+local GAP = 1
 
-if false then return end
+---@class Toolbar.Entry
+---@field name string
+---@field path string
+---@field icon string
+---@field shortcut Minecraft.keyCode?
 
+---@type table<integer,Toolbar.Entry|{gap:true}>
 local ENTRIES = {
+	{
+		name = "Macros [IMPLEMENT]",
+		path = "orthographic",
+		icon = ":mcb_chain_command_block:",
+	},
+	{
+		name = "Camera Mode [IMPLEMENT]",
+		path = "orthographic",
+		icon = ":camera:",
+	},
+	
+	{
+		name = "Player Info [IMPLEMENT]",
+		path = "orthographic",
+		icon = ":mcm_steve:",
+	},
+	
+	{
+		name = "Server Info [IMPLEMENT]",
+		path = "orthographic",
+		icon = ":minecraft:",
+	},
+	{gap=true},
+	
 	{
 		name = "Color Picker",
 		path = "colorize",
-		icon = ":palette:"
+		icon = ":palette:",
+	},
+	
+	{
+		name = "File Dialog [IMPLEMENT]",
+		path = "orthographic",
+		icon = ":folder_paper:",
 	},
 	{
-		name = "Orthographic Projection",
+		name = "Notepad [IMPLEMENT]",
 		path = "orthographic",
-		icon = ":camera:"
+		icon = ":mci_book_and_quill:",
 	},
-	--{
-	--	name = "Face Expression",
-	--	path = "expression",
-	--	icon = ":smile:"
-	--},
+	{gap=true},
+	{
+		name = "Local Storage [IMPLEMENT]",
+		path = "orthographic",
+		icon = ":mcb_chest:",
+	},
+	
+	
 }
 
-
-local toolbar = screen:parse{
-	layout="HORIZONTAL",
-	style="opaque",
-	pos = vec(5,5),
-	name="toolbar",
-	sizing={"FIT","FIT"}
-}
-
-
-
-
-
+local toolbar = screen:parse({
+	layout = "HORIZONTAL",
+	pos = vec(5, 5),
+	name = "toolbar",
+	growDirection = vec(1, 1),
+	sizing = { "FIT", "FIXED" },
+	sizee = vec(0, SIZE),
+})
 
 for index, entry in ipairs(ENTRIES) do
-	local btn = toolbar:parse{
-		--name = entry.name,
-		type = "button",
-		sizing={"FIT","FIT"},
-		minSize = vec(10,10),
-		text = entry.icon,
-		wrapText = false,
-		toggle=true
-	}
-	local macro = require("scripthost.windows."..entry.path)
-	entry.macro = macro
-	---@cast btn GNUI.Widget.Button
+	if entry.gap then
+		toolbar:parse({
+			sizing = { "FIXED", "FIXED" },
+			size = vec(GAP, 0),
+		})
+	else
+		local btn = toolbar:parse({
+			--name = entry.name,
+			type = "button",
+			style = "secondary",
+			sizing = { "FIXED", "FIXED" },
+			size = vec(SIZE, SIZE),
+			text = entry.icon,
+			textAlign = vec(0, 0),
+			textScale = ICON_SCALE,
+			wrapText = false,
+			toggle = true,
+		})
 	
-	btn.BUTTON_DOWN:register(function ()
-		entry.macro:setActive(true,screen,GNUI)
-	end)
+		if false then
+			btn:parse({
+				style = "opaque",
+				text = tostring(index),
+				size = vec(9, 9),
+				textAlign = vec(0, 0),
+				pos = vec(math.floor(SIZE / 2 - 9 / 2),-9-2),
+			})
+		end
+		local macro = require("scripthost.windows." .. entry.path)
+		entry.macro = macro
+		---@cast btn GNUI.Widget.Button
 	
-	btn.BUTTON_UP:register(function ()
-		entry.macro:setActive(false,screen,GNUI)
-	end)
+		btn.BUTTON_DOWN:register(function()
+			entry.macro:setActive(true, screen, GNUI)
+		end)
 	
-	btn.tooltipText = entry.name
+		btn.BUTTON_UP:register(function()
+			entry.macro:setActive(false, screen, GNUI)
+		end)
+	
+		btn.tooltipText = entry.name
+	end
 end
 
+local function updateToolbar(mode)
+	local size = screen:getFinalSize()
+	toolbar:setPos(size.x * 0.5 - 89.66, size.y - (mode and 53 or 35))
+end
 
+local lGamemode
+events.TICK:register(function ()
+	local gamemode = player:getGamemode()
+	if lGamemode ~= gamemode then
+		lGamemode = gamemode
+		updateToolbar(gamemode ~= "CREATIVE")
+	end
+end)
 
-
-screen.SIZE_CHANGED:register(function (size)
-	toolbar:setPos(
-		size.x * 0.5 - 91.25,
-		size.y - 55.1
-	)
+screen.SIZE_CHANGED:register(function(size)
+	updateToolbar(false)
 end)

@@ -8,6 +8,8 @@ local screen = GNUI.getScreen()
 
 local hasTooltip = false
 
+local OFFSET = vec(10,0)
+
 local tooltip = screen:parse{
 	style="opaque",
 	text="Text",
@@ -20,7 +22,12 @@ screen.CHILDREN_ORDER_CHANGED:register(function ()
 end)
 
 screen.CURSOR_MOVED:register(function (pos, vel)
-	tooltip:setPos(pos:floor() + vec(10,0))
+	local size = tooltip:getFinalSize()
+	local screenSize = screen:getFinalSize()
+	tooltip:setPos(
+	math.clamp(math.floor(pos.x) + OFFSET.x,0,screenSize.x-size.x),
+	math.clamp(math.floor(pos.y) + OFFSET.y,0,screenSize.y-size.y-40)
+	)
 end)
 
 

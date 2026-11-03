@@ -165,21 +165,11 @@ function notify(message, title, icon, manual)
 	
 	return self
 end
-
-local height = 32
-
 local function updateNotifPos()
-	area:setPos(screen:getFinalSize().x-MAX_WIDTH,height)
+	area:setPos(screen:getFinalSize().x-MAX_WIDTH,32)
 end
 
--- wait for reload tooltip to disappear before moving to top right of the screen
-tween.new {
-	duration = 6,
-	onFinish = function ()
-		height = 0
-		updateNotifPos()
-	end
-}
+
 
 screen.SIZE_CHANGED:register(function (size)
 	updateNotifPos()

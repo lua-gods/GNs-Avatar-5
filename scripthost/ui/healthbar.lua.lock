@@ -1,0 +1,79 @@
+local GNUI = require("libhost.GNUI.init")
+local screen = GNUI.getScreen()
+
+
+if false then return end
+local HEIGHT = 3
+local WIDTH = 90
+local COOLDOWN_TIMER = 20
+
+local HEALTH_COLOR = vectors.hexToRGB("#d3fc7e")
+local DAMAGE_COLOR = vectors.hexToRGB("#B8000C")
+
+local damagedHealth = 0
+local lastHealth = 0
+local cooldown = 0
+
+local flip = false
+local flipCounter = 0
+
+local bar = screen:parse{
+	type="button",
+	style="secondary",
+	pos = vec(5,5),
+	sizing="FIXED",
+	padding = vec(0,0,0,0),
+	size = vec(WIDTH,HEIGHT),
+}
+
+local flash = bar:parse{
+	color = vec(1,1,1),
+	style="white",
+	sizing={"FIXED","FILL"},
+}
+
+local total = bar:parse{
+	color = HEALTH_COLOR,
+	style="white",
+	sizing={"FIXED","FILL"},
+}
+
+silly:setHudElementDisabled("PLAYER_HEALTH",true)
+silly:setHudElementDisabled("PLAYER_HUNGER",true)
+silly:setHudElementDisabled("EXPERIENCE_BAR",true)
+
+events.TICK:register(function ()
+	local health = player:getHealth() / player:getMaxHealth()
+	
+	if lastHealth < health then
+		lastHealth = health
+	elseif health < damagedHealth then
+		cooldown = COOLDOWN_TIMER
+		damagedHealth = health
+	elseif health > damagedHealth then
+		damagedHealth = health
+	end
+	
+	if cooldown < 1 then
+		lastHealth = math.max(lastHealth - 1/ player:getMaxHealth(),health)
+	else
+		cooldown = cooldown - 1
+	end
+	total:setSize(health * WIDTH,HEIGHT)
+	flash:setSize((lastHealth-health)*WIDTH,HEIGHT):setPos(health*WIDTH,0)
+	flash:setColor(DAMAGE_COLOR)
+	
+	if flipCounter < 0 then
+		flipCounter = 1
+		flip = not flip
+	else
+		flipCounter = flipCounter - 1
+	end
+end)
+
+screen.SIZE_CHANGED:register(function (size)
+	bar:setPos(
+		size.x * 0.5 - 89.66,
+		size.y - 28
+	)
+end)
