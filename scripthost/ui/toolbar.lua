@@ -16,52 +16,52 @@ local GAP = 1
 
 ---@type table<integer,Toolbar.Entry|{gap:true}>
 local ENTRIES = {
-	{
-		name = "Macros [IMPLEMENT]",
-		path = "orthographic",
-		icon = ":mcb_chain_command_block:",
-	},
-	{
-		name = "Camera Mode [IMPLEMENT]",
-		path = "orthographic",
-		icon = ":camera:",
-	},
+--	{
+--		name = "Macros [IMPLEMENT]",
+--		path = "orthographic",
+--		icon = ":mcb_chain_command_block:",
+--	},
+--	{
+--		name = "Camera Mode [IMPLEMENT]",
+--		path = "orthographic",
+--		icon = ":camera:",
+--	},
 	
 	{
 		name = "Player Info [IMPLEMENT]",
 		path = "orthographic",
 		icon = ":mcm_steve:",
 	},
-	
-	{
-		name = "Server Info [IMPLEMENT]",
-		path = "orthographic",
-		icon = ":minecraft:",
-	},
-	{gap=true},
-	
+--	
+--	{
+--		name = "Server Info [IMPLEMENT]",
+--		path = "orthographic",
+--		icon = ":minecraft:",
+--	},
+--	{gap=true},
+--	
 	{
 		name = "Color Picker",
 		path = "colorize",
 		icon = ":palette:",
 	},
-	
-	{
-		name = "File Dialog [IMPLEMENT]",
-		path = "orthographic",
-		icon = ":folder_paper:",
-	},
-	{
-		name = "Notepad [IMPLEMENT]",
-		path = "orthographic",
-		icon = ":mci_book_and_quill:",
-	},
-	{gap=true},
-	{
-		name = "Local Storage [IMPLEMENT]",
-		path = "orthographic",
-		icon = ":mcb_chest:",
-	},
+--	
+--	{
+--		name = "File Dialog [IMPLEMENT]",
+--		path = "orthographic",
+--		icon = ":folder_paper:",
+--	},
+--	{
+--		name = "Notepad [IMPLEMENT]",
+--		path = "orthographic",
+--		icon = ":mci_book_and_quill:",
+--	},
+--	{gap=true},
+--	{
+--		name = "Local Storage [IMPLEMENT]",
+--		path = "orthographic",
+--		icon = ":mcb_chest:",
+--	},
 	
 	
 }
@@ -103,7 +103,7 @@ for index, entry in ipairs(ENTRIES) do
 				pos = vec(math.floor(SIZE / 2 - 9 / 2),-9-2),
 			})
 		end
-		local macro = require("scripthost.windows." .. entry.path)
+		local macro = require("scripthost.apps." .. entry.path)
 		entry.macro = macro
 		---@cast btn GNUI.Widget.Button
 	

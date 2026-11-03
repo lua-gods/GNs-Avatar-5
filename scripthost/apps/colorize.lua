@@ -1,6 +1,6 @@
 local Macro = require("lib.GNMacros")
 
-local ColorPickerWindow = require("scripthost.windows.utils.colorPicker")
+local ColorPickerWindow = require("scripthost.apps.utils.colorPicker")
 
 local colorMacro
 

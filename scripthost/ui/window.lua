@@ -5,16 +5,8 @@
 \____/_/ |_/ source: link ]]
 
 
-local BASE = ((...):gsub("/", ".")):match(".+%.GNUI")
-local cfg = require(BASE .. ".config") ---@type GNUI.config
-local Box = require(cfg.WIDGETS .. ".box") ---@type GNUI.BoxAPI
-local Event = require(cfg.EVENT)
-local Button = require(cfg.WIDGETS .. ".button") ---@type GNUI.Widget.ButtonAPI
-
-local Theme = require(cfg.THEME .. ".init") ---@type GNUI.ThemeAPI
-local Layout = require(cfg.LAYOUT .. ".init") ---@type GNUI.LayoutAPI
-
-local utils = require(cfg.UTILS) ---@type GNUI.utils
+local Event = require("lib.GNEvent")
+local Box = require("libhost.GNUI.widgets.box")
 
 ---@class GNUI.WindowAPI
 local WindowAPI = {}
@@ -25,7 +17,7 @@ local Window = {}
 Window.__index = function(t, i)
 	return rawget(t, i)
 		 or Window[i]
-		 or Box.index(t, i)
+		 or Box.index(t,i)
 end
 
 

@@ -1,6 +1,6 @@
 local Macro = require("lib.GNMacros")
 
-local Window = require("libhost.GNUI-WindowManager.widgets.window")
+local Window = require("scripthost.ui.window")
 local Event = require("lib.GNEvent")
 local Pathfind = require("lib.AStar")
 local applyMotion = require("libhost.silly.walk")

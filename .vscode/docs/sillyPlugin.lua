@@ -525,7 +525,7 @@ function SillyAPI:setGuiMatrix(mat) end
 
 --- Sets whether or not a keybind is pressed.
 --- Requires cheats.
----@param id string
+---@param id Minecraft.keybind
 ---@param state boolean
 ---@return nil
 function SillyAPI:setBindPressed(id, state) end
