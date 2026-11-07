@@ -1,6 +1,4 @@
-if false then
-	return
-end
+if true then return end
 
 local GNUI = require("libhost.GNUI.init")
 local screen = GNUI.getScreen()

@@ -5,12 +5,11 @@ local tween = require("lib.GNtween")
 
 local WIDTH = 130
 local DURATION = 5
-local MAX_WIDTH = 300
 
 local area = screen:parse {
 	layout = "VERTICAL",
 	pos = vec(5, 5),
-	size = vec(MAX_WIDTH, 0),
+	size = vec(WIDTH, 0),
 	sizing = { "FIXED", "FIT" },
 	name = "notification",
 	childAlign=vec(1,0)
@@ -101,18 +100,18 @@ function notify(message, title, icon, manual)
 		layout = "VERTICAL",
 
 		style = "opaque",
-		sizing = { "FIT", "FIT" },
+		sizing = { "FIXED", "FIT" },
 		minSize = vec(WIDTH,0),
 		pos = vec(5, 5),
 		{
 			{
 				layout = "HORIZONTAL",
 				minSize=vec(WIDTH,0),
-				sizing = { "FIT", "FIT" },
+				sizing = { "FIXED", "FIT" },
 				{
 					{
 						type = "button",
-						sizing = { "FIT", "FIT" },
+						sizing = { "FIXED", "FIT" },
 						style = "secondary",
 						text = icon,
 						minSize = vec(7, 7),
@@ -124,7 +123,7 @@ function notify(message, title, icon, manual)
 						style = "secondary",
 						minSize = vec(WIDTH-7,0),
 						textAlign = vec(-1, 0),
-						sizing = { "FIT", "FIT" },
+						sizing = { "FIXED", "FIT" },
 						text = title,
 						wrapText = false,
 						name="title"
@@ -132,12 +131,14 @@ function notify(message, title, icon, manual)
 				},
 			},
 			{
-				sizing = { "FILL", "FIT" },
+				sizing = { "FIXED", "FIT" },
 				name = "middle",
+				size = vec(WIDTH,0),
 			},
 			{
-				sizing = { "FILL", "FIT" },
+				sizing = { "FIXED", "FIT" },
 				text = message,
+				size = vec(WIDTH,0),
 				name="message",
 				wrapText = true,
 				padding = vec(1, 0, 1, 1),
@@ -146,8 +147,6 @@ function notify(message, title, icon, manual)
 	}
 	
 	local self = setmetatable({box=notification},NotifAPI)
-	
-	local middle = notification:getChild("middle")
 
 	tween.new {
 		from = WIDTH,
@@ -166,7 +165,7 @@ function notify(message, title, icon, manual)
 	return self
 end
 local function updateNotifPos()
-	area:setPos(screen:getFinalSize().x-MAX_WIDTH,32)
+	area:setPos(screen:getFinalSize().x-WIDTH,32)
 end
 
 

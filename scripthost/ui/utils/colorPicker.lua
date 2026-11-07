@@ -110,6 +110,7 @@ return (function(screen, GNUI)
 					{
 						name = "brightnessSlider",
 						type = "slider",
+						minSize = vec(11,11),
 						isVertical = true,
 						min = 1,
 						max = 255,
@@ -132,6 +133,7 @@ return (function(screen, GNUI)
 					{
 						name = "hueSlider",
 						type = "slider",
+						minSize = vec(11,11),
 						min = 1,
 						max = 100,
 						step = 1,
@@ -161,6 +163,7 @@ return (function(screen, GNUI)
 					{
 						name = "saturationSlider",
 						type = "slider",
+						minSize = vec(11,11),
 						min = 1,
 						max = 255,
 						step = 1,
@@ -192,6 +195,7 @@ return (function(screen, GNUI)
 					{
 						type = "slider",
 						name = "alphaSlider",
+						minSize = vec(11,11),
 						min = 1,
 						max = 255,
 						step = 1,

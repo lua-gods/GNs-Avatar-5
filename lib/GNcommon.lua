@@ -114,11 +114,7 @@ function gnc.appendArrays(...)
 end
 
 
----Parses Vector2 variants into a single unified Vector2.
----uses an average of `20` instructions
----@overload fun(xy: Vector2): Vector2
----@param x number?
----@param y number?
+
 ---Parses Vector2 variants into a single unified Vector2.
 ---@overload fun(xy: Vector2, default: Vector2?): Vector2
 ---@overload fun(x: number, y: number, default: Vector2?): Vector2
@@ -179,22 +175,6 @@ function gnc.vec3(x,y,z)
 end
 
 
-
----Parses Vector4 variants into a single unified Vector4.
----uses an average of `32` instructions
----@overload fun(xyzw: Vector4): Vector4
----@overload fun(xyz: Vector3, w: number): Vector4
----@overload fun(x: number, yzw: Vector3): Vector4
----@overload fun(xy: Vector2, z: number, z: number): Vector4
----@overload fun(x: number,yz: Vector2, w: number): Vector4
----@overload fun(x: number,y: number,zw: Vector2): Vector4
----@overload fun(xy: Vector2, zw: Vector2,): Vector4
----@overload fun(x: number,y: number,z: number,w: number): Vector4
----@param x number?
----@param y number?
----@param z number?
----@param w number?
----@return Vector4
 ---Parses Vector4 variants into a single unified Vector4.
 ---@overload fun(xyzw: Vector4): Vector4
 ---@overload fun(all: number): Vector4

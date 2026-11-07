@@ -18,7 +18,7 @@ local GAP = 1
 local ENTRIES = {
 --	{
 --		name = "Macros [IMPLEMENT]",
---		path = "orthographic",
+--		path = "info",
 --		icon = ":mcb_chain_command_block:",
 --	},
 --	{
@@ -26,43 +26,43 @@ local ENTRIES = {
 --		path = "orthographic",
 --		icon = ":camera:",
 --	},
-	
+--	
 	{
-		name = "Player Info [IMPLEMENT]",
-		path = "orthographic",
-		icon = ":mcm_steve:",
+		name = "Info Sheet",
+		path = "info",
+		icon = ":info:",
 	},
---	
---	{
---		name = "Server Info [IMPLEMENT]",
---		path = "orthographic",
---		icon = ":minecraft:",
---	},
---	{gap=true},
---	
+	{gap=true},
+	--	
 	{
 		name = "Color Picker",
 		path = "colorize",
 		icon = ":palette:",
 	},
---	
 --	{
---		name = "File Dialog [IMPLEMENT]",
---		path = "orthographic",
---		icon = ":folder_paper:",
+--		name = "UI Elements",
+--		path = "colorize",
+--		icon = ":mcb_white_stained_glass:",
 --	},
+	{gap=true},
+--	
+	{
+		name = "File Importer",
+		path = "file",
+		icon = ":folder_paper:",
+	},
 --	{
 --		name = "Notepad [IMPLEMENT]",
---		path = "orthographic",
+--		path = "colorize",
 --		icon = ":mci_book_and_quill:",
 --	},
 --	{gap=true},
 --	{
---		name = "Local Storage [IMPLEMENT]",
---		path = "orthographic",
+--		name = "Local Item Storage [IMPLEMENT]",
+--		path = "colorize",
 --		icon = ":mcb_chest:",
 --	},
-	
+--	
 	
 }
 
@@ -92,6 +92,7 @@ for index, entry in ipairs(ENTRIES) do
 			textAlign = vec(0, 0),
 			textScale = ICON_SCALE,
 			wrapText = false,
+			toggle=true,
 		})
 	
 		if false then
@@ -103,30 +104,50 @@ for index, entry in ipairs(ENTRIES) do
 				pos = vec(math.floor(SIZE / 2 - 9 / 2),-9-2),
 			})
 		end
-		local macro = require("scripthost.apps." .. entry.path)
+		local macro = require("scripthost.toolbar." .. entry.path)
 		entry.macro = macro
 		---@cast btn GNUI.Widget.Button
 	
-		btn.PRESSED:register(function()
-			entry.macro:setActive(true, screen, GNUI)
+		btn.BUTTON_DOWN:register(function()
+			entry.macro:setActive(true, screen, GNUI, btn)
 		end)
-	
+		
+		btn.BUTTON_UP:register(function()
+			entry.macro:setActive(false, screen, GNUI, btn)
+		end)
+		
+		if false and entry.path == "info" then
+			local i = 0
+			local function e()
+				i = i + 1
+				if i > 4 then
+					btn:press()
+					events.TICK:remove(e)
+				end
+			end
+			events.TICK:register(e)
+		end
+		
 		btn.tooltipText = entry.name
 	end
 end
 
 local function updateToolbar(mode)
 	local size = screen:getFinalSize()
-	toolbar:setPos(size.x * 0.5 - 89.66, size.y - (mode and 53 or 35))
+	toolbar:setPos(math.floor(size.x * 0.5 + 0.4) - 90, size.y - (mode and 53 or 35))
 end
 
+local c = 0
 local lGamemode
 events.TICK:register(function ()
 	local gamemode = player:getGamemode()
-	if lGamemode ~= gamemode then
+	if lGamemode ~= gamemode or c < 10 then
 		lGamemode = gamemode
 		updateToolbar(gamemode ~= "CREATIVE")
+	else
+		c = c + 1
 	end
+	
 end)
 
 screen.SIZE_CHANGED:register(function(size)

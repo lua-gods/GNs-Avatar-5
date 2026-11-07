@@ -6,7 +6,7 @@ local Event = require("lib.GNEvent")
 
 local myApp
 
-myApp = Macro.new(function (events, screen, GNUI)
+myApp = Macro.new(function (self, events, screen, GNUI)
 	local Window = Window.new(screen)
 	Window.ON_CLOSE:register(function ()
 		myApp:setActive(false)

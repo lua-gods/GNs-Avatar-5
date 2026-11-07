@@ -7,7 +7,7 @@ local FILE_NAME = avatar:getName() .. ".cache"
 local byte = string.byte
 ---@param str string
 ---@return string
-local function checksum(str)
+local function calcChecksum(str)
 	local len = #str
 	local h1, h2 = len, 2166136261
 	local limit = len - 63
@@ -55,7 +55,7 @@ if host:isAvatarUploaded() then
 	for path, checksum in pairs(entries) do
 		local content = contents[path]
 		if content then
-			if checksum(content) == checksum then
+			if calcChecksum(content) == checksum then
 				addScript(path, content, "RUNTIME")
 			else
 				warn("Checksum for " .. path .. " failed, file might be tampered")
@@ -72,7 +72,7 @@ else -- cache in local scripts
 	local contents = {}
 	for _, path in pairs(paths) do
 		local content = getScript(path)
-		local checksum = checksum(content)
+		local checksum = calcChecksum(content)
 
 		contents[path] = content
 		checksums = checksums .. '["' .. path .. '"]="' .. checksum .. '",'

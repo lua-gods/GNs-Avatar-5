@@ -108,6 +108,7 @@ end
 
 function Window:setTitle(title)
 	self:getChild("titlebar"):setText(title)
+	return self
 end
 
 return WindowAPI
