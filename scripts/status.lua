@@ -38,19 +38,17 @@ GNParticles.registerIdentity(
 	"zzz",
 	GNParticles.newBillboardTexture(textures.particles,9,1,7,7),
 	3,
-	function (dust,pos,vel,scl)
+	function (p)
 		
-		pos = pos + vel
-		local t = dust.age * 5
-		pos.x = pos.x + math.sin(t) * 0.02
-		pos.z = pos.z + math.cos(t) * 0.02
-		scl = math.clamp((0.5-math.abs(dust.age-0.5))*3,0,1)
-		scl = Easings.outSine(scl) * 0.5
-		return pos,vel,scl
+		p.pos = p.pos + p.vel
+		local t = p.age * 5
+		p.pos.x = p.pos.x + math.sin(t) * 0.02
+		p.pos.z = p.pos.z + math.cos(t) * 0.02
+		p.scl = math.clamp((0.5-math.abs(p.age-0.5))*3,0,1)
+		p.scl = Easings.outSine(p.scl) * 0.5
 	end,
-	function (dust,pos,vel,scl)
-		vel = vec(0,0.02,0)
-		return pos,vel,scl
+	function (p)
+		p.vel = vec(0,0.02,0)
 	end
 )
 

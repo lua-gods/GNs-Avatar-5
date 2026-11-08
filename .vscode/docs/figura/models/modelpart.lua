@@ -41,7 +41,7 @@ function ModelPart:addChild(part) end
 ---Creates a shallow copy of this part.
 ---
 ---*This does not create a deep copy, all of the child parts are references to the original child parts.*
----@param name string
+---@param name string|number
 ---@return ModelPart
 ---@nodiscard
 function ModelPart:copy(name) end

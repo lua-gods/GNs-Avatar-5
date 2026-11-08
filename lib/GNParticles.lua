@@ -1,6 +1,6 @@
 ---@diagnostic disable: param-type-mismatch
 --[[______   __
-  / ____/ | / / Name: GN PARTICLES LIBRARY v1.0.0
+  / ____/ | / / Name: GN PARTICLES LIBRARY v1.1.0
  / / __/  |/ /  Desc: A simple particle library
 / /_/ / /|  / Author: GNanimates | https://gnon.top | @gn68s
 \____/_/ |_/ License: Mozilla Public License Version 2.0
@@ -12,67 +12,67 @@ Place required dependencies in the same folder as this script.
 -- model 16x scale transform is precalculated instead of applied per frame per particle
 ]]
 
-
 local GNcommon = require("./GNcommon") ---@type GNCommon
+local ModelUtils = require("lib.modelUtils")
 
 --────  CONFIG  ────────────────────────────────────────────────────────--
-
-
 
 ---@type table<string,GN.Particle.Identity>
 local IDENTITIES = {}
 
 local SCALE = 16
 
-local PARTICLE_WORLD = models:newPart("GNParticleWorld","WORLD"):scale(SCALE)
+local PARTICLE_WORLD = models:newPart("GNParticleWorld", "WORLD"):scale(SCALE)
 
 --──── Auto calculated configs ────────────────────────────────────────────--
 
-local INV_SCALE = 1/SCALE
+local INV_SCALE = 1 / SCALE
 
 --────  Particle API  ────────────────────────────────────────────────────────--
 
 ---@class GN.ParticlesAPI
 ---@field identities table<string,GN.Particle.Identity>
 local DustAPI = {
-	identities = {}
+	identities = {},
 }
-
 
 --──── UTILITIES ────────────────────────────────────────────--
 
 local i = 0
-local function id() i = i + 1; return i end
-
-local function r(a,b) return math.random() * (b - a) + a end
-
-local function copyModel(part)
-	return part:copy(id())
+local function id()
+	i = i + 1
+	return i
 end
 
+local function r(a, b)
+	return math.random() * (b - a) + a
+end
+
+local function copyModel(part)
+	return ModelUtils.deepCopy(part)
+end
 
 ---@param texture Texture
 ---@param x number?
 ---@param y number?
 ---@param w number?
 ---@param h number?
-function DustAPI.newBillboardTexture(texture,x,y,w,h)
+function DustAPI.newBillboardTexture(texture, x, y, w, h)
 	local size = texture:getDimensions()
-	w,h = w or size.x, h or size.y
-	local root = models:newPart("gndust"..id())
-	local sprite = root:newPart("billboard","CAMERA"):newSprite("sprite")
-	:texture(texture,size.x,size.y)
-	:setRegion(w,h)
-	:size(w,h)
-	:setUVPixels(x or 0,y or 0)
-	:pos(w * 0.5,h * 0.5)
-	:setRenderType("CUTOUT_EMISSIVE_SOLID")
-	return root,sprite
+	w, h = w or size.x, h or size.y
+	local root = models:newPart("gndust" .. id())
+	local sprite = root:newPart("billboard", "CAMERA")
+		:newSprite("sprite")
+		:texture(texture, size.x, size.y)
+		:setRegion(w, h)
+		:size(w, h)
+		:setUVPixels(x or 0, y or 0)
+		:pos(w * 0.5, h * 0.5)
+		:setRenderType("CUTOUT_EMISSIVE_SOLID")
+	return root, sprite
 end
 
-
-
-local UP = vec(0,1,0)
+local UP = vec(0, 1, 0)
 
 ---@overload fun(dir: Vector3, spreadAngle: number): Vector3
 ---@param x number
@@ -80,34 +80,35 @@ local UP = vec(0,1,0)
 ---@param z number
 ---@param spreadAngle number
 ---@return Vector3
-function DustAPI.dirRandom(x,y,z,spreadAngle)
+function DustAPI.dirRandom(x, y, z, spreadAngle)
 	local dir
 	local spread
 	if type(x) == "Vector3" then
 		dir = x
 		spread = y
 	else
-		dir = vec(x,y,z)
+		dir = vec(x, y, z)
 		spread = spreadAngle
 	end
-	
-	local localFinal = vectors.angleToDir(vec(math.random()*spread+90,math.random()*360))
-	
-	if math.abs(dir.x*dir.z) < 0.0001 then
+
+	local localFinal = vectors.angleToDir(vec(math.random() * spread + 90, math.random() * 360))
+
+	if math.abs(dir.x * dir.z) < 0.0001 then
 		return localFinal * -dir.y
 	end
-	return vectors.rotateAroundAxis(math.deg(math.asin(dir:normalized().y))+90,localFinal,dir:copy():cross(UP))*dir:length()
+	return vectors.rotateAroundAxis(math.deg(math.asin(dir:normalized().y)) + 90, localFinal, dir:copy():cross(UP))
+		* dir:length()
 end
 --──── Commons ────────────────────────────────────────────--
 
 local TIME = 0
-events.TICK:register(function ()
-	TIME = client.getSystemTime()*0.001
+events.TICK:register(function()
+	TIME = client.getSystemTime() * 0.001
 end)
 
 --──── Particle Process ────────────────────────────────────────────--
 
----@alias GN.Particle.ProcessMaterial (fun(Dust.Instance,pos:Vector3,vel:Vector3,scl:number):Vector3,Vector3,number?)
+---@alias GN.Particle.ProcessMaterial (fun(self:GN.Particle.Instance))
 
 ---Creates a new process with properties expected from a particle
 ---@param damping number|Vector3 # between 0 and 1, gets applied to velocity
@@ -115,19 +116,16 @@ end)
 ---@return GN.Particle.ProcessMaterial
 function DustAPI.newProcessMaterial(damping, gravity)
 	gravity = gravity / 20
-	return function (p, pos, vel, scl)
-		p.vel = (p.vel + gravity)  * damping
+	return function(p)
+		p.vel = (p.vel + gravity) * damping
 		p.pos = p.pos + p.vel
-		return pos,vel,scl
 	end
 end
 
 --──── Particle Identity ────────────────────────────────────────────--
 
 --- this gets used when no process is giveth.
-local DEFAULT_PROCESS = DustAPI.newProcessMaterial(0.95, vec(0,-1,0))
-
-
+local DEFAULT_PROCESS = DustAPI.newProcessMaterial(0.95, vec(0, -1, 0))
 
 ---an identity a particle can be when spawned
 ---@class GN.Particle.Identity
@@ -136,6 +134,7 @@ local DEFAULT_PROCESS = DustAPI.newProcessMaterial(0.95, vec(0,-1,0))
 ---@field duration number
 ---@field process GN.Particle.ProcessMaterial
 ---@field init GN.Particle.ProcessMaterial
+---@field frame GN.Particle.ProcessMaterial
 
 ---Registers a particle template to be spawned later.
 ---@param id string
@@ -143,7 +142,8 @@ local DEFAULT_PROCESS = DustAPI.newProcessMaterial(0.95, vec(0,-1,0))
 ---@param duration number? # (in seconds) how long the particle should last, this defaults to 1
 ---@param process GN.Particle.ProcessMaterial?
 ---@param init GN.Particle.ProcessMaterial?
-function DustAPI.registerIdentity(id, model, duration, process,init)
+---@param frame GN.Particle.ProcessMaterial?
+function DustAPI.registerIdentity(id, model, duration, process, init, frame)
 	model:remove()
 	assert(IDENTITIES[id] == nil, "Particle identity already exists: " .. id)
 	assert(model, "No model provided")
@@ -152,13 +152,13 @@ function DustAPI.registerIdentity(id, model, duration, process,init)
 		duration = (duration or 1),
 		model = model,
 		process = process or DEFAULT_PROCESS,
-		init = init
+		init = init,
+		frame = frame,
 	}
 	IDENTITIES[id] = identity
 end
 
 --──── Particle Instance ────────────────────────────────────────────--
-
 
 ---an physical representation of a particle
 ---@class GN.Particle.Instance
@@ -167,15 +167,13 @@ end
 ---@field lpos Vector3
 ---@field pos Vector3
 ---@field lscale number
----@field scale number
+---@field scl number
 ---@field vel Vector3
 ---@field spawnTime number
 ---@field age number
 
-
 ---@type table<GN.Particle.Identity,GN.Particle.Instance[]>
 local instances = {}
-
 
 ---Spawns a particle.
 ---@param id string
@@ -183,47 +181,40 @@ local instances = {}
 ---@param vel Vector3?
 function DustAPI.spawn(id, pos, vel)
 	assert(IDENTITIES[id], "No such particle identity: " .. tostring(id))
-	
+
 	local identity = IDENTITIES[id]
 	instances[identity] = instances[identity] or {}
-	
+
 	local self = {
 		identity = identity,
-		model = copyModel(identity.model):moveTo(PARTICLE_WORLD):scale(INV_SCALE):pos(0,-999999999,0),
-		pos = pos or vec(0,0,0),
-		vel = vel or vec(0,0,0),
+		model = copyModel(identity.model):moveTo(PARTICLE_WORLD):scale(INV_SCALE):pos(0, -999999999, 0),
+		pos = pos or vec(0, 0, 0),
+		vel = vel or vec(0, 0, 0),
 		spawnTime = TIME,
-		scale = 1,
-		age = 0
+		scl = 1,
+		age = 0,
 	}
 	if identity.init then
-		local pos,vel,scl = identity.init(self,self.pos,self.vel,self.scale)
-		self.pos = pos
-		self.vel = vel
-		self.scale = scl
+		identity.init(self)
 	end
 	if identity.process then
-		local pos,vel,scl = identity.process(self,self.pos,self.vel,self.scale)
-		self.pos = pos
-		self.vel = vel
-		self.scale = scl
+		identity.process(self)
 	end
-	instances[identity][#instances[identity]+1] = self
+	instances[identity][#instances[identity] + 1] = self
 	return self
 end
 
-
-events.TICK:register(function ()
+events.TICK:register(function()
 	for identity, particles in pairs(instances) do
 		for i, instance in pairs(particles) do
 			instance.lpos = instance.pos
-			instance.lscale = instance.scale
+			instance.lscale = instance.scl
 			instance.age = (TIME - instance.spawnTime) / identity.duration
-			local newPos, newVel, newScale = identity.process(instance,instance.pos,instance.vel,instance.scale)
+			local newPos, newVel, newScale = identity.process(instance)
 			instance.pos = newPos or instance.pos
-			instance.vel = newVel or instance.vel 
-			instance.scale = (newScale) or instance.scale
-			if TIME > instance.spawnTime+identity.duration then
+			instance.vel = newVel or instance.vel
+			instance.scl = newScale or instance.scl
+			if TIME > instance.spawnTime + identity.duration then
 				instance.model:remove()
 				particles[i] = nil
 			end
@@ -231,18 +222,30 @@ events.TICK:register(function ()
 	end
 end)
 
-events.RENDER:register(function (delta, ctx, matrix)
+local fancyMetatable = {
+	__index = function(t, i)
+		return rawget(t, i) or rawget(t, "source")[i]
+	end,
+}
+
+events.RENDER:register(function(delta, ctx, matrix)
 	if ctx == "RENDER" or ctx == "FIRST_PERSON" then
 		for identity, particles in pairs(instances) do
 			for i, p in pairs(particles) do
-				p.model
-				:setPos(math.lerp(p.lpos or p.pos, p.pos, delta))
-				:scale(math.lerp(p.lscale or p.scale, p.scale, delta)*INV_SCALE)
+				local pos = math.lerp(p.lpos or p.pos, p.pos, delta)
+				local scl = math.lerp(p.lscale or p.scl, p.scl, delta)
+				p.model:setPos(pos):scale(scl * INV_SCALE)
+				if p.identity.frame then
+					local fancyData = setmetatable(
+						{ source = p, pos = pos, scl = scl, age = p.age + (delta / (identity.duration * 20)) },
+						fancyMetatable
+					)
+					p.identity.frame(fancyData)
+				end
 			end
 		end
 	end
 end)
-
 
 --──── Particle Spawner ────────────────────────────────────────────--
 
@@ -260,26 +263,25 @@ local activeSpawners = {} ---@type table<GN.Particle.Spawner,true>
 ---@field stock integer # the amount of particles to spawn before disabling itself, -1 for infinite
 ---@field extent Vector3 # The extent of the area the particles can spawn in
 local DustSpawner = {}
-DustSpawner.__index = function (t,i)
-	return rawget(t,i) 
-	or DustSpawner[i]
-	or function (self,...) --TODO: find a better way to do this
-		return partCache[t][i](partCache[t],...)
-	end
+DustSpawner.__index = function(t, i)
+	return rawget(t, i)
+		or DustSpawner[i]
+		or function(self, ...) --TODO: find a better way to do this
+			return partCache[t][i](partCache[t], ...)
+		end
 end
-
 
 ---@param identity string
 ---@return GN.Particle.Spawner
 function DustAPI.newSpawner(identity)
-	local part = models:newPart("particle"..id())
+	local part = models:newPart("particle" .. id())
 	local self = {
 		identity = identity,
 		interval = 0.1,
 		lastSpawnTime = 0,
 		stock = -1,
 		amount = 1,
-		extent = vec(8,8,8),
+		extent = vec(8, 8, 8),
 		part = part,
 	}
 	partCache[self] = part
@@ -294,7 +296,6 @@ function DustSpawner:remove()
 	self.part:remove()
 end
 
-
 ---@param visible boolean
 ---@return ModelPart
 function DustSpawner:setVisible(visible)
@@ -302,7 +303,6 @@ function DustSpawner:setVisible(visible)
 	activeSpawners[self] = visible and true or nil
 	return self
 end
-
 
 ---Sets the amount to spawn before disabling itself, use `-1` for infinity, defaults to `-1`
 ---@param amount integer
@@ -312,7 +312,6 @@ function DustSpawner:setStock(amount)
 	return self
 end
 
-
 ---Sets the amount of particles to spawn at once, defaults to `1`
 ---@param amount integer
 ---@return GN.Particle.Spawner
@@ -320,7 +319,6 @@ function DustSpawner:setAmount(amount)
 	self.amount = amount or 1
 	return self
 end
-
 
 ---Sets the spawn interval in seconds, defaults to `1`
 ---@param interval number
@@ -330,14 +328,13 @@ function DustSpawner:setInterval(interval)
 	return self
 end
 
-function DustSpawner:setAreaExtent(x,y,z)
-	local extent = GNcommon.vec3(x,y,z)
+function DustSpawner:setAreaExtent(x, y, z)
+	local extent = GNcommon.vec3(x, y, z)
 	self.extent = extent * 8
 	return self
 end
 
-
-events.TICK:register(function ()
+events.TICK:register(function()
 	for spawner in pairs(activeSpawners) do
 		local timeSinceSpawn = TIME - spawner.lastSpawnTime
 		if timeSinceSpawn > spawner.interval then
@@ -351,11 +348,10 @@ events.TICK:register(function ()
 				end
 				local mat = spawner:partToWorldMatrix()
 				local e = spawner.extent
-				DustAPI.spawn(spawner.identity, mat:apply(r(-e.x,e.x),r(-e.y,e.y),r(-e.z,e.z)),mat:applyDir())
+				DustAPI.spawn(spawner.identity, mat:apply(r(-e.x, e.x), r(-e.y, e.y), r(-e.z, e.z)), mat:applyDir())
 			end
 		end
 	end
 end)
-
 
 return DustAPI

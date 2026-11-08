@@ -3,13 +3,17 @@ local Macro = require("lib.GNMacros")
 local IMPORTERS = {
 	ogg = function (path)
 		oggHead(path,{loop=true})
+	end,
+	nbs = function (path)
+		nbsHead(path)
 	end
 }
 
 
 ---@param btn GNUI.Widget.Button
 return Macro.new(function (self, events, screen, GNUI, btn)
-	silly:promptFile(function (absolutePath)
+	silly:promptFile(function (absolutePath,b,c,d)
+		print(absolutePath,b,c,d)
 		if absolutePath then
 			local resourcePath = absolutePath:match("/data/(.+)$")
 			local extension = resourcePath:match("%.([^.]+)$")
